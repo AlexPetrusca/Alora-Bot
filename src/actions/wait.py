@@ -13,3 +13,6 @@ class WaitAction(Action):
 
     def tick(self, t):
         return t > self.d
+
+    def last_tick(self):
+        pass

@@ -18,3 +18,6 @@ class CalibrateAction(Action):
         # screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
         # print(self.tick_counter)
         return t > 3
+
+    def last_tick(self):
+        pass

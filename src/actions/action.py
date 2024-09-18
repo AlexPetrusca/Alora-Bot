@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+INTERVAL = 0.1
 
 class Action:
     tick_counter = 0
@@ -12,11 +13,19 @@ class Action:
     def tick(self, t):
         ...
 
-    def reset(self):
-        self.tick_counter = 0
+    @abstractmethod
+    def last_tick(self):
+        ...
 
     def run(self, t):
-        if self.tick_counter == 0:
+        if self.tick_counter == -1:
             self.first_tick()
-        self.tick_counter += 1
-        return self.tick(t)
+            self.tick_counter = 0
+        if t / INTERVAL > self.tick_counter:
+            self.tick_counter += 1
+            if self.tick(t):
+                print(self.tick_counter)
+                self.last_tick()
+                self.tick_counter = -1
+                return True
+        return False

@@ -17,7 +17,8 @@ class Bot:
     def __init__(self, loop=False, debug=False):
         self.debug_display = debug
         self.loop = loop
-        self.action_queue.append(WaitAction(5))
+
+        # self.action_queue.append(WaitAction(5))
         self.action_queue.append(CalibrateAction())
 
     def tick(self):
@@ -28,7 +29,6 @@ class Bot:
             self.t_ref = perf_counter()
             top = self.action_queue.pop(0)
             if self.loop:
-                top.reset()
                 self.action_queue.append(top)
         return False
 
