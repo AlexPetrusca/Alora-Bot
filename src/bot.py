@@ -18,8 +18,9 @@ class Bot:
         self.debug_display = debug
         self.loop = loop
 
-        # self.action_queue.append(WaitAction(5))
+        self.action_queue.append(WaitAction(5))
         self.action_queue.append(CalibrateAction())
+        self.action_queue.append(TeleportHomeAction())
 
     def tick(self):
         t = perf_counter() - self.t_ref

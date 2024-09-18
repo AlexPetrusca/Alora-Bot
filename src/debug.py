@@ -1,4 +1,6 @@
 from enum import Enum
+
+from src.util import vision
 from src.util.color import Color
 from src.util.common import get_color_limits
 import cv2 as cv
@@ -55,6 +57,10 @@ class DebugDisplay:
                 if cv.contourArea(contour) > 1000:
                     x, y, w, h = cv.boundingRect(contour)
                     cv.rectangle(screenshot, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
+
+        # compass = cv.imread('../resources/target/compass.png', cv.IMREAD_UNCHANGED)
+        # x, y = vision.locate_image(screenshot, compass, 0.5)
+        # cv.rectangle(screenshot, (round(x) - 5, round(y) - 5), (round(x) + 5, round(y) + 5), (0, 0, 255), -1)
 
         image = screenshot
         if self.display_type == DisplayType.DETECTION:
