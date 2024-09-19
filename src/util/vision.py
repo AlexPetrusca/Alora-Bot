@@ -10,6 +10,10 @@ def grab_screen(sct):
     return np.array(sct.grab(sct.monitors[1]))
 
 
+def grab_damage_ui(sct):
+    return grab_screen(sct)[152:192, 12:264]
+
+
 def grab_minimap(sct):
     return grab_screen(sct)[74:420, 2952:3394]
 

@@ -21,7 +21,7 @@ top_left = max_loc
 bottom_right = (top_left[0] + needle_w, top_left[1] + needle_h)
 
 damage_ui_image = np.ndarray.copy(haystack_img[152:192, 12:264])
-print(f'OCR: "{pytesseract.image_to_string(damage_ui_image)}"')
+print(f'OCR: "{pytesseract.image_to_string(damage_ui_image).strip()}"')
 
 cv.rectangle(haystack_img, top_left, bottom_right, color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
 
