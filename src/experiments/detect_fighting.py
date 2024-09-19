@@ -1,13 +1,9 @@
 import cv2 as cv
 import numpy as np
+from pytesseract import pytesseract
 
-haystack_img = cv.imread('../../resources/experiments/screenshot/slayer/nechryael.png', cv.IMREAD_UNCHANGED)
-minimap_image = np.ndarray.copy(haystack_img[74:420, 2952:3394])
-inventory_image = np.ndarray.copy(haystack_img[1568:2234, 2910:3392])
-hover_action_image = np.ndarray.copy(haystack_img[74:114, 0:800])
-needle_img = cv.imread('../../resources/target/compass.png', cv.IMREAD_UNCHANGED)
-
-# hide_ui(haystack_img)
+haystack_img = cv.imread('../../resources/experiments/screenshot/damage_ui/present_68.png', cv.IMREAD_UNCHANGED)
+needle_img = cv.imread('../../resources/experiments/target/damage_ui.png', cv.IMREAD_UNCHANGED)
 
 result = cv.matchTemplate(haystack_img, needle_img, cv.TM_CCOEFF_NORMED)
 min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
@@ -24,11 +20,12 @@ needle_h = needle_img.shape[0]
 top_left = max_loc
 bottom_right = (top_left[0] + needle_w, top_left[1] + needle_h)
 
+damage_ui_image = np.ndarray.copy(haystack_img[152:192, 12:264])
+print(f'OCR: "{pytesseract.image_to_string(damage_ui_image)}"')
+
 cv.rectangle(haystack_img, top_left, bottom_right, color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
 
 cv.imshow('Screenshot', haystack_img)
-cv.imshow('Minimap', minimap_image)
-cv.imshow('Inventory', inventory_image)
-cv.imshow('Hover Action', hover_action_image)
+cv.imshow('Damage UI', damage_ui_image)
 cv.waitKey()
 cv.destroyAllWindows()

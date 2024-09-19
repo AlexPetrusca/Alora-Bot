@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 
-def hide(img, p1, p2, color=(255, 0, 0)):
+def hide(img, p1, p2, color=(0, 0, 0)):
     return cv.rectangle(img, (2 * p1[0], 2 * p1[1]), (2 * p2[0], 2 * p2[1]), color, thickness=-1)
 
 

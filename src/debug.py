@@ -21,6 +21,10 @@ class DisplayType(Enum):
 class DebugDisplay:
     display_type = DisplayType.DETECTION
     sct = mss.mss()
+    bot = None
+
+    def __init__(self, bot):
+        self.bot = bot
 
     def show(self, t):
         screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
@@ -77,6 +81,8 @@ class DebugDisplay:
                    1, (0, 0, 255), 2, cv.LINE_AA)
         # cv.putText(screenshot, pytesseract.image_to_string(hover_action_image), (200, 50), cv.FONT_HERSHEY_SIMPLEX,
         #            1, (0, 0, 255), 2, cv.LINE_AA)
+        cv.putText(image, self.bot.action_queue[0].status, (1000, 50), cv.FONT_HERSHEY_SIMPLEX,
+                   1, (0, 0, 255), 2, cv.LINE_AA)
         cv.imshow('Bot Vision', image)
 
         key = cv.waitKey(1) & 0xFF

@@ -1,3 +1,4 @@
+import logging
 import math
 from abc import abstractmethod
 
@@ -6,6 +7,7 @@ TICK_INTERVAL = 0.1  # 100ms tick
 
 class Action:
     tick_counter = -1
+    status = ""
 
     @abstractmethod
     def first_tick(self):
@@ -25,12 +27,15 @@ class Action:
             self.tick_counter = 0
         if Action.sec2tick(t) >= self.tick_counter:
             if self.tick(t):
-                # print(self.tick_counter)
                 self.last_tick()
                 self.tick_counter = -1
                 return True
             self.tick_counter += 1
         return False
+
+    def set_status(self, status):
+        self.status = status
+        logging.info(self.status)
 
     @staticmethod
     def sec2tick(secs):

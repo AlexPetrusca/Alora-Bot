@@ -9,7 +9,7 @@ class WaitAction(Action):
         self.d = d
 
     def first_tick(self):
-        logging.info('WAITING...')
+        self.set_status('Waiting...')
 
     def tick(self, t):
         return t > self.d

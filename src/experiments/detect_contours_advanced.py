@@ -4,7 +4,7 @@ from src.util.common import hide_ui, get_color_limits
 
 COLOR_RED = [0, 0, 255]
 
-haystack = hide_ui(cv.imread('../../resources/screenshot/slayer/nechryael.png', cv.IMREAD_UNCHANGED))
+haystack = hide_ui(cv.imread('../../resources/experiments/screenshot/slayer/nechryael.png', cv.IMREAD_UNCHANGED))
 _, threshold = cv.threshold(haystack, 0, 255, cv.THRESH_BINARY)
 
 hsv_threshold = cv.cvtColor(threshold, cv.COLOR_BGR2HSV)

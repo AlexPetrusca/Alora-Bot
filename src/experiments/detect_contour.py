@@ -4,8 +4,8 @@ from src.util.common import hide_ui
 
 COLOR_RED = [0, 0, 255]
 
-haystack = hide_ui(cv.imread('../../resources/screenshot/slayer/nechryael.png', cv.IMREAD_UNCHANGED))
-needle = cv.imread('../../resources/target/outline.png', cv.IMREAD_UNCHANGED)
+haystack = hide_ui(cv.imread('../../resources/experiments/screenshot/slayer/nechryael.png', cv.IMREAD_UNCHANGED))
+needle = cv.imread('../../resources/experiments/target/outline.png', cv.IMREAD_UNCHANGED)
 _, threshold = cv.threshold(haystack, 0, 255, cv.THRESH_BINARY)
 
 result = cv.matchTemplate(threshold, needle, cv.TM_CCOEFF_NORMED)
