@@ -12,7 +12,7 @@ class HomeTeleportAction(Action):
             robot.click(Controls.MAGIC_TAB.value)
         if self.tick_counter == Action.sec2tick(1):
             robot.click(StandardSpellbook.HOME_TELEPORT.value)
-        return self.tick_counter == Action.sec2tick(3)
+        return self.tick_counter == Action.sec2tick(4)
 
     def last_tick(self):
         pass

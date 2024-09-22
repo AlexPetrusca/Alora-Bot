@@ -12,24 +12,33 @@ SPADE = 1512, 845
 
 class BarrowAction(Action):
     barrow = None
-    image = None
     prayer = True
     last = False
+    available_img = None
+    unavailable_img = None
+
+    skip = False
     fight_over_tick = None
 
     def __init__(self, barrow, prayer=True, last=False):
         self.barrow = barrow
-        self.image = cv2.imread(f"../resources/target/label/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
         self.prayer = prayer
         self.last = last
+        self.available_img = cv2.imread(f"../resources/target/label/barrows/available/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
+        self.unavailable_img = cv2.imread(f"../resources/target/label/barrows/unavailable/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
 
     def first_tick(self):
         self.set_status(f"Routing to Barrow {self.barrow} ...")
 
-    # 5, 57 to 134, 95 - combat bar
     def tick(self, t):
         if self.tick_counter == 0:  # move to barrow (8s)
-            robot.click_image(self.image)  # todo: should only search in minimap
+            if not robot.click_image(self.available_img, 0.9):  # todo: should only search in minimap
+                robot.click_image(self.unavailable_img, 0.9)
+                self.skip = True
+
+        if self.skip:
+            return self.tick_counter == Action.sec2tick(8)
+
         if self.tick_counter == Action.sec2tick(1):  # open inventory todo: if inventory is already open, don't open it again
             robot.click(Controls.INVENTORY_TAB.value)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
@@ -52,9 +61,9 @@ class BarrowAction(Action):
                     self.fight_over_tick = self.tick_counter
 
         if self.fight_over_tick is not None:
-            if self.last:
-                if self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
-                    robot.click(922, 417)
+            if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
+                print("COLLECTING REWARDS")
+                robot.click(922, 417)
             if self.tick_counter == self.fight_over_tick + Action.sec2tick(3):  # exit barrow (8s) todo: if last we dont need to do this
                 self.set_status(f"Completed Barrow {self.barrow}")
                 robot.click_outline(Color.PURPLE.value)
@@ -67,3 +76,4 @@ class BarrowAction(Action):
 
     def last_tick(self):
         self.fight_over_tick = None
+        self.skip = False
