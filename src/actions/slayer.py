@@ -1,10 +1,10 @@
-import cv2 as cv
 import mss
 from pytesseract import pytesseract
 
 from src.actions.action import Action
-from src.util import vision, robot
-from src.util.color import Color
+from src.util import robot
+from src.vision import vision
+from src.vision.color import Color
 
 
 class SlayerAction(Action):

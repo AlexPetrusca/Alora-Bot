@@ -1,11 +1,9 @@
 from enum import Enum
 
-from src.util import vision
-from src.util.color import Color
+from src.vision.color import Color
 from src.util.common import get_color_limits
 import cv2 as cv
 import numpy as np
-import pytesseract
 import mss
 import time
 

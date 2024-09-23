@@ -1,11 +1,7 @@
 from src.actions.action import Action
-import cv2 as cv
-import numpy as np
-import logging
-import mss
 
 from src.util import robot
-from src.util.coordinates import Minimap
+from src.vision.coordinates import Minimap
 
 
 class CalibrateAction(Action):

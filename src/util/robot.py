@@ -1,7 +1,7 @@
 import mss
 import pyautogui
 
-from src.util import vision
+from src.vision import vision
 
 
 def click(x=None, y=None):

@@ -3,9 +3,10 @@ import mss
 from pytesseract import pytesseract
 
 from src.actions.action import Action
-from src.util import vision, robot
-from src.util.color import Color
-from src.util.coordinates import Controls, Prayer
+from src.util import robot
+from src.vision import vision
+from src.vision.color import Color
+from src.vision.coordinates import Controls, Prayer
 
 SPADE = 1512, 845
 

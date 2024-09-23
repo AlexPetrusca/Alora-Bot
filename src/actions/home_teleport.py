@@ -1,6 +1,6 @@
 from src.actions.action import Action
 from src.util import robot
-from src.util.coordinates import Controls, StandardSpellbook
+from src.vision.coordinates import Controls, StandardSpellbook
 
 
 class HomeTeleportAction(Action):
