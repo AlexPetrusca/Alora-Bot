@@ -36,7 +36,7 @@ class Bot:
 
         self.action_queue.append(PickUpItemsAction())
         self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(HealAction())  # todo: a heal action should probably include a home teleport action
+        self.action_queue.append(HealAction(bank=True))  # todo: a heal action should probably include a home teleport action
 
         # Slayer
         # self.action_queue.append(SlayerAction())
