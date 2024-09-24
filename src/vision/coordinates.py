@@ -23,5 +23,17 @@ class StandardSpellbook(Enum):
     HOME_TELEPORT = 1496, 832
 
 
+class ArceuusSpellbook(Enum):
+    HOME_TELEPORT = 1496, 832
+    RESURRECT_GREATER_SKELETON = 1575, 996
+
+
+# x: 1496 - 1644  -->  5 columns  -->  37 gap
+# y:  845 - 1030  -->  6 rows     -->  37 gap
 class Prayer(Enum):
-    PROTECT_FROM_MELEE = 1610, 960
+    PROTECT_FROM_MAGIC = 1533, 956
+    PROTECT_FROM_MISSILES = 1570, 956
+    PROTECT_FROM_MELEE = 1607, 956
+    EAGLE_EYE = 1644, 956
+    MYSTIC_MIGHT = 1496, 993
+    PIETY = 1533, 1030

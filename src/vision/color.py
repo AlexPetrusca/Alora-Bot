@@ -10,3 +10,10 @@ class Color(Enum):
     MAGENTA = [255, 0, 255]
     YELLOW = [0, 255, 255]
     WHITE = [255, 255, 255]
+
+    DEFAULT_VALUE = [255, 255, 255]
+    HIGHLIGHTED_VALUE = [255, 0, 170]
+    LOW_VALUE = [255, 178, 102]
+    MEDIUM_VALUE = [153, 255, 153]
+    HIGH_VALUE = [0, 150, 255]
+    INSANE_VALUE = [178, 102, 255]

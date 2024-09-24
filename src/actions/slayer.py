@@ -23,7 +23,7 @@ class SlayerAction(Action):
     def tick(self, t):
         if self.tick_counter == 0:
             print("DO_CLICK")
-            robot.click_outline(self.color)
+            robot.click_contour(self.color)
         elif self.tick_counter > Action.sec2tick(4) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 damage_ui = vision.grab_damage_ui(mss.mss())

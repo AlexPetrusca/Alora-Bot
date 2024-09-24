@@ -5,9 +5,10 @@ from time import perf_counter
 
 from src.actions.barrow import BarrowAction
 from src.actions.calibrate import CalibrateAction
-from src.actions.click_image import ClickImageAction
+from src.actions.cerberus import CerberusAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
+from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.slayer import SlayerAction
 from src.actions.teleport_wizard import TeleportWizardAction
 from src.actions.wait import WaitAction
@@ -25,8 +26,22 @@ class Bot:
         self.debug_display = debug
         self.loop = loop
 
-        self.action_queue.append(SlayerAction())
+        # Cerberus
+        self.action_queue.append(WaitAction(5))
+        self.action_queue.append(HomeTeleportAction())
+        self.action_queue.append(CalibrateAction())
+        self.action_queue.append(TeleportWizardAction("cerberus"))
 
+        self.action_queue.append(CerberusAction())
+
+        # self.action_queue.append(PickUpItemsAction())
+        self.action_queue.append(HomeTeleportAction())
+        self.action_queue.append(HealAction())  # todo: a heal action should probably include a home teleport action
+
+        # Slayer
+        # self.action_queue.append(SlayerAction())
+
+        # Barrows
         # self.action_queue.append(WaitAction(5))
         # self.action_queue.append(HomeTeleportAction())
         # self.action_queue.append(CalibrateAction())

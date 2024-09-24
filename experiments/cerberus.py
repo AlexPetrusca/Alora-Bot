@@ -25,12 +25,12 @@ screenshot_threshold = cv.cvtColor(screenshot_image, cv.COLOR_BGR2HSV)
 white_mask = cv.inRange(screenshot_threshold, np.array([0, 0, 255]), np.array([255, 100, 255]))
 cv.imshow("White Mask", white_mask)
 
-tile_xy = vision.locate_outline(screenshot_image, Color.YELLOW.value)
+tile_xy = vision.locate_contour(screenshot_image, Color.YELLOW.value)
 if tile_xy is not None:
     tile_x, tile_y = (round(tile_xy[0]), round(tile_xy[1]))
     cv.rectangle(screenshot_image, (tile_x - 5, tile_y - 5), (tile_x + 5, tile_y + 5), (0, 255, 0), -1)
 
-cerb_xy = vision.locate_outline(screenshot_image, Color.RED.value)
+cerb_xy = vision.locate_contour(screenshot_image, Color.RED.value)
 if cerb_xy is not None:
     cerb_x, cerb_y = (round(cerb_xy[0]), round(cerb_xy[1]))
     cv.rectangle(screenshot_image, (cerb_x - 5, cerb_y - 5), (cerb_x + 5, cerb_y + 5), (0, 255, 0), -1)

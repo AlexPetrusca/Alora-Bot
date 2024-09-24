@@ -51,7 +51,7 @@ class BarrowAction(Action):
                 robot.click(Prayer.PROTECT_FROM_MELEE.value)
         if self.tick_counter == Action.sec2tick(12):  # click sarcophagus + fight (50s)
             self.set_status("Fighting...")
-            robot.click_outline(Color.YELLOW.value)
+            robot.click_contour(Color.YELLOW.value)
 
         if self.tick_counter > Action.sec2tick(20) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
@@ -62,12 +62,12 @@ class BarrowAction(Action):
                     self.fight_over_tick = self.tick_counter
 
         if self.fight_over_tick is not None:
-            if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
+            if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):  # todo: this is being done too early
                 print("COLLECTING REWARDS")
                 robot.click(922, 417)
             if self.tick_counter == self.fight_over_tick + Action.sec2tick(3):  # exit barrow (8s) todo: if last we dont need to do this
                 self.set_status(f"Completed Barrow {self.barrow}")
-                robot.click_outline(Color.MAGENTA.value)
+                robot.click_contour(Color.MAGENTA.value)
             if self.prayer:
                 if self.tick_counter == self.fight_over_tick + Action.sec2tick(4):
                     robot.click(Prayer.PROTECT_FROM_MELEE.value)
