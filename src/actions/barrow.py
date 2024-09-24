@@ -67,7 +67,7 @@ class BarrowAction(Action):
                 robot.click(922, 417)
             if self.tick_counter == self.fight_over_tick + Action.sec2tick(3):  # exit barrow (8s) todo: if last we dont need to do this
                 self.set_status(f"Completed Barrow {self.barrow}")
-                robot.click_outline(Color.PURPLE.value)
+                robot.click_outline(Color.MAGENTA.value)
             if self.prayer:
                 if self.tick_counter == self.fight_over_tick + Action.sec2tick(4):
                     robot.click(Prayer.PROTECT_FROM_MELEE.value)

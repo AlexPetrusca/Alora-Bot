@@ -50,7 +50,7 @@ class DebugDisplay:
                     x, y, w, h = cv.boundingRect(contour)
                     cv.rectangle(screenshot, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
 
-        purple_lower, purple_upper = get_color_limits(Color.PURPLE.value)
+        purple_lower, purple_upper = get_color_limits(Color.MAGENTA.value)
         purple_mask = cv.inRange(hsv_threshold, purple_lower, purple_upper)
 
         contours, _ = cv.findContours(purple_mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)

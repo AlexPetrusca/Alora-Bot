@@ -1,24 +1,25 @@
 import cv2 as cv
 
-from src.util.common import hide_ui
+from src.util.common import hide_ui, get_color_limits
 
 COLOR_RED = [0, 0, 255]
 
 haystack = hide_ui(cv.imread('../resources/experiments/screenshot/slayer/nechryael.png', cv.IMREAD_UNCHANGED))
-needle = cv.imread('../resources/experiments/target/outline.png', cv.IMREAD_UNCHANGED)
 _, threshold = cv.threshold(haystack, 0, 255, cv.THRESH_BINARY)
 
-result = cv.matchTemplate(threshold, needle, cv.TM_CCOEFF_NORMED)
-min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
-print('found', '-', max_val)
+hsv_threshold = cv.cvtColor(threshold, cv.COLOR_BGR2HSV)
+lower_limit, upper_limit = get_color_limits(COLOR_RED)
+mask = cv.inRange(hsv_threshold, lower_limit, upper_limit)
 
-needle_w = needle.shape[1]
-needle_h = needle.shape[0]
-top_left = max_loc
-bottom_right = (top_left[0] + needle_w, top_left[1] + needle_h)
-cv.rectangle(haystack, top_left, bottom_right, color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
+contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+if len(contours) > 0:
+    for contour in contours:
+        if cv.contourArea(contour) > 750:
+            x, y, w, h = cv.boundingRect(contour)
+            cv.rectangle(haystack, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
 
 cv.imshow('Original', haystack)
 cv.imshow('Threshold', threshold)
+cv.imshow('Range Mask', mask)
 cv.waitKey()
 cv.destroyAllWindows()
