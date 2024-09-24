@@ -8,14 +8,6 @@ from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import Controls, Prayer, Minimap, ArceuusSpellbook
 
-
-# 1. Click 850, 50 + wait to walk
-# 2. Click 750, 90 + wait to walk + wait to enter chamber
-# 3. Click 850, 215 + wait to walk + enable prayers
-# 4. Click yellow contour + spec + wait to walk + summon thrall
-# 5. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
-# 6. Disable prayers
-
 class CerberusAction(Action):
     sct = mss.mss()
 
@@ -86,6 +78,7 @@ class CerberusAction(Action):
                 if chat.find("Cerberus: Grr") == 0 and chat != self.last_chat:
                     print("HIT ------------>", chat)
                     robot.click_contour(Color.YELLOW.value)
+                    robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
                 self.last_chat = chat
 
         if self.fight_over_tick is not None:
