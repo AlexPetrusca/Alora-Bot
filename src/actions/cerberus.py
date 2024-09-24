@@ -47,7 +47,7 @@ class CerberusAction(Action):
             robot.click(850, 215)
 
         # 4. Enable prayers + spec
-        tick_offset += Action.sec2tick(5)
+        tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
             robot.click(Controls.PRAYER_TAB.value)
         tick_offset += Action.sec2tick(1)

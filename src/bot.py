@@ -34,7 +34,7 @@ class Bot:
 
         self.action_queue.append(CerberusAction())
 
-        # self.action_queue.append(PickUpItemsAction())
+        self.action_queue.append(PickUpItemsAction())
         self.action_queue.append(HomeTeleportAction())
         self.action_queue.append(HealAction())  # todo: a heal action should probably include a home teleport action
 

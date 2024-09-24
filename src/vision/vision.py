@@ -59,14 +59,13 @@ def locate_contour(haystack, color, area_threshold=750):
     return closest_position
 
 
-def locate_ground_item(haystack, area_threshold=500):
+def locate_ground_item(haystack, area_threshold=750):
     haystack = hide_ui(np.ndarray.copy(haystack))
 
-    def find_item_by_color(color):
-        # _, threshold = cv.threshold(hide_ui(haystack), 0, 255, cv.THRESH_BINARY)
-        # hsv_threshold = cv.cvtColor(threshold, cv.COLOR_BGR2HSV)
-        lower_limit, upper_limit = get_color_limits(color, 10, 150, 150)
-        mask = cv.inRange(cv.cvtColor(haystack, cv.COLOR_BGR2HSV), lower_limit, upper_limit)
+    def locate_item_by_color(color, hue_threshold=10, saturation_threshold=100, brightness_threshold=100):
+        copy = hide_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
+        lower_limit, upper_limit = get_color_limits(color, hue_threshold, saturation_threshold, brightness_threshold)
+        mask = cv.inRange(copy, lower_limit, upper_limit)
 
         closest_distance = 999999999
         closest_position = None
@@ -82,50 +81,32 @@ def locate_ground_item(haystack, area_threshold=500):
                     closest_position = contour_center
         return closest_position
 
-        # lower_limit, upper_limit = get_color_limits(color, 10, 200, 200)
-        # mask = cv.inRange(cv.cvtColor(haystack, cv.COLOR_BGR2HSV), lower_limit, upper_limit)
-        # morph = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((10, 200), np.uint8))
-        #
-        # closest_distance = 999999999
-        # closest_position = None
-        # screen_center = haystack.shape[1] / 2, haystack.shape[0] / 2
-        # contours, _ = cv.findContours(morph, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
-        # for contour in contours:
-        #     if cv.contourArea(contour) > area_threshold:
-        #         x, y, w, h = cv.boundingRect(contour)
-        #         contour_center = round(x + w / 2), round(y + h)
-        #         distance = math.dist(screen_center, contour_center)
-        #         if distance < closest_distance:
-        #             closest_distance = distance
-        #             closest_position = contour_center
-        # return closest_position
-
-    insane_value_item = find_item_by_color(Color.INSANE_VALUE.value)
+    insane_value_item = locate_item_by_color(Color.INSANE_VALUE.value)
     if insane_value_item is not None:
         print("INSANE VALUE")
         return insane_value_item
 
-    high_value_item = find_item_by_color(Color.HIGH_VALUE.value)
+    high_value_item = locate_item_by_color(Color.HIGH_VALUE.value, saturation_threshold=245, brightness_threshold=200)
     if high_value_item is not None:
         print("HIGH VALUE")
         return high_value_item
 
-    medium_value_item = find_item_by_color(Color.MEDIUM_VALUE.value)
+    medium_value_item = locate_item_by_color(Color.MEDIUM_VALUE.value)
     if medium_value_item is not None:
         print("MEDIUM VALUE")
         return medium_value_item
 
-    low_value_item = find_item_by_color(Color.LOW_VALUE.value)
+    low_value_item = locate_item_by_color(Color.LOW_VALUE.value)
     if low_value_item is not None:
         print("LOW VALUE")
         return low_value_item
 
-    highlighted_item = find_item_by_color(Color.HIGHLIGHTED_VALUE.value)
+    highlighted_item = locate_item_by_color(Color.HIGHLIGHTED_VALUE.value)
     if highlighted_item is not None:
         print("HIGHLIGHTED VALUE")
         return highlighted_item
 
-    default_item = find_item_by_color(Color.DEFAULT_VALUE.value)
+    default_item = locate_item_by_color(Color.DEFAULT_VALUE.value, saturation_threshold=0, brightness_threshold=200)
     if default_item is not None:
         print("DEFAULT VALUE")
         return default_item
