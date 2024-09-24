@@ -1,6 +1,6 @@
 import mss
 import pyautogui
-
+import cv2 as cv
 from src.vision import vision
 
 
@@ -23,6 +23,15 @@ def right_click(x=None, y=None):
 def shift_click(x, y):
     with pyautogui.hold('shift'):
         click(x, y)
+
+
+def click_food():
+    ate_food = click_image(cv.imread('../resources/target/item/monkfish.png', cv.IMREAD_UNCHANGED), 0.9)
+    if not ate_food:
+        ate_food = click_image(cv.imread('../resources/target/item/shark.png', cv.IMREAD_UNCHANGED), 0.9)
+    if not ate_food:
+        ate_food = click_image(cv.imread('../resources/target/item/manta_ray.png', cv.IMREAD_UNCHANGED), 0.9)
+    return ate_food
 
 
 def click_image(image, threshold=0.7):

@@ -31,10 +31,11 @@ def grab_hover_action(sct):
 def locate_image(haystack, needle, threshold=0.7):
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv.minMaxLoc(result)
-    print(max_val)
     if max_val >= threshold:
+        print(max_val)
         return max_loc[0] + needle.shape[1] / 2, max_loc[1] + needle.shape[0] / 2
     else:
+        print("ERROR: locate_image failed with:", max_val)
         return None
 
 
@@ -60,6 +61,8 @@ def locate_contour(haystack, color, area_threshold=750):
 
 
 def locate_ground_item(haystack, area_threshold=250):
+    # todo: this sometimes doesn't work - item is missed (most problematic for DEFAULT_VALUE items)
+
     haystack = hide_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(color, hue_threshold=10, saturation_threshold=100, brightness_threshold=100):
@@ -114,6 +117,47 @@ def locate_ground_item(haystack, area_threshold=250):
     return None
 
 
-def get_latest_chat(sct):
+def read_text(haystack, config=""):
+    grayscale = cv.cvtColor(haystack, cv.COLOR_BGR2GRAY)
+    threshold = cv.threshold(grayscale, 120, 255, cv.THRESH_BINARY)[1]
+    # dilation = cv.dilate(threshold, np.ones((1, 2), np.uint8), iterations=1)
+    return pytesseract.image_to_string(threshold, config=config).strip()
+
+
+def read_int(haystack):
+    text = read_text(haystack, config="--psm 6")
+    text = text.replace('i', '1').replace('I', '1')
+    text = text.replace('z', '2').replace('Z', '2').replace('L', '2').replace('&2', '2')
+    text = text.replace('y', '4').replace('k', '4').replace('h', '4')
+    text = text.replace('S', '5')
+    text = text.replace('G', '6').replace('E', '6')
+    text = text.replace('B8', '8').replace('B', '8')
+    text = text.replace('g', '9')
+    try:
+        print("HP:", text)
+        return int(text)
+    except ValueError:
+        print("ERROR: read_int failed with:", text)
+        return -1
+
+
+def read_latest_chat(sct):
     chat_line_image = grab_screen(sct)[2106:2144, 14:994]
     return pytesseract.image_to_string(chat_line_image).strip()
+    # return read_text(grab_screen(sct)[2106:2144, 14:994])  # todo: use this instead
+
+
+def read_hitpoints(sct):
+    return read_int(grab_screen(sct)[188:212, 2978:3018])
+
+
+def read_prayer_energy(sct):
+    return read_int(grab_screen(sct)[256:280, 2978:3018])
+
+
+def read_run_energy(sct):
+    return read_int(grab_screen(sct)[320:344, 2996:3036])
+
+
+def read_spec_energy(sct):
+    return read_int(grab_screen(sct)[372:396, 3044:3084])

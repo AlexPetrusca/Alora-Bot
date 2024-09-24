@@ -40,7 +40,7 @@ class BarrowAction(Action):
         if self.skip:
             return self.tick_counter == Action.sec2tick(8)
 
-        if self.tick_counter == Action.sec2tick(1):  # open inventory todo: if inventory is already open, don't open it again
+        if self.tick_counter == Action.sec2tick(1):  # open item todo: if item is already open, don't open it again
             robot.click(Controls.INVENTORY_TAB.value)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
             robot.click(SPADE)

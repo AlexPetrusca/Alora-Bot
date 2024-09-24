@@ -8,6 +8,7 @@ from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import Controls, Prayer, Minimap, ArceuusSpellbook
 
+
 class CerberusAction(Action):
     sct = mss.mss()
 
@@ -61,6 +62,7 @@ class CerberusAction(Action):
         # 6. summon thrall
         tick_offset += Action.sec2tick(3)
         if self.tick_counter == tick_offset:
+            self.set_status('Fighting Cerberus...')
             robot.click(Controls.MAGIC_TAB.value)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
@@ -81,20 +83,17 @@ class CerberusAction(Action):
                     if self.retry_count > 5:
                         return True
 
-                chat = vision.get_latest_chat(self.sct)
-                print(chat, "->", chat.find("Cerberus: Grr"))
+                chat = vision.read_latest_chat(self.sct)
+                # print(chat, "->", chat.find("Cerberus: Grr"))
                 if chat.find("Cerberus: Grr") == 0 and chat != self.last_chat:
-                    print("HIT ------------>", chat)
+                    # print("HIT ------------>", chat)
                     robot.click_contour(Color.YELLOW.value)
                     robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
                 self.last_chat = chat
 
-                # if vision.get_player_health(self.sct) <= 30:
-                #     screen = vision.grab_screen(self.sct)
-                #     shark = cv.imread("../resources/target/inventory/items/shark.png")
-                #     shark_xy = vision.locate_image(screen, shark)
-                #     if shark_xy is not None:
-                #         robot.click(shark_xy[0] / 2, shark_xy[1] / 2)
+                if vision.read_hitpoints(self.sct) <= 30:
+                    # robot.click_image(cv.imread('../resources/target/item/shark.png', cv.IMREAD_UNCHANGED), 0.9)
+                    robot.click_food()
 
         if self.fight_over_tick is not None:
             tick_offset = self.fight_over_tick
@@ -110,6 +109,7 @@ class CerberusAction(Action):
             if self.tick_counter == tick_offset:
                 robot.click(Prayer.PIETY.value)
 
+            # 9. End fight
             tick_offset += Action.sec2tick(2)
             if self.tick_counter == tick_offset:
                 return True

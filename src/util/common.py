@@ -8,7 +8,7 @@ def hide(img, p1, p2, color=(0, 0, 0)):
 
 def hide_ui(img):
     hide(img, (1328, 40), (1453, 70))  # hide exp bar
-    hide(img, (1455, 784), (1696, 1117))  # hide inventory
+    hide(img, (1455, 784), (1696, 1117))  # hide item
     hide(img, (0, 922), (520, 1117))  # hide chat
     hide(img, (1476, 37), (1697, 210))  # hide minimap
     hide(img, (0, 37), (221, 210))  # hide status ui
