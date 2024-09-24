@@ -59,7 +59,7 @@ def locate_contour(haystack, color, area_threshold=750):
     return closest_position
 
 
-def locate_ground_item(haystack, area_threshold=750):
+def locate_ground_item(haystack, area_threshold=250):
     haystack = hide_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(color, hue_threshold=10, saturation_threshold=100, brightness_threshold=100):
@@ -116,4 +116,4 @@ def locate_ground_item(haystack, area_threshold=750):
 
 def get_latest_chat(sct):
     chat_line_image = grab_screen(sct)[2106:2144, 14:994]
-    return pytesseract.image_to_string(chat_line_image)
+    return pytesseract.image_to_string(chat_line_image).strip()
