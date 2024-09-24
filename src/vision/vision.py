@@ -4,6 +4,7 @@ import numpy as np
 import cv2 as cv
 
 from src.util.common import hide_ui, get_color_limits
+from src.vision.color import Color
 
 
 def grab_screen(sct):
@@ -35,6 +36,7 @@ def locate_image(haystack, needle, threshold=0.7):
     else:
         return None
 
+
 def locate_outline(haystack, color, area_threshold=750):
     _, threshold = cv.threshold(hide_ui(haystack), 0, 255, cv.THRESH_BINARY)
     hsv_threshold = cv.cvtColor(threshold, cv.COLOR_BGR2HSV)
@@ -48,7 +50,28 @@ def locate_outline(haystack, color, area_threshold=750):
     for contour in contours:
         if cv.contourArea(contour) > area_threshold:
             x, y, w, h = cv.boundingRect(contour)
-            contour_center = x + w / 2, y + h / 2
+            contour_center = round(x + w / 2), round(y + h / 2)
+            distance = math.dist(screen_center, contour_center)
+            if distance < closest_distance:
+                closest_distance = distance
+                closest_position = contour_center
+    return closest_position
+
+
+def locate_ground_item(haystack, color=Color.WHITE.value, area_threshold=500):
+    haystack = hide_ui(np.ndarray.copy(haystack))
+    lower_limit, upper_limit = get_color_limits(color)
+    mask = cv.inRange(cv.cvtColor(haystack, cv.COLOR_BGR2HSV), lower_limit, upper_limit)
+    morph = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((10, 200), np.uint8))
+
+    closest_distance = 999999999
+    closest_position = None
+    screen_center = haystack.shape[1] / 2, haystack.shape[0] / 2
+    contours, _ = cv.findContours(morph, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        if cv.contourArea(contour) > area_threshold:
+            x, y, w, h = cv.boundingRect(contour)
+            contour_center = round(x + w / 2), round(y + h)
             distance = math.dist(screen_center, contour_center)
             if distance < closest_distance:
                 closest_distance = distance
