@@ -18,16 +18,7 @@ def hide_ui(img):
     return img
 
 
-# todo move away from this one
-def get_color_limits(color, ht=10, st=100, bt=100):
-    if color == [255, 255, 255]:
-        return (0, st, bt), (255, 20, 255)
-    hsv_convert = cv.cvtColor(np.uint8([[color]]), cv.COLOR_BGR2HSV)
-    hue = int(hsv_convert[0][0][0])
-    return (hue - ht, st, bt), (hue + ht, 255, 255)
-
-
-def get_color_limits_2(color, ht=0.98, st=0.8, bt=0.8):
+def get_color_limits(color, ht=0.99, st=0.9, bt=0.8):
     hsv = cv.cvtColor(np.uint8([[color]]), cv.COLOR_BGR2HSV)[0][0]
     hl, hh = ht * hsv[0], (2 - ht) * hsv[0]
     sl, sh = st * hsv[1], (2 - st) * hsv[1]

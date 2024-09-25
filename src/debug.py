@@ -3,7 +3,7 @@ from enum import Enum
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.slayer import SlayerAction
 from src.vision.color import Color
-from src.util.common import hide_ui, get_color_limits_2
+from src.util.common import hide_ui, get_color_limits
 import cv2 as cv
 import numpy as np
 import mss
@@ -51,25 +51,25 @@ class DebugDisplay:
         copy = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         if self.debug_tab == 1:
             self.tab_name = "Default Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.DEFAULT_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.DEFAULT_VALUE.value)
         elif self.debug_tab == 2:
             self.tab_name = "Highlighted Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.HIGHLIGHTED_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.HIGHLIGHTED_VALUE.value)
         elif self.debug_tab == 3:
             self.tab_name = "Low Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.LOW_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.LOW_VALUE.value)
         elif self.debug_tab == 4:
             self.tab_name = "Medium Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.MEDIUM_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.MEDIUM_VALUE.value)
         elif self.debug_tab == 5:
             self.tab_name = "High Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.HIGH_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.HIGH_VALUE.value)
         elif self.debug_tab == 6:
             self.tab_name = "Insane Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.INSANE_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.INSANE_VALUE.value)
         else:
             self.tab_name = "Default Value Mask"
-            lower_limit, upper_limit = get_color_limits_2(Color.DEFAULT_VALUE.value, ht=0.99, st=0.9, bt=0.8)
+            lower_limit, upper_limit = get_color_limits(Color.DEFAULT_VALUE.value)
 
         mask = cv.inRange(copy, lower_limit, upper_limit)
         contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
@@ -87,7 +87,7 @@ class DebugDisplay:
         slayer_color = self.current_action.color
 
         screenshot = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
-        lower_limit, upper_limit = get_color_limits_2(slayer_color, ht=0.99, st=0.9, bt=0.8)
+        lower_limit, upper_limit = get_color_limits(slayer_color)
         mask = cv.inRange(screenshot, lower_limit, upper_limit)
         contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
