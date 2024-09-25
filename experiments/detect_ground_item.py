@@ -15,7 +15,7 @@ COLOR = Color.HIGH_VALUE.value  # 200, 200
 
 screenshot_image = hide_ui(cv.imread('../resources/experiments/screenshot/ground_items.png', cv.IMREAD_UNCHANGED))
 screenshot_threshold = cv.cvtColor(screenshot_image, cv.COLOR_BGR2HSV)
-lower_limit, upper_limit = get_color_limits(COLOR, saturation_threshold=245, brightness_threshold=200)
+lower_limit, upper_limit = get_color_limits(COLOR, st=245, bt=200)
 mask = cv.inRange(screenshot_threshold, lower_limit, upper_limit)
 
 contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)

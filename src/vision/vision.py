@@ -4,7 +4,7 @@ import numpy as np
 import cv2 as cv
 from pytesseract import pytesseract
 
-from src.util.common import hide_ui, get_color_limits
+from src.util.common import hide_ui, get_color_limits, get_color_limits_2
 from src.vision.color import Color
 
 
@@ -61,14 +61,11 @@ def locate_contour(haystack, color, area_threshold=750):
 
 
 def locate_ground_item(haystack, area_threshold=250):
-    # todo: this sometimes doesn't work - item is missed (most problematic for DEFAULT_VALUE items)
-    #todo: finds MEDIUM_VALUE items that arent there after killing Cerberus
-
     haystack = hide_ui(np.ndarray.copy(haystack))
 
-    def locate_item_by_color(color, hue_threshold=10, saturation_threshold=100, brightness_threshold=100):
+    def locate_item_by_color(color, ht=0.99, st=0.9, bt=0.8):
         copy = hide_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
-        lower_limit, upper_limit = get_color_limits(color, hue_threshold, saturation_threshold, brightness_threshold)
+        lower_limit, upper_limit = get_color_limits_2(color, ht, st, bt)
         mask = cv.inRange(copy, lower_limit, upper_limit)
 
         closest_distance = 999999999
@@ -90,7 +87,7 @@ def locate_ground_item(haystack, area_threshold=250):
         print("INSANE VALUE")
         return insane_value_item
 
-    high_value_item = locate_item_by_color(Color.HIGH_VALUE.value, saturation_threshold=245, brightness_threshold=200)
+    high_value_item = locate_item_by_color(Color.HIGH_VALUE.value)
     if high_value_item is not None:
         print("HIGH VALUE")
         return high_value_item
@@ -110,7 +107,7 @@ def locate_ground_item(haystack, area_threshold=250):
         print("HIGHLIGHTED VALUE")
         return highlighted_item
 
-    default_item = locate_item_by_color(Color.DEFAULT_VALUE.value, saturation_threshold=0, brightness_threshold=200)
+    default_item = locate_item_by_color(Color.DEFAULT_VALUE.value)
     if default_item is not None:
         print("DEFAULT VALUE")
         return default_item
