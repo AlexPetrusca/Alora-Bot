@@ -1,3 +1,4 @@
+import cv2 as cv
 from src.actions.action import Action
 from src.util import robot
 
@@ -16,18 +17,16 @@ class HealAction(Action):
             robot.shift_click(700, 302)  # move to teleport wizard
         if self.tick_counter == Action.sec2tick(4):
             robot.click(1292, 68)  # click prayer altar
-        if self.tick_counter == Action.sec2tick(10):
-            robot.click(1292, 68)  # click prayer altar
         if self.tick_counter == Action.sec2tick(12):
             robot.right_click(805, 520)  # right click healer
         if self.tick_counter == Action.sec2tick(13):
-            robot.click(730, 568)  # heal
+            robot.click_image(cv.imread('../resources/target/menu/heal_option.png', cv.IMREAD_UNCHANGED), 0.9)
         if self.bank:
-            if self.tick_counter == Action.sec2tick(15):
+            if self.tick_counter == Action.sec2tick(16):
                 robot.click(1080, 524)  # click bank chest
-            if self.tick_counter == Action.sec2tick(19):
+            if self.tick_counter == Action.sec2tick(20):
                 robot.click(1074, 110)  # close bank
-            return self.tick_counter == Action.sec2tick(20)
+            return self.tick_counter == Action.sec2tick(21)
         else:
             return self.tick_counter == Action.sec2tick(14)
 

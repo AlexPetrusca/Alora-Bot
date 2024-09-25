@@ -13,7 +13,7 @@ SPADE = 1512, 845
 
 class BarrowAction(Action):
     barrow = None
-    prayer = True
+    prayer = None
     last = False
     available_img = None
     unavailable_img = None
@@ -21,7 +21,7 @@ class BarrowAction(Action):
     skip = False
     fight_over_tick = None
 
-    def __init__(self, barrow, prayer=True, last=False):
+    def __init__(self, barrow, prayer=Prayer.PROTECT_FROM_MELEE, last=False):
         self.barrow = barrow
         self.prayer = prayer
         self.last = last
@@ -44,16 +44,19 @@ class BarrowAction(Action):
             robot.click(Controls.INVENTORY_TAB.value)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
             robot.click(SPADE)
-        if self.prayer:
-            if self.tick_counter == Action.sec2tick(9):  # todo: its annoying to change one of these timings because everything after has to be updated as well
-                robot.click(Controls.PRAYER_TAB.value)
-            if self.tick_counter == Action.sec2tick(10):
-                robot.click(Prayer.PROTECT_FROM_MELEE.value)
-        if self.tick_counter == Action.sec2tick(12):  # click sarcophagus + fight (50s)
+
+        if self.tick_counter == Action.sec2tick(11):  # click sarcophagus + fight (50s)
             self.set_status("Fighting...")
             robot.click_contour(Color.YELLOW.value)
 
-        if self.tick_counter > Action.sec2tick(20) and self.fight_over_tick is None:
+        if self.tick_counter == Action.sec2tick(14):  # todo: its annoying to change one of these timings because everything after has to be updated as well
+            robot.click(Controls.PRAYER_TAB.value)
+        if self.tick_counter == Action.sec2tick(14.5):
+            robot.click(self.prayer.value)
+        if self.tick_counter == Action.sec2tick(15):
+            robot.click(Prayer.PIETY.value)
+
+        if self.tick_counter > Action.sec2tick(18) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 damage_ui = vision.grab_damage_ui(mss.mss())
                 ocr = pytesseract.image_to_string(damage_ui).strip()
@@ -62,16 +65,23 @@ class BarrowAction(Action):
                     self.fight_over_tick = self.tick_counter
 
         if self.fight_over_tick is not None:
-            if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):  # todo: this is being done too early
-                print("COLLECTING REWARDS")
-                robot.click(922, 417)
-            if self.tick_counter == self.fight_over_tick + Action.sec2tick(3):  # exit barrow (8s) todo: if last we dont need to do this
+            if self.tick_counter == self.fight_over_tick + Action.sec2tick(0.5):
+                robot.click(Prayer.PIETY.value)
+            if self.tick_counter == self.fight_over_tick + Action.sec2tick(1):
+                robot.click(self.prayer.value)
+
+            # if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):  # todo: this is being done too early
+            #     print("COLLECTING REWARDS")
+            #     robot.click(922, 417)
+            if self.last:
+                if self.tick_counter == self.fight_over_tick + Action.sec2tick(5):
+                    robot.click(922, 417)  # collect rewards
+                    return True
+            elif self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
                 self.set_status(f"Completed Barrow {self.barrow}")
-                robot.click_contour(Color.MAGENTA.value)
-            if self.prayer:
-                if self.tick_counter == self.fight_over_tick + Action.sec2tick(4):
-                    robot.click(Prayer.PROTECT_FROM_MELEE.value)
-            return self.tick_counter == self.fight_over_tick + Action.sec2tick(8)
+                robot.click_contour(Color.MAGENTA.value)  # exit barrow (8s) todo: if last we dont need to do this
+
+            return self.tick_counter == self.fight_over_tick + Action.sec2tick(7)
 
         return False
 
