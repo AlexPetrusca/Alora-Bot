@@ -104,7 +104,7 @@ class DebugDisplay:
 
 
     def show_slayer(self, screenshot):
-        slayer_color = self.current_action.color
+        slayer_color = self.current_action.target_color
 
         screenshot = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         lower_limit, upper_limit = get_color_limits(slayer_color)
