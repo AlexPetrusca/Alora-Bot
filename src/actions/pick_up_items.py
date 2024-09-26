@@ -9,7 +9,7 @@ from src.vision import vision
 class PickUpItemsAction(Action):
     sct = mss.mss()
 
-    item_found_tick = None
+    item_found = False
 
     def __init__(self):
         pass
@@ -19,28 +19,25 @@ class PickUpItemsAction(Action):
         pass
 
     def tick(self, t):
-        if self.tick_counter % Action.sec2tick(10) == 0:
-            screenshot = vision.grab_screen(self.sct)
-            click_xy = vision.locate_ground_item(screenshot)
+        if self.tick_counter == 0:
+            click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
             if click_xy is not None:
-                self.item_found_tick = self.tick_counter
                 robot.click(click_xy[0] / 2, click_xy[1] / 2)
             else:
-                # return True  # todo: uncomment
-                return self.tick_counter > Action.sec2tick(8)
+                self.item_found = True
 
-        if self.item_found_tick is not None:
-            # todo: uncomment
-            # if self.tick_counter == Action.sec2tick(5):
-            #     screenshot = vision.grab_screen(self.sct)
-            #     click_xy = vision.locate_ground_item(screenshot)
-            #     if click_xy is None:
-            #         return True
-            if self.tick_counter > self.item_found_tick + Action.sec2tick(5) and self.tick_counter < self.item_found_tick + Action.sec2tick(8):
+        if self.tick_counter > Action.sec2tick(3):
+            if self.item_found:
                 if self.tick_counter % Action.sec2tick(0.25) == 0:
-                    robot.click(855, 575)
+                    click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
+                    if click_xy is not None:
+                        robot.click(click_xy[0] / 2, click_xy[1] / 2)
+                    else:
+                        return True
+            else:
+                return True
 
         return False
 
     def last_tick(self):
-        self.item_found_tick = None
+        self.item_found = False

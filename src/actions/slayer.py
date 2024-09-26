@@ -37,7 +37,7 @@ class SlayerAction(Action):
                         self.fight_over_tick = self.tick_counter
 
         if self.fight_over_tick is not None:
-            return self.tick_counter > self.fight_over_tick + Action.sec2tick(2)
+            return self.tick_counter > self.fight_over_tick + Action.sec2tick(4)
         else:
             return False
 

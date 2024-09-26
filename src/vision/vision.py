@@ -56,38 +56,63 @@ def locate_contour(haystack, color, area_threshold=750):
             if distance < closest_distance:
                 closest_distance = distance
                 closest_position = contour_center
+
     return closest_position
 
 
-def locate_ground_item(haystack, area_threshold=250):
+def locate_ground_item(haystack, area_threshold=500):
     haystack = hide_ui(np.ndarray.copy(haystack))
 
-    insane_value_item = locate_contour(haystack, Color.INSANE_VALUE.value, area_threshold)
+    def locate_item_by_color(screenshot, color):
+        hsv = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        lower_limit, upper_limit = get_color_limits(color)
+        mask = cv.inRange(hsv, lower_limit, upper_limit)
+
+        # enhancements
+        mask = cv.blur(mask, (3, 3))
+        mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+
+        closest_distance = 999999999
+        closest_position = None
+        screen_center = screenshot.shape[1] / 2, screenshot.shape[0] / 2
+        contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+        for contour in contours:
+            if cv.contourArea(contour) > area_threshold:
+                x, y, w, h = cv.boundingRect(contour)
+                contour_center = round(x + w / 2), round(y + h / 2)
+                distance = math.dist(screen_center, contour_center)
+                if distance < closest_distance:
+                    closest_distance = distance
+                    closest_position = contour_center
+
+        return closest_position
+
+    insane_value_item = locate_item_by_color(haystack, Color.INSANE_VALUE.value)
     if insane_value_item is not None:
         print("INSANE VALUE")
         return insane_value_item
 
-    high_value_item = locate_contour(haystack, Color.HIGH_VALUE.value, area_threshold)
+    high_value_item = locate_item_by_color(haystack, Color.HIGH_VALUE.value)
     if high_value_item is not None:
         print("HIGH VALUE")
         return high_value_item
 
-    medium_value_item = locate_contour(haystack, Color.MEDIUM_VALUE.value, area_threshold)
+    medium_value_item = locate_item_by_color(haystack, Color.MEDIUM_VALUE.value)
     if medium_value_item is not None:
         print("MEDIUM VALUE")
         return medium_value_item
 
-    low_value_item = locate_contour(haystack, Color.LOW_VALUE.value, area_threshold)
+    low_value_item = locate_item_by_color(haystack, Color.LOW_VALUE.value)
     if low_value_item is not None:
         print("LOW VALUE")
         return low_value_item
 
-    highlighted_item = locate_contour(haystack, Color.HIGHLIGHTED_VALUE.value, area_threshold)
+    highlighted_item = locate_item_by_color(haystack, Color.HIGHLIGHTED_VALUE.value)
     if highlighted_item is not None:
         print("HIGHLIGHTED VALUE")
         return highlighted_item
 
-    default_item = locate_contour(haystack, Color.DEFAULT_VALUE.value, area_threshold)
+    default_item = locate_item_by_color(haystack, Color.DEFAULT_VALUE.value)
     if default_item is not None:
         print("DEFAULT VALUE")
         return default_item

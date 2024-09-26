@@ -11,7 +11,7 @@ class Color(Enum):
     YELLOW = [0, 255, 255]
     WHITE = [255, 255, 255]
 
-    DEFAULT_VALUE = [255, 255, 255]
+    DEFAULT_VALUE = [170, 255, 0]
     HIGHLIGHTED_VALUE = [255, 0, 170]
     LOW_VALUE = [255, 178, 102]
     MEDIUM_VALUE = [153, 255, 153]

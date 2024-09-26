@@ -48,40 +48,58 @@ class DebugDisplay:
             exit(1)
 
     def show_pick_up_items(self, screenshot):
+        def identify_items(color, return_mask=True):
+            lower_limit, upper_limit = get_color_limits(color)
+            mask = cv.inRange(copy, lower_limit, upper_limit)
+
+            # enhancements
+            mask = cv.blur(mask, (3, 3))
+            mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+
+            contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
+            mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
+            target = mask if return_mask else screenshot
+
+            for contour in contours:
+                if cv.contourArea(contour) > 500:
+                    x, y, w, h = cv.boundingRect(contour)
+                    c = round(x + w / 2), round(y + h / 2)
+                    cv.rectangle(target, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
+                    cv.rectangle(target, (c[0] - 5, c[1] - 5), (c[0] + 5, c[1] + 5), color=(0, 0, 255), thickness=-1, lineType=cv.LINE_AA)
+
+            return target
+
         copy = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         if self.debug_tab == 1:
+            self.tab_name = "All Item Values"
+            identify_items(Color.DEFAULT_VALUE.value, False)
+            identify_items(Color.LOW_VALUE.value, False)
+            identify_items(Color.MEDIUM_VALUE.value, False)
+            identify_items(Color.HIGH_VALUE.value, False)
+            identify_items(Color.INSANE_VALUE.value, False)
+            return identify_items(Color.HIGHLIGHTED_VALUE.value, False)
+        if self.debug_tab == 2:
             self.tab_name = "Default Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.DEFAULT_VALUE.value)
-        elif self.debug_tab == 2:
-            self.tab_name = "Highlighted Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.HIGHLIGHTED_VALUE.value)
+            return identify_items(Color.DEFAULT_VALUE.value)
         elif self.debug_tab == 3:
             self.tab_name = "Low Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.LOW_VALUE.value)
+            return identify_items(Color.LOW_VALUE.value)
         elif self.debug_tab == 4:
             self.tab_name = "Medium Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.MEDIUM_VALUE.value)
+            return identify_items(Color.MEDIUM_VALUE.value)
         elif self.debug_tab == 5:
             self.tab_name = "High Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.HIGH_VALUE.value)
+            return identify_items(Color.HIGH_VALUE.value)
         elif self.debug_tab == 6:
             self.tab_name = "Insane Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.INSANE_VALUE.value)
+            return identify_items(Color.INSANE_VALUE.value)
+        elif self.debug_tab == 7:
+            self.tab_name = "Highlighted Value Mask"
+            return identify_items(Color.HIGHLIGHTED_VALUE.value)
         else:
-            self.tab_name = "Default Value Mask"
-            lower_limit, upper_limit = get_color_limits(Color.DEFAULT_VALUE.value)
+            self.debug_tab = 1
+            return self.show_pick_up_items(screenshot)
 
-        mask = cv.inRange(copy, lower_limit, upper_limit)
-        contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
-        mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
-        for contour in contours:
-            if cv.contourArea(contour) > 250:
-                x, y, w, h = cv.boundingRect(contour)
-                c = round(x + w / 2), round(y + h / 2)
-                cv.rectangle(mask, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
-                cv.rectangle(mask, (c[0] - 5, c[1] - 5), (c[0] + 5, c[1] + 5), color=(0, 0, 255), thickness=-1, lineType=cv.LINE_AA)
-
-        return mask
 
     def show_slayer(self, screenshot):
         slayer_color = self.current_action.color
