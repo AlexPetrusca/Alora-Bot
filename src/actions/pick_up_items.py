@@ -8,11 +8,14 @@ from src.vision import vision
 
 class PickUpItemsAction(Action):
     sct = mss.mss()
+    pause_on_fail = True
 
     item_found = False
+    click_count = 0
+    retry_count = 0
 
-    def __init__(self):
-        pass
+    def __init__(self, pause_on_fail=True):
+        self.pause_on_fail = pause_on_fail
 
     def first_tick(self):
         self.set_status('Picking Up Ground Items...')
@@ -22,9 +25,10 @@ class PickUpItemsAction(Action):
         if self.tick_counter == 0:
             click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
             if click_xy is not None:
-                robot.click(click_xy[0] / 2, click_xy[1] / 2)
-            else:
                 self.item_found = True
+                robot.click(click_xy[0] / 2, click_xy[1] / 2)
+            elif not self.pause_on_fail:
+                return True  # exit quickly if item not found and not pausing on failure
 
         if self.tick_counter > Action.sec2tick(3):
             if self.item_found:
@@ -32,12 +36,22 @@ class PickUpItemsAction(Action):
                     click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
                     if click_xy is not None:
                         robot.click(click_xy[0] / 2, click_xy[1] / 2)
+                        self.click_count += 1
                     else:
-                        return True
+                        self.retry_count += 1
             else:
                 return True
+
+        if self.click_count > 25:
+            print("Find item failed - excessive click count")
+            return True
+        if self.retry_count > 4:
+            print("Find item stopped - retry timeout")
+            return True
 
         return False
 
     def last_tick(self):
         self.item_found = False
+        self.click_count = 0
+        self.retry_count = 0

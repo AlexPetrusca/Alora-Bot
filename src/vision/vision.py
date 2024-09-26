@@ -72,20 +72,18 @@ def locate_ground_item(haystack, area_threshold=500):
         mask = cv.blur(mask, (3, 3))
         mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
 
-        closest_distance = 999999999
-        closest_position = None
-        screen_center = screenshot.shape[1] / 2, screenshot.shape[0] / 2
+        largest_area = area_threshold
+        largest_position = None
         contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
         for contour in contours:
-            if cv.contourArea(contour) > area_threshold:
+            area = cv.contourArea(contour)
+            # area = w * h
+            if area > largest_area:
+                largest_area = area
                 x, y, w, h = cv.boundingRect(contour)
-                contour_center = round(x + w / 2), round(y + h / 2)
-                distance = math.dist(screen_center, contour_center)
-                if distance < closest_distance:
-                    closest_distance = distance
-                    closest_position = contour_center
+                largest_position = round(x + w / 2), round(y + h / 2)
 
-        return closest_position
+        return largest_position
 
     insane_value_item = locate_item_by_color(haystack, Color.INSANE_VALUE.value)
     if insane_value_item is not None:

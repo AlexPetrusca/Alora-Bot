@@ -28,21 +28,21 @@ class Bot:
         self.loop = loop
 
         ''' Cerberus '''
-        self.action_queue.append(WaitAction(5))
-        self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(CalibrateAction())
-        self.action_queue.append(TeleportWizardAction("cerberus"))
-
-        self.action_queue.append(CerberusAction())
-
-        self.action_queue.append(PickUpItemsAction())
-        self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(HealAction(bank=True))  # todo: a heal action should probably include a home teleport action
+        # self.action_queue.append(WaitAction(5))
+        # self.action_queue.append(HomeTeleportAction())
+        # self.action_queue.append(CalibrateAction())
+        # self.action_queue.append(TeleportWizardAction("cerberus"))
+        #
+        # self.action_queue.append(CerberusAction())
+        #
+        # self.action_queue.append(PickUpItemsAction())
+        # self.action_queue.append(HomeTeleportAction())
+        # self.action_queue.append(HealAction(bank=True))  # todo: a heal action should probably include a home teleport action
 
         ''' Slayer '''
-        # self.action_queue.append(WaitAction(5))
-        # self.action_queue.append(SlayerAction())
-        # self.action_queue.append(PickUpItemsAction())
+        # self.action_queue.append(WaitAction(1))
+        self.action_queue.append(SlayerAction())
+        self.action_queue.append(PickUpItemsAction(pause_on_fail=False))
 
         ''' Barrows '''
         # self.action_queue.append(WaitAction(5))

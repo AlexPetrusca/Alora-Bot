@@ -48,6 +48,9 @@ class DebugDisplay:
             exit(1)
 
     def show_pick_up_items(self, screenshot):
+        copy = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        screenshot = cv.cvtColor(cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY), cv.COLOR_GRAY2BGR)
+
         def identify_items(color, return_mask=True):
             lower_limit, upper_limit = get_color_limits(color)
             mask = cv.inRange(copy, lower_limit, upper_limit)
@@ -61,7 +64,7 @@ class DebugDisplay:
             target = mask if return_mask else screenshot
 
             for contour in contours:
-                if cv.contourArea(contour) > 500:
+                if cv.contourArea(contour) > 250:
                     x, y, w, h = cv.boundingRect(contour)
                     c = round(x + w / 2), round(y + h / 2)
                     cv.rectangle(target, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
@@ -69,7 +72,6 @@ class DebugDisplay:
 
             return target
 
-        copy = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         if self.debug_tab == 1:
             self.tab_name = "All Item Values"
             identify_items(Color.DEFAULT_VALUE.value, False)
@@ -110,7 +112,7 @@ class DebugDisplay:
         contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
         for contour in contours:
-            if cv.contourArea(contour) > 250:
+            if cv.contourArea(contour) > 750:
                 x, y, w, h = cv.boundingRect(contour)
                 c = round(x + w / 2), round(y + h / 2)
                 cv.rectangle(mask, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)

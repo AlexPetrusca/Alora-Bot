@@ -12,6 +12,7 @@ from src.vision.coordinates import Controls, Prayer, Minimap, ArceuusSpellbook
 class CerberusAction(Action):
     sct = mss.mss()
 
+    tile_color = None
     last_chat = None
     fight_over_tick = None
     retry_count = 0
@@ -54,10 +55,11 @@ class CerberusAction(Action):
         if self.tick_counter == tick_offset:
             robot.click(Minimap.SPECIAL.value)
 
-        # 5. click yellow contour + wait to start fight
+        # 5. click magenta contour + wait to start fight
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click_contour(Color.YELLOW.value)
+            self.tile_color = Color.MAGENTA.value
+            robot.click_contour(self.tile_color)
 
         # 6. summon thrall
         tick_offset += Action.sec2tick(3)
@@ -83,17 +85,18 @@ class CerberusAction(Action):
                     if self.retry_count > 5:
                         return True
 
+                if vision.read_hitpoints(self.sct) <= 30:
+                    robot.click_food()
+
+            if self.tick_counter % Action.sec2tick(0.5) == 0:
                 chat = vision.read_latest_chat(self.sct)
                 # print(chat, "->", chat.find("Cerberus: Grr"))
                 if chat.find("Cerberus: Grr") == 0 and chat != self.last_chat:
                     # print("HIT ------------>", chat)
-                    robot.click_contour(Color.YELLOW.value)
+                    self.tile_color = Color.YELLOW.value if self.tile_color == Color.MAGENTA.value else Color.MAGENTA.value
+                    robot.click_contour(self.tile_color)
                     robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
                 self.last_chat = chat
-
-                if vision.read_hitpoints(self.sct) <= 30:
-                    # robot.click_image(cv.imread('../resources/target/item/shark.png', cv.IMREAD_UNCHANGED), 0.9)
-                    robot.click_food()
 
         if self.fight_over_tick is not None:
             tick_offset = self.fight_over_tick
@@ -117,6 +120,7 @@ class CerberusAction(Action):
         return False
 
     def last_tick(self):
+        self.tile_color = None
         self.last_chat = None
         self.fight_over_tick = None
         self.retry_count = 0
