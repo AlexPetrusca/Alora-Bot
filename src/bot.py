@@ -9,7 +9,7 @@ from src.actions.cerberus import CerberusAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
 from src.actions.pick_up_items import PickUpItemsAction
-from src.actions.slayer import SlayerAction
+from src.actions.combat import CombatAction
 from src.actions.teleport_wizard import TeleportWizardAction
 from src.actions.wait import WaitAction
 from src.debug import DebugDisplay
@@ -56,7 +56,7 @@ class Bot:
     def config_slayer(self):
         self.action_queue.append(WaitAction(5).play_once())
 
-        self.action_queue.append(SlayerAction())
+        self.action_queue.append(CombatAction())
         self.action_queue.append(PickUpItemsAction(pause_on_fail=False))
 
     def config_cerberus(self):

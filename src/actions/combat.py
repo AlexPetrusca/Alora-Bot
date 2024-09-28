@@ -8,7 +8,7 @@ from src.vision.color import Color
 from src.vision.coordinates import Controls, StandardSpellbook
 
 
-class SlayerAction(Action):
+class CombatAction(Action):
     sct = mss.mss()
     target_color = Color.RED.value
     health_threshold = 30

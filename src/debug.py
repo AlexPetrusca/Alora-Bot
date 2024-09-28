@@ -1,7 +1,7 @@
 from enum import Enum
 
 from src.actions.pick_up_items import PickUpItemsAction
-from src.actions.slayer import SlayerAction
+from src.actions.combat import CombatAction
 from src.vision.color import Color
 from src.util.common import hide_ui, get_color_limits
 import cv2 as cv
@@ -27,7 +27,7 @@ class DebugDisplay:
         self.current_action = self.bot.action_queue[0]
         if isinstance(self.current_action, PickUpItemsAction):
             screenshot = self.show_pick_up_items(screenshot)
-        elif isinstance(self.current_action, SlayerAction):
+        elif isinstance(self.current_action, CombatAction):
             screenshot = self.show_slayer(screenshot)
         else:
             screenshot = self.show_pick_up_items(screenshot)
