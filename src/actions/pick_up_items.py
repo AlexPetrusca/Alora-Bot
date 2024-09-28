@@ -40,9 +40,9 @@ class PickUpItemsAction(Action):
                     else:
                         self.retry_count += 1
             else:
-                return True
+                return self.tick_counter > Action.sec2tick(10)  # item not found, pause in case user wants to take action
 
-        if self.click_count > 25:
+        if self.click_count > 20:
             print("Find item failed - excessive click count")
             return True
         if self.retry_count > 4:

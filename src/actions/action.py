@@ -6,6 +6,7 @@ TICK_INTERVAL = 0.1  # 100ms tick
 
 
 class Action:
+    play_count = -1
     tick_counter = -1
     status = ""
 
@@ -36,6 +37,13 @@ class Action:
     def set_status(self, status):
         self.status = status
         logging.info(self.status)
+
+    def play(self, count):
+        self.play_count = count
+        return self
+
+    def play_once(self):
+        return self.play(1)
 
     @staticmethod
     def sec2tick(secs):

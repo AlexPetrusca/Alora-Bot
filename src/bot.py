@@ -18,23 +18,29 @@ from src.vision.coordinates import Prayer
 
 class Bot:
     debug_display = False
-    loop = False
+    play_count = -1
 
     action_queue = []
     t_ref = perf_counter()
 
-    def __init__(self, loop=False, debug=False):
+    def __init__(self, play_count=-1, debug=False):
         self.debug_display = debug
-        self.loop = loop
+        self.play_count = play_count
 
-        self.config_cerberus()
-        # self.config_slayer()
+        # self.config_test()
+        # self.config_cerberus()
+        self.config_slayer()
         # self.config_barrows()
 
+    def config_test(self):
+        self.action_queue.append(WaitAction(10).play_once())
+        self.action_queue.append(WaitAction(0.5))
+
     def config_barrows(self):
-        self.action_queue.append(WaitAction(5))
+        self.action_queue.append(WaitAction(5).play_once())
+        self.action_queue.append(CalibrateAction().play_once())
+
         self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(CalibrateAction())
         self.action_queue.append(TeleportWizardAction("barrows"))
 
         self.action_queue.append(BarrowAction("A", prayer=Prayer.PROTECT_FROM_MAGIC))
@@ -48,14 +54,16 @@ class Bot:
         self.action_queue.append(HealAction(bank=True))  # todo: a heal action should probably include a home teleport action
 
     def config_slayer(self):
-        # self.action_queue.append(WaitAction(1))
+        self.action_queue.append(WaitAction(5).play_once())
+
         self.action_queue.append(SlayerAction())
         self.action_queue.append(PickUpItemsAction(pause_on_fail=False))
 
     def config_cerberus(self):
-        self.action_queue.append(WaitAction(5))
+        self.action_queue.append(WaitAction(5).play_once())
+        self.action_queue.append(CalibrateAction().play_once())
+
         self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(CalibrateAction())
         self.action_queue.append(TeleportWizardAction("cerberus"))
 
         self.action_queue.append(CerberusAction())
@@ -66,13 +74,20 @@ class Bot:
 
     def tick(self):
         t = perf_counter() - self.t_ref
-        if len(self.action_queue) == 0:  # actions is done?
+        if len(self.action_queue) == 0:  # all actions are done?
             return True
         elif self.action_queue[0].run(t):  # current action is done?
             self.t_ref = perf_counter()
             top = self.action_queue.pop(0)
-            if self.loop:
-                self.action_queue.append(top)
+            if self.play_count != 0:  # all replays are done?
+                if self.play_count > 0:
+                    self.play_count -= 1
+                if top.play_count > 0:
+                    top.play_count -= 1
+                if top.play_count != 0:
+                    self.action_queue.append(top)
+            else:
+                return True
         return False
 
     def start(self):
