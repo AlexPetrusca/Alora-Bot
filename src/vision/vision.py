@@ -130,8 +130,8 @@ def read_int(haystack):
     old_text = text
     text = text.replace('O', '0')
     text = text.replace('i', '1').replace('I', '1')
-    text = text.replace('z', '2').replace('Z', '2').replace('L', '2').replace('&2', '2')
-    text = text.replace('y', '4').replace('k', '4').replace('h', '4')
+    text = text.replace('z', '2').replace('Z', '2').replace('&2', '2')
+    text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('L', '4')
     text = text.replace('S', '5')
     text = text.replace('G', '6').replace('E', '6')
     text = text.replace('B8', '8').replace('B', '8').replace('a', '8')

@@ -39,7 +39,7 @@ class SlayerAction(Action):
                     self.fight_over_tick = self.tick_counter
                 elif ocr.find("/") == -1:  # "/" not found
                     self.retry_count += 1
-                    if self.retry_count > 3:
+                    if self.retry_count >= 3:
                         self.fight_over_tick = self.tick_counter
                 # eat food or teleport home on low health
                 if vision.read_hitpoints(self.sct) < self.health_threshold:
@@ -53,7 +53,9 @@ class SlayerAction(Action):
                 robot.click(Controls.MAGIC_TAB.value)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT.value)
-            return self.tick_counter > self.tp_home_tick + Action.sec2tick(4)
+            # return self.tick_counter > self.tp_home_tick + Action.sec2tick(4)
+            if self.tick_counter == self.tp_home_tick + Action.sec2tick(4):
+                exit(1)
         elif self.fight_over_tick is not None:
             return self.tick_counter > self.fight_over_tick + Action.sec2tick(4)
         else:
