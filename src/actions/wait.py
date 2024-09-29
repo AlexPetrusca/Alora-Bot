@@ -9,7 +9,7 @@ class WaitAction(Action):
         self.d = d
 
     def first_tick(self):
-        self.set_status('Waiting...')
+        self.set_status(f'Waiting {self.d} seconds...')
 
     def tick(self, t):
         return t > self.d
