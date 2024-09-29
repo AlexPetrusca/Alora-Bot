@@ -1,6 +1,4 @@
 import logging
-import threading
-import mss
 from time import perf_counter
 
 from src.actions.barrow import BarrowAction
@@ -46,8 +44,8 @@ class Bot:
     def config_test(self):
         self.action_queue.append(WaitAction(5).play_once())
 
-        self.action_queue.append(WaitAction(0.5))
-        self.action_queue.append(WaitAction(0.25))
+        self.action_queue.append(WaitAction(2))
+        self.action_queue.append(WaitAction(1))
 
     def config_barrows(self):
         self.action_queue.append(WaitAction(5).play_once())
@@ -108,7 +106,7 @@ class Bot:
             self.debug = DebugDisplay(self)
         while True:
             if self.debug:
-                self.debug.show(perf_counter())
+                self.debug.tick(perf_counter())
             if self.tick():
                 logging.info("Done!")
                 return

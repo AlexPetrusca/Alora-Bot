@@ -21,7 +21,7 @@ class DebugDisplay:
     def __init__(self, bot):
         self.bot = bot
 
-    def show(self, t):
+    def tick(self, t):
         screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
 
         self.current_action = self.bot.action_queue[0]
@@ -68,7 +68,8 @@ class DebugDisplay:
                     x, y, w, h = cv.boundingRect(contour)
                     c = round(x + w / 2), round(y + h / 2)
                     cv.rectangle(target, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
-                    cv.rectangle(target, (c[0] - 5, c[1] - 5), (c[0] + 5, c[1] + 5), color=(0, 0, 255), thickness=-1, lineType=cv.LINE_AA)
+                    cv.rectangle(target, (c[0] - 5, c[1] - 5), (c[0] + 5, c[1] + 5), color=(0, 0, 255), thickness=-1,
+                                 lineType=cv.LINE_AA)
 
             return target
 
@@ -102,7 +103,6 @@ class DebugDisplay:
             self.debug_tab = 1
             return self.show_pick_up_items(screenshot)
 
-
     def show_slayer(self, screenshot):
         slayer_color = self.current_action.target_color
 
@@ -116,6 +116,7 @@ class DebugDisplay:
                 x, y, w, h = cv.boundingRect(contour)
                 c = round(x + w / 2), round(y + h / 2)
                 cv.rectangle(mask, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
-                cv.rectangle(mask, (c[0] - 5, c[1] - 5), (c[0] + 5, c[1] + 5), color=(0, 0, 255), thickness=-1, lineType=cv.LINE_AA)
+                cv.rectangle(mask, (c[0] - 5, c[1] - 5), (c[0] + 5, c[1] + 5), color=(0, 0, 255), thickness=-1,
+                             lineType=cv.LINE_AA)
 
         return mask

@@ -5,9 +5,6 @@ from src.vision.coordinates import Minimap
 
 
 class CalibrateAction(Action):
-    def __init__(self):
-        1+1
-
     def first_tick(self):
         self.set_status('Calibrating Camera...')
 
