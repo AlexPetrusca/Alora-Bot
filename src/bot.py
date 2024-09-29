@@ -1,19 +1,11 @@
 import logging
+from copy import copy
 from time import perf_counter
 
-from src.actions.barrow import BarrowAction
-from src.actions.calibrate import CalibrateAction
-from src.actions.cerberus import CerberusAction
-from src.actions.heal import HealAction
-from src.actions.home_teleport import HomeTeleportAction
-from src.actions.pick_up_items import PickUpItemsAction
-from src.actions.combat import CombatAction
-from src.actions.teleport_wizard import TeleportWizardAction
-from src.actions.wait import WaitAction
 from src.background import BackgroundScript
+from src.bot_config import BotConfig
 from src.debug import DebugDisplay
 from src.keylogger.keys import Key
-from src.vision.coordinates import Prayer
 
 
 class Bot:
@@ -35,66 +27,17 @@ class Bot:
         self.debug = debug
         self.play_count = play_count
         self.background = BackgroundScript(self)
+        self.apply_config(BotConfig.experiment())
 
-        config = self.config_test
-        # config = self.config_cerberus
-        # config = self.config_combat
-        # config = self.config_barrows
-        self.apply_config(config)
-
-    def apply_config(self, config_fn):
-        self.action_queue.clear()
-        config_fn()
-
-        self.current_config = config_fn
+    def apply_config(self, config):
+        self.action_queue = copy(config)
+        self.current_config = config
         self.current_action = self.action_queue[0]
 
         self.loop_length = 0
         for action in self.action_queue:
             if action.play_count == -1:
                 self.loop_length += 1
-
-    def config_test(self):
-        self.action_queue.append(WaitAction(5).play_once())
-
-        self.action_queue.append(WaitAction(2))
-        self.action_queue.append(WaitAction(1))
-
-    def config_barrows(self):
-        self.action_queue.append(WaitAction(5).play_once())
-        self.action_queue.append(CalibrateAction().play_once())
-
-        self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(TeleportWizardAction("barrows"))
-
-        self.action_queue.append(BarrowAction("A", prayer=Prayer.PROTECT_FROM_MAGIC))
-        self.action_queue.append(BarrowAction("K", prayer=Prayer.PROTECT_FROM_MISSILES))
-        self.action_queue.append(BarrowAction("G"))
-        self.action_queue.append(BarrowAction("D"))
-        self.action_queue.append(BarrowAction("V"))
-        self.action_queue.append(BarrowAction("T", last=True))
-
-        self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(HealAction(bank=True))  # todo: heal action should probably include a home teleport
-
-    def config_combat(self):
-        self.action_queue.append(WaitAction(5).play_once())
-
-        self.action_queue.append(CombatAction())
-        self.action_queue.append(PickUpItemsAction(pause_on_fail=False))
-
-    def config_cerberus(self):
-        self.action_queue.append(WaitAction(5).play_once())
-        self.action_queue.append(CalibrateAction().play_once())
-
-        self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(TeleportWizardAction("cerberus"))
-
-        self.action_queue.append(CerberusAction())
-
-        self.action_queue.append(PickUpItemsAction())
-        self.action_queue.append(HomeTeleportAction())
-        self.action_queue.append(HealAction(bank=True))  # todo: heal action should probably include a home teleport
 
     def handle_user_input(self):
         if self.paused != self.background.key_toggled(Key.F1):  # pause/play
