@@ -11,12 +11,11 @@ import time
 
 
 class DebugDisplay:
+    bot = None
+    sct = mss.mss()
+
     debug_tab = 1
     tab_name = ""
-
-    sct = mss.mss()
-    bot = None
-    current_action = None
 
     def __init__(self, bot):
         self.bot = bot
@@ -24,10 +23,9 @@ class DebugDisplay:
     def tick(self, t):
         screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
 
-        self.current_action = self.bot.action_queue[0]
-        if isinstance(self.current_action, PickUpItemsAction):
+        if isinstance(self.bot.current_action, PickUpItemsAction):
             screenshot = self.show_pick_up_items(screenshot)
-        elif isinstance(self.current_action, CombatAction):
+        elif isinstance(self.bot.current_action, CombatAction):
             screenshot = self.show_slayer(screenshot)
         else:
             screenshot = self.show_pick_up_items(screenshot)
@@ -104,7 +102,7 @@ class DebugDisplay:
             return self.show_pick_up_items(screenshot)
 
     def show_slayer(self, screenshot):
-        slayer_color = self.current_action.target_color
+        slayer_color = self.bot.current_action.target_color
 
         screenshot = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         lower_limit, upper_limit = get_color_limits(slayer_color)
