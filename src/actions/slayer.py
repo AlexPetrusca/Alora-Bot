@@ -10,6 +10,7 @@ from src.vision.coordinates import Prayer, Controls
 class SlayerTask(Enum):
     CAVE_KRAKEN = 'Cave Kraken'
     RUNE_DRAGON = 'Rune Dragon'
+    BASILISK_KNIGHT = 'Basilisk Knight'
 
 
 class SlayerAction(Action):
@@ -20,21 +21,24 @@ class SlayerAction(Action):
     tp_home_tick = None
     t_ref = 0
 
-    def __init__(self, task):
+    def __init__(self, task, health_threshold=30):
         self.task = task
-
-        # implement fully
-        if self.task == SlayerTask.CAVE_KRAKEN or self.task == SlayerTask.RUNE_DRAGON:
-            self.prayer = Prayer.PROTECT_FROM_MAGIC
-        # elif :
-        #     self.prayer = Prayer.PROTECT_FROM_MAGIC
-        else:
-            self.prayer = Prayer.PROTECT_FROM_MELEE
-
         self.action_queue = [
-            CombatAction(),
+            CombatAction(health_threshold),
             PickUpItemsAction(pause_on_fail=False)
         ]
+
+        magic_tasks = {SlayerTask.CAVE_KRAKEN, SlayerTask.RUNE_DRAGON, SlayerTask.BASILISK_KNIGHT}
+        melee_tasks = {}
+        ranged_tasks = {}
+
+        self.prayer = Prayer.PROTECT_FROM_MELEE
+        if task in magic_tasks:
+            self.prayer = Prayer.PROTECT_FROM_MAGIC
+        elif task in ranged_tasks:
+            self.prayer = Prayer.PROTECT_FROM_MISSILES
+        elif task in melee_tasks:
+            self.prayer = Prayer.PROTECT_FROM_MELEE
 
     def first_tick(self):
         self.set_status(f'Slaying {self.task.value}s...')

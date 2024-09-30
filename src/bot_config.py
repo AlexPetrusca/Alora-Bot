@@ -1,6 +1,6 @@
 from src.actions.barrow import BarrowAction
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
-from src.actions.calibrate import CalibrateAction
+from src.actions.calibrate import CalibrateAction, Direction
 from src.actions.cerberus import CerberusAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
@@ -24,7 +24,7 @@ class BotConfig:
         ]
 
     @staticmethod
-    def slayer(task, color=Color.YELLOW):
+    def slayer(task, color=Color.YELLOW, health_threshold=30):
         return [
             WaitAction(5).play_once(),
             CalibrateAction().play_once(),
@@ -33,7 +33,7 @@ class BotConfig:
             TeleportWizardAction(task),
 
             BreadcrumbTrailAction(color),
-            SlayerAction(task),
+            SlayerAction(task, health_threshold),
 
             HealAction(bank=True)
         ]

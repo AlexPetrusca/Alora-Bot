@@ -30,7 +30,7 @@ class Bot:
         self.background = BackgroundScript(self)
 
         # config = BotConfig.experiment()
-        config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
+        config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=40)
         self.apply_config(config)
 
     def apply_config(self, config):
