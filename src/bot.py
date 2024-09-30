@@ -2,6 +2,7 @@ import logging
 from copy import copy
 from time import perf_counter
 
+from src.actions.slayer import SlayerTask
 from src.background import BackgroundScript
 from src.bot_config import BotConfig
 from src.debug import DebugDisplay
@@ -28,7 +29,9 @@ class Bot:
         self.play_count = play_count
         self.background = BackgroundScript(self)
 
-        self.apply_config(BotConfig.slayer())
+        # config = BotConfig.experiment()
+        config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
+        self.apply_config(config)
 
     def apply_config(self, config):
         self.action_queue = copy(config)

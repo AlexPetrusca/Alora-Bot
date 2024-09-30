@@ -7,6 +7,8 @@ class TeleportWizardAction(Action):
 
     def __init__(self, destination):
         self.destination = destination
+        if hasattr(self.destination, 'value'):
+            self.destination = destination.value
 
     def first_tick(self):
         self.set_status('Walking to Teleport Wizard...')

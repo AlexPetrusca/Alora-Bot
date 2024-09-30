@@ -6,6 +6,7 @@ from pytesseract import pytesseract
 
 from src.util.common import hide_ui, get_color_limits, get_color_limits
 from src.vision.color import Color
+from src.vision.coordinates import PLAYER_SCREEN_POS
 
 
 def grab_screen(sct):
@@ -39,7 +40,7 @@ def locate_image(haystack, needle, threshold=0.7):
         return None
 
 
-def locate_contour(haystack, color, area_threshold=750):
+def locate_contour(haystack, color, area_threshold=750, min_distance=0):
     if hasattr(color, 'value'):
         color = color.value
 
@@ -49,14 +50,13 @@ def locate_contour(haystack, color, area_threshold=750):
 
     closest_distance = 999999999
     closest_position = None
-    screen_center = haystack.shape[1] / 2, haystack.shape[0] / 2
     contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
     for contour in contours:
         if cv.contourArea(contour) > area_threshold:
             x, y, w, h = cv.boundingRect(contour)
             contour_center = round(x + w / 2), round(y + h / 2)
-            distance = math.dist(screen_center, contour_center)
-            if distance < closest_distance:
+            distance = math.dist(PLAYER_SCREEN_POS, contour_center)
+            if min_distance < distance < closest_distance:
                 closest_distance = distance
                 closest_position = contour_center
 

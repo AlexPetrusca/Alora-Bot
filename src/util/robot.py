@@ -48,9 +48,9 @@ def click_image(image, threshold=0.7):
         return True
 
 
-def click_contour(color, area_threshold=750):
+def click_contour(color, area_threshold=750, min_distance=0):
     screenshot = vision.grab_screen(mss.mss())  # todo: can we avoid reinitializing mss each time
-    loc = vision.locate_contour(screenshot, color, area_threshold)
+    loc = vision.locate_contour(screenshot, color, area_threshold, min_distance)
     if loc is None:
         return False
     else:

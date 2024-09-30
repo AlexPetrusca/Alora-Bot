@@ -4,6 +4,7 @@ import mss
 from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
+from src.vision.coordinates import Controls, StandardSpellbook
 
 
 class PickUpItemsAction(Action):
@@ -11,6 +12,7 @@ class PickUpItemsAction(Action):
     pause_on_fail = True
 
     item_found = False
+    tp_home_tick = None
     click_count = 0
     retry_count = 0
 
@@ -32,9 +34,11 @@ class PickUpItemsAction(Action):
 
         if self.tick_counter > Action.sec2tick(3):
             if self.item_found:
-                if self.tick_counter % Action.sec2tick(0.25) == 0:
+                if self.tick_counter % Action.sec2tick(0.25) == 0 and self.tp_home_tick is None:
                     click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
                     if click_xy is not None:
+                        if vision.read_latest_chat(self.sct).find("You do not have enough inventory space.") == 0:
+                            self.tp_home_tick = self.tick_counter
                         robot.click(click_xy[0] / 2, click_xy[1] / 2)
                         self.click_count += 1
                     else:
@@ -42,6 +46,12 @@ class PickUpItemsAction(Action):
             else:
                 return self.tick_counter > Action.sec2tick(10)  # item not found, pause in case user wants to take action
 
+        if self.tp_home_tick is not None:
+            if self.tick_counter == self.tp_home_tick:
+                robot.click(Controls.MAGIC_TAB)
+            if self.tick_counter == self.tp_home_tick + Action.sec2tick(1):
+                robot.click(StandardSpellbook.HOME_TELEPORT)
+            return self.tick_counter > self.tp_home_tick + Action.sec2tick(4)
         if self.click_count > 20:
             print("Find item failed - excessive click count")
             return True
@@ -53,5 +63,10 @@ class PickUpItemsAction(Action):
 
     def last_tick(self):
         self.item_found = False
+        self.tp_home_tick = None
         self.click_count = 0
         self.retry_count = 0
+
+    # replace with Status.ABORTED
+    def did_tp_home(self):
+        return self.tp_home_tick is not None

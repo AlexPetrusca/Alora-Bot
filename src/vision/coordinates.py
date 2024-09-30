@@ -1,5 +1,8 @@
 from enum import Enum
 
+PLAYER_POS = 855, 585
+PLAYER_SCREEN_POS = 1710, 1170
+
 
 class Controls(Enum):
     MAGIC_TAB = 1674, 801
