@@ -54,6 +54,7 @@ class Bot:
         if self.background.key_toggled(Key.F2):  # reset
             logging.info("Reset")
             self.apply_config(self.current_config)
+            self.t_start = perf_counter() - self.t_duration
             self.background.untoggle_key(Key.F2)
         if self.background.key_toggled(Key.F3):  # exit
             logging.info("Exit")

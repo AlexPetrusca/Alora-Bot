@@ -49,9 +49,9 @@ class PickUpItemsAction(Action):
         if self.tp_home_tick is not None:
             if self.tick_counter == self.tp_home_tick:
                 robot.click(Controls.MAGIC_TAB)
-            if self.tick_counter == self.tp_home_tick + Action.sec2tick(1):
+            if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            return self.tick_counter > self.tp_home_tick + Action.sec2tick(4)
+            return self.tick_counter > self.tp_home_tick + Action.sec2tick(5)
         if self.click_count > 20:
             print("Find item failed - excessive click count")
             return True

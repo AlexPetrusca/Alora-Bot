@@ -53,9 +53,9 @@ class CombatAction(Action):
                 robot.click(Controls.MAGIC_TAB)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            return self.tick_counter > self.tp_home_tick + Action.sec2tick(4)
+            return self.tick_counter > self.tp_home_tick + Action.sec2tick(5)
         elif self.fight_over_tick is not None:
-            return self.tick_counter > self.fight_over_tick + Action.sec2tick(4)
+            return self.tick_counter > self.fight_over_tick + Action.sec2tick(5)
         else:
             return False
 
