@@ -9,9 +9,9 @@ class HomeTeleportAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:
-            robot.click(Controls.MAGIC_TAB.value)
+            robot.click(Controls.MAGIC_TAB)
         if self.tick_counter == Action.sec2tick(1):
-            robot.click(StandardSpellbook.HOME_TELEPORT.value)
+            robot.click(StandardSpellbook.HOME_TELEPORT)
         return self.tick_counter == Action.sec2tick(4)
 
     def last_tick(self):

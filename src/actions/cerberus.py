@@ -44,34 +44,34 @@ class CerberusAction(Action):
         # 4. Enable prayers + spec
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Controls.PRAYER_TAB.value)
+            robot.click(Controls.PRAYER_TAB)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Prayer.PROTECT_FROM_MAGIC.value)
+            robot.click(Prayer.PROTECT_FROM_MAGIC)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Prayer.PIETY.value)
+            robot.click(Prayer.PIETY)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Minimap.SPECIAL.value)
+            robot.click(Minimap.SPECIAL)
 
         # 5. click magenta contour + wait to start fight
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            self.tile_color = Color.MAGENTA.value
+            self.tile_color = Color.MAGENTA
             robot.click_contour(self.tile_color)
 
         # 6. summon thrall
         tick_offset += Action.sec2tick(3)
         if self.tick_counter == tick_offset:
             self.set_status('Fighting Cerberus...')
-            robot.click(Controls.MAGIC_TAB.value)
+            robot.click(Controls.MAGIC_TAB)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(ArceuusSpellbook.RESURRECT_GREATER_SKELETON.value)
+            robot.click(ArceuusSpellbook.RESURRECT_GREATER_SKELETON)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Controls.INVENTORY_TAB.value)
+            robot.click(Controls.INVENTORY_TAB)
 
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
         if self.tick_counter > tick_offset and self.fight_over_tick is None:
@@ -93,7 +93,7 @@ class CerberusAction(Action):
                 # print(chat, "->", chat.find("Cerberus: Grr"))
                 if chat.find("Cerberus: Grr") == 0 and chat != self.last_chat:
                     # print("HIT ------------>", chat)
-                    self.tile_color = Color.YELLOW.value if self.tile_color == Color.MAGENTA.value else Color.MAGENTA.value
+                    self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
                     robot.click_contour(self.tile_color)
                     robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
                 self.last_chat = chat
@@ -104,13 +104,13 @@ class CerberusAction(Action):
             # 8. Disable prayers
             tick_offset += Action.sec2tick(1)
             if self.tick_counter == tick_offset:
-                robot.click(Controls.PRAYER_TAB.value)
+                robot.click(Controls.PRAYER_TAB)
             tick_offset += Action.sec2tick(1)
             if self.tick_counter == tick_offset:
-                robot.click(Prayer.PROTECT_FROM_MAGIC.value)
+                robot.click(Prayer.PROTECT_FROM_MAGIC)
             tick_offset += Action.sec2tick(1)
             if self.tick_counter == tick_offset:
-                robot.click(Prayer.PIETY.value)
+                robot.click(Prayer.PIETY)
 
             # 9. End fight
             tick_offset += Action.sec2tick(2)

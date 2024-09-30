@@ -40,6 +40,9 @@ def locate_image(haystack, needle, threshold=0.7):
 
 
 def locate_contour(haystack, color, area_threshold=750):
+    if hasattr(color, 'value'):
+        color = color.value
+
     hsv = hide_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
     lower_limit, upper_limit = get_color_limits(color)
     mask = cv.inRange(hsv, lower_limit, upper_limit)

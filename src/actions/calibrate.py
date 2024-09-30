@@ -10,7 +10,7 @@ class CalibrateAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:
-            robot.click(Minimap.COMPASS.value)
+            robot.click(Minimap.COMPASS)
         elif self.tick_counter == 1:
             robot.key_down('up')
         elif self.tick_counter == 20:

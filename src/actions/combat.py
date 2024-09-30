@@ -10,14 +10,14 @@ from src.vision.coordinates import Controls, StandardSpellbook
 
 class CombatAction(Action):
     sct = mss.mss()
-    target_color = Color.RED.value
+    target_color = Color.RED
     health_threshold = 30
 
     fight_over_tick = None
     tp_home_tick = None
     retry_count = 0
 
-    def __init__(self, target_color=Color.RED.value, health_threshold=30):
+    def __init__(self, target_color=Color.RED, health_threshold=30):
         self.target_color = target_color
         self.health_threshold = health_threshold
 
@@ -28,7 +28,7 @@ class CombatAction(Action):
         if self.tick_counter == 0:
             robot.click_contour(self.target_color)
         if self.tick_counter == Action.sec2tick(1):
-            robot.click(Controls.INVENTORY_TAB.value)
+            robot.click(Controls.INVENTORY_TAB)
         if self.tick_counter > Action.sec2tick(4) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 # check fight end
@@ -50,9 +50,9 @@ class CombatAction(Action):
 
         if self.tp_home_tick is not None:
             if self.tick_counter == self.tp_home_tick:
-                robot.click(Controls.MAGIC_TAB.value)
+                robot.click(Controls.MAGIC_TAB)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
-                robot.click(StandardSpellbook.HOME_TELEPORT.value)
+                robot.click(StandardSpellbook.HOME_TELEPORT)
             # return self.tick_counter > self.tp_home_tick + Action.sec2tick(4)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(4):
                 exit(1)

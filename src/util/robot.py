@@ -7,6 +7,8 @@ from src.vision import vision
 def click(x=None, y=None):
     if isinstance(x, tuple):
         pyautogui.moveTo(x)
+    elif hasattr(x, 'value'):
+        pyautogui.moveTo(x.value)
     else:
         pyautogui.moveTo(x, y)
     pyautogui.click()
@@ -15,6 +17,8 @@ def click(x=None, y=None):
 def right_click(x=None, y=None):
     if isinstance(x, tuple):
         pyautogui.moveTo(x)
+    elif hasattr(x, 'value'):
+        pyautogui.moveTo(x.value)
     else:
         pyautogui.moveTo(x, y)
     pyautogui.rightClick()

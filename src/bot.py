@@ -27,7 +27,8 @@ class Bot:
         self.debug = debug
         self.play_count = play_count
         self.background = BackgroundScript(self)
-        self.apply_config(BotConfig.experiment())
+
+        self.apply_config(BotConfig.slayer())
 
     def apply_config(self, config):
         self.action_queue = copy(config)

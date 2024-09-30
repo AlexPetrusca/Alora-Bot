@@ -41,20 +41,20 @@ class BarrowAction(Action):
             return self.tick_counter == Action.sec2tick(8)
 
         if self.tick_counter == Action.sec2tick(1):  # open item todo: if item is already open, don't open it again
-            robot.click(Controls.INVENTORY_TAB.value)
+            robot.click(Controls.INVENTORY_TAB)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
             robot.click(SPADE)
 
         if self.tick_counter == Action.sec2tick(11):  # click sarcophagus + fight (50s)
             self.set_status("Fighting...")
-            robot.click_contour(Color.YELLOW.value)
+            robot.click_contour(Color.YELLOW)
 
         if self.tick_counter == Action.sec2tick(14):  # todo: its annoying to change one of these timings because everything after has to be updated as well
-            robot.click(Controls.PRAYER_TAB.value)
+            robot.click(Controls.PRAYER_TAB)
         if self.tick_counter == Action.sec2tick(14.5):
-            robot.click(self.prayer.value)
+            robot.click(self.prayer)
         if self.tick_counter == Action.sec2tick(15):
-            robot.click(Prayer.PIETY.value)
+            robot.click(Prayer.PIETY)
 
         if self.tick_counter > Action.sec2tick(18) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
@@ -66,9 +66,9 @@ class BarrowAction(Action):
 
         if self.fight_over_tick is not None:
             if self.tick_counter == self.fight_over_tick + Action.sec2tick(0.5):
-                robot.click(Prayer.PIETY.value)
+                robot.click(Prayer.PIETY)
             if self.tick_counter == self.fight_over_tick + Action.sec2tick(1):
-                robot.click(self.prayer.value)
+                robot.click(self.prayer)
 
             # if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):  # todo: this is being done too early
             #     print("COLLECTING REWARDS")
@@ -79,7 +79,7 @@ class BarrowAction(Action):
                     return True
             elif self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
                 self.set_status(f"Completed Barrow {self.barrow}")
-                robot.click_contour(Color.MAGENTA.value)  # exit barrow (8s) todo: if last we dont need to do this
+                robot.click_contour(Color.MAGENTA)  # exit barrow (8s) todo: if last we dont need to do this
 
             return self.tick_counter == self.fight_over_tick + Action.sec2tick(7)
 
