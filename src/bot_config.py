@@ -1,6 +1,6 @@
 from src.actions.barrow import BarrowAction
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
-from src.actions.calibrate import CalibrateAction, Direction
+from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction

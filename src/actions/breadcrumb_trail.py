@@ -1,36 +1,50 @@
+import cv2 as cv
 import mss
 
 from src.actions.action import Action
 from src.util import robot
+from src.util.common import hide_ui
 from src.vision import vision
 from src.vision.color import Color
 
 
+# todo: [bug] sometimes gets stuck before final breadcrumb (maybe related to todo below)
 class BreadcrumbTrailAction(Action):
     color = Color.YELLOW
+    breadcrumbs = []
     sct = mss.mss()
 
-    dest_tile = None
+    next_label = 0
+    retry_count = 0
 
     def __init__(self, color=Color.YELLOW):
         self.color = color
+        for i in range(0, 9):
+            path = f'../resources/target/label/marker/{self.color.to_string()}/{i}.png'
+            self.breadcrumbs.append(cv.imread(path, cv.IMREAD_UNCHANGED))
 
     def first_tick(self):
-        self.set_status(f'Following {self.color} breadcrumb trail...')
+        self.set_status(f'Following {self.color.to_string()} breadcrumb trail...')
 
-    # todo: try different color for destination marker to try to make it thinner
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
     def tick(self, t):
         if self.tick_counter % Action.sec2tick(1) == 0:
-            dest_tile = vision.locate_contour(vision.grab_screen(self.sct), Color.WHITE)
-            print("White Tile:", dest_tile)
+            screenshot = hide_ui(vision.grab_screen(self.sct))
+            dest_tile = vision.locate_contour(screenshot, Color.WHITE)
             if dest_tile is None:
-                clicked_breadcrumb = robot.click_contour(self.color, min_distance=50)
-                print("Yellow Tile:", clicked_breadcrumb)
-                if not clicked_breadcrumb:
-                    return True  # reached destination
+                breadcrumb_loc = vision.locate_image(screenshot, self.breadcrumbs[self.next_label], 0.8)
+                if breadcrumb_loc is not None:
+                    robot.click(breadcrumb_loc[0] / 2, breadcrumb_loc[1] / 2)
+                    self.next_label += 1
+                    self.retry_count = 0
+                else:
+                    print("Failed looking for breadcrumb: ", self.next_label)
+                    self.retry_count += 1
+                    if self.retry_count >= 4:
+                        return True  # reached destination
 
         return False
 
     def last_tick(self):
-        self.dest_tile = None
+        self.next_label = 0
+        self.retry_count = 0

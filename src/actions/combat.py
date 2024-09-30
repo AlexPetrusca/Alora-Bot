@@ -8,6 +8,8 @@ from src.vision.color import Color
 from src.vision.coordinates import Controls, StandardSpellbook
 
 
+# todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
+#   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
     sct = mss.mss()
     target_color = Color.RED

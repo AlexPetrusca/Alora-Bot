@@ -30,7 +30,8 @@ class Bot:
         self.background = BackgroundScript(self)
 
         # config = BotConfig.experiment()
-        config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=40)
+        # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
+        config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=30)
         self.apply_config(config)
 
     def apply_config(self, config):
@@ -54,7 +55,8 @@ class Bot:
         if self.background.key_toggled(Key.F2):  # reset
             logging.info("Reset")
             self.apply_config(self.current_config)
-            self.t_start = perf_counter() - self.t_duration
+            self.t_start = perf_counter()
+            self.t_duration = 0
             self.background.untoggle_key(Key.F2)
         if self.background.key_toggled(Key.F3):  # exit
             logging.info("Exit")

@@ -13,8 +13,10 @@ class SlayerTask(Enum):
     BASILISK_KNIGHT = 'Basilisk Knight'
 
 
+# todo: [bug] sometimes heal action is messed up and fails after tp back
 class SlayerAction(Action):
     task = None
+    health_threshold = 30
     prayer = None
 
     action_queue = []
@@ -23,8 +25,9 @@ class SlayerAction(Action):
 
     def __init__(self, task, health_threshold=30):
         self.task = task
+        self.health_threshold = health_threshold
         self.action_queue = [
-            CombatAction(health_threshold),
+            CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction(pause_on_fail=False)
         ]
 
@@ -67,7 +70,7 @@ class SlayerAction(Action):
 
     def last_tick(self):
         self.action_queue = [
-            CombatAction(),
+            CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction(pause_on_fail=False)
         ]
         self.tp_home_tick = None

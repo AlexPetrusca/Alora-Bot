@@ -40,7 +40,7 @@ def locate_image(haystack, needle, threshold=0.7):
         return None
 
 
-def locate_contour(haystack, color, area_threshold=750, min_distance=0):
+def locate_contour(haystack, color, area_threshold=750, farthest=False):
     if hasattr(color, 'value'):
         color = color.value
 
@@ -48,19 +48,19 @@ def locate_contour(haystack, color, area_threshold=750, min_distance=0):
     lower_limit, upper_limit = get_color_limits(color)
     mask = cv.inRange(hsv, lower_limit, upper_limit)
 
-    closest_distance = 999999999
-    closest_position = None
+    opt_distance = 0 if farthest else 1e10
+    opt_position = None
     contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
     for contour in contours:
         if cv.contourArea(contour) > area_threshold:
             x, y, w, h = cv.boundingRect(contour)
             contour_center = round(x + w / 2), round(y + h / 2)
             distance = math.dist(PLAYER_SCREEN_POS, contour_center)
-            if min_distance < distance < closest_distance:
-                closest_distance = distance
-                closest_position = contour_center
+            if (farthest and distance > opt_distance) or (not farthest and distance < opt_distance):
+                opt_distance = distance
+                opt_position = contour_center
 
-    return closest_position
+    return opt_position
 
 
 def locate_ground_item(haystack, area_threshold=500):
