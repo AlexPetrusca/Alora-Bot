@@ -1,0 +1,7 @@
+Flask
+mss
+numpy
+pyautogui
+pytesseract
+Requests
+opencv-python
