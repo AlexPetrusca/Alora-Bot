@@ -6,7 +6,7 @@ def hide(img, p1, p2, color=(0, 0, 0)):
     return cv.rectangle(img, (2 * p1[0], 2 * p1[1]), (2 * p2[0], 2 * p2[1]), color, thickness=-1)
 
 
-def hide_ui(img):
+def mask_ui(img):
     hide(img, (1328, 40), (1453, 70))  # hide exp bar
     hide(img, (1455, 784), (1696, 1117))  # hide item
     hide(img, (0, 922), (520, 1117))  # hide chat

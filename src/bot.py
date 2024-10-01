@@ -29,9 +29,9 @@ class Bot:
         self.play_count = play_count
         self.background = BackgroundScript(self)
 
-        # config = BotConfig.experiment()
+        config = BotConfig.experiment()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
-        config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=30)
+        # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=40)
         self.apply_config(config)
 
     def apply_config(self, config):
@@ -44,6 +44,7 @@ class Bot:
             if action.play_count == -1:
                 self.loop_length += 1
 
+    # todo: [bug] Pausing then resetting then playing skips actions (reset is broken)
     def handle_user_input(self):
         if self.paused != self.background.key_toggled(Key.F1):  # pause/play
             self.paused = self.background.key_toggled(Key.F1)

@@ -2,6 +2,7 @@ import mss
 import pyautogui
 import cv2 as cv
 from src.vision import vision
+from src.vision.vision import ContourDetection
 
 
 def click(x=None, y=None):
@@ -48,9 +49,9 @@ def click_image(image, threshold=0.7):
         return True
 
 
-def click_contour(color, area_threshold=750, farthest=False):
+def click_contour(color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
     screenshot = vision.grab_screen(mss.mss())  # todo: can we avoid reinitializing mss each time
-    loc = vision.locate_contour(screenshot, color, area_threshold, farthest)
+    loc = vision.locate_contour(screenshot, color, area_threshold, mode)
     if loc is None:
         return False
     else:

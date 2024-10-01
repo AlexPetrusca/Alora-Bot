@@ -2,7 +2,7 @@ import math
 
 import cv2 as cv
 import numpy as np
-from src.util.common import hide_ui, get_color_limits
+from src.util.common import mask_ui, get_color_limits
 from src.vision import vision
 from src.vision.color import Color
 
@@ -13,7 +13,7 @@ from src.vision.color import Color
 COLOR = Color.HIGH_VALUE.value  # 200, 200
 # COLOR = Color.INSANE_VALUE.value
 
-screenshot_image = hide_ui(cv.imread('../resources/experiments/screenshot/ground_items.png', cv.IMREAD_UNCHANGED))
+screenshot_image = mask_ui(cv.imread('../resources/experiments/screenshot/ground_items.png', cv.IMREAD_UNCHANGED))
 screenshot_threshold = cv.cvtColor(screenshot_image, cv.COLOR_BGR2HSV)
 lower_limit, upper_limit = get_color_limits(COLOR)
 mask = cv.inRange(screenshot_threshold, lower_limit, upper_limit)

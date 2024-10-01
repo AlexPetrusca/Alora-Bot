@@ -10,7 +10,7 @@ class HealAction(Action):
         self.bank = bank
 
     def first_tick(self):
-        self.set_status("Routing to Healer...")
+        self.set_status(f"Routing to Healer... tick={self.tick_counter}")
 
     def tick(self, t):
         if self.tick_counter == 0:

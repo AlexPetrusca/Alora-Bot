@@ -2,12 +2,16 @@ from enum import Enum
 
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
+from src.actions.zulrah import ZulrahAction
+from src.vision import vision
 from src.vision.color import Color
-from src.util.common import hide_ui, get_color_limits
+from src.util.common import mask_ui, get_color_limits
 import cv2 as cv
 import numpy as np
 import mss
 import time
+
+from src.vision.vision import ContourDetection
 
 
 class DebugDisplay:
@@ -24,11 +28,13 @@ class DebugDisplay:
         screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
 
         if isinstance(self.bot.current_action, PickUpItemsAction):
-            screenshot = self.show_pick_up_items(screenshot)
+            screenshot = self.tick_pick_up_items(screenshot)
         elif isinstance(self.bot.current_action, CombatAction):
-            screenshot = self.show_slayer(screenshot)
+            screenshot = self.tick_slayer(screenshot)
+        elif isinstance(self.bot.current_action, ZulrahAction):
+            screenshot = self.tick_zulrah(screenshot)
         else:
-            screenshot = self.show_pick_up_items(screenshot)
+            screenshot = self.tick_pick_up_items(screenshot)
 
         cv.putText(screenshot, f'FPS: {round(1 / (time.perf_counter() - t))}', (10, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)
@@ -45,8 +51,8 @@ class DebugDisplay:
             cv.destroyAllWindows()
             exit(1)
 
-    def show_pick_up_items(self, screenshot):
-        copy = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+    def tick_pick_up_items(self, screenshot):
+        copy = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         screenshot = cv.cvtColor(cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY), cv.COLOR_GRAY2BGR)
 
         def identify_items(color, return_mask=True):
@@ -99,12 +105,12 @@ class DebugDisplay:
             return identify_items(Color.HIGHLIGHTED_VALUE.value)
         else:
             self.debug_tab = 1
-            return self.show_pick_up_items(screenshot)
+            return self.tick_pick_up_items(screenshot)
 
-    def show_slayer(self, screenshot):
+    def tick_slayer(self, screenshot):
         slayer_color = self.bot.current_action.target_color
 
-        screenshot = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        screenshot = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         lower_limit, upper_limit = get_color_limits(slayer_color)
         mask = cv.inRange(screenshot, lower_limit, upper_limit)
         contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
@@ -118,3 +124,52 @@ class DebugDisplay:
                              lineType=cv.LINE_AA)
 
         return mask
+
+    def tick_zulrah(self, screenshot):
+        if self.debug_tab == 1:
+            self.tab_name = "Zulrah Markers"
+        if self.debug_tab == 2:
+            self.tab_name = "Green Mask"
+            return self.get_color_mask(screenshot, Color.GREEN.value)
+        elif self.debug_tab == 3:
+            self.tab_name = "Blue Mask"
+            return self.get_color_mask(screenshot, Color.BLUE.value)
+        elif self.debug_tab == 4:
+            self.tab_name = "Red Mask"
+            return self.get_color_mask(screenshot, Color.RED.value)
+
+        red_contour, red_area = vision.get_contour(screenshot, Color.RED, mode=ContourDetection.AREA_LARGEST)
+        green_contour, green_area = vision.get_contour(screenshot, Color.GREEN, mode=ContourDetection.AREA_LARGEST)
+        blue_contour, blue_area = vision.get_contour(screenshot, Color.BLUE, mode=ContourDetection.AREA_LARGEST)
+
+        if red_contour is not None:
+            x, y, w, h = cv.boundingRect(red_contour)
+            red_loc = round(x + w / 2), round(y + h / 2)
+            DebugDisplay.draw_point(screenshot, red_loc[0], red_loc[1], Color.MAGENTA.value, 10, f'{red_area}')
+        if green_contour is not None:
+            x, y, w, h = cv.boundingRect(green_contour)
+            green_loc = round(x + w / 2), round(y + h / 2)
+            DebugDisplay.draw_point(screenshot, green_loc[0], green_loc[1], Color.YELLOW.value, 10, f'{green_area}')
+        if blue_contour is not None:
+            x, y, w, h = cv.boundingRect(blue_contour)
+            blue_loc = round(x + w / 2), round(y + h / 2)
+            DebugDisplay.draw_point(screenshot, blue_loc[0], blue_loc[1], Color.CYAN.value, 10, f'{blue_area}')
+
+        return screenshot
+
+    @staticmethod
+    def get_color_mask(screenshot, color):
+        screenshot = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        lower_limit, upper_limit = get_color_limits(color)
+        mask = cv.inRange(screenshot, lower_limit, upper_limit)
+        mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
+        return mask
+
+    @staticmethod
+    def draw_point(img, x, y, color=(0, 0, 255), thickness=5, label=None):
+        cv.rectangle(img, (x - thickness, y - thickness), (x + thickness, y + thickness), color=color,
+                     thickness=-1, lineType=cv.LINE_AA)
+        if label is not None:
+            cv.putText(img, label, (x - thickness, y - thickness - 10), cv.FONT_HERSHEY_SIMPLEX, 1, color,
+                       2, cv.LINE_AA)
+
