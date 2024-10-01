@@ -3,7 +3,6 @@ import mss
 
 from src.actions.action import Action
 from src.util import robot
-from src.util.common import hide_ui
 from src.vision import vision
 from src.vision.color import Color
 
@@ -29,7 +28,7 @@ class BreadcrumbTrailAction(Action):
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
     def tick(self, t):
         if self.tick_counter % Action.sec2tick(1) == 0:
-            screenshot = hide_ui(vision.grab_screen(self.sct))
+            screenshot = vision.grab_screen(self.sct, hide_ui=True)
             dest_tile = vision.locate_contour(screenshot, Color.WHITE)
             if dest_tile is None:
                 breadcrumb_loc = vision.locate_image(screenshot, self.breadcrumbs[self.next_label], 0.8)

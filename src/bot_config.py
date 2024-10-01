@@ -9,6 +9,7 @@ from src.actions.combat import CombatAction
 from src.actions.slayer import SlayerAction
 from src.actions.teleport_wizard import TeleportWizardAction
 from src.actions.wait import WaitAction
+from src.actions.zulrah import ZulrahAction
 from src.vision.color import Color
 from src.vision.coordinates import Prayer
 
@@ -17,10 +18,9 @@ class BotConfig:
     @staticmethod
     def experiment():
         return [
-            WaitAction(5).play_once(),
+            WaitAction(1).play_once(),
 
-            WaitAction(2),
-            BreadcrumbTrailAction()
+            ZulrahAction()
         ]
 
     @staticmethod

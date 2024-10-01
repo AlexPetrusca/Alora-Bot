@@ -1,16 +1,25 @@
 import math
+from enum import Enum
 
 import numpy as np
 import cv2 as cv
 from pytesseract import pytesseract
 
-from src.util.common import hide_ui, get_color_limits, get_color_limits
+from src.util.common import mask_ui, get_color_limits
 from src.vision.color import Color
 from src.vision.coordinates import PLAYER_SCREEN_POS
 
 
-def grab_screen(sct):
-    return np.array(sct.grab(sct.monitors[1]))
+class ContourDetection(Enum):
+    DISTANCE_CLOSEST = 0
+    DISTANCE_FARTHEST = 1
+    AREA_LARGEST = 2
+    AREA_SMALLEST = 3
+
+
+def grab_screen(sct, hide_ui=False):
+    screen = np.array(sct.grab(sct.monitors[1]))
+    return mask_ui(screen) if hide_ui else screen
 
 
 def grab_damage_ui(sct):
@@ -29,6 +38,35 @@ def grab_hover_action(sct):
     return grab_screen(sct)[74:114, 0:800]
 
 
+def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
+    if hasattr(color, 'value'):
+        color = color.value
+
+    hsv = mask_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
+    lower_limit, upper_limit = get_color_limits(color)
+    mask = cv.inRange(hsv, lower_limit, upper_limit)
+
+    to_maximize = (mode == ContourDetection.DISTANCE_FARTHEST or mode == ContourDetection.AREA_LARGEST)
+    opt_value = 0 if to_maximize else 1e10
+    opt_contour = None
+    contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        contour_area = cv.contourArea(contour)
+        if contour_area > area_threshold:
+            x, y, w, h = cv.boundingRect(contour)
+            contour_center = round(x + w / 2), round(y + h / 2)
+
+            if mode == ContourDetection.AREA_LARGEST or mode == ContourDetection.AREA_SMALLEST:
+                value = contour_area
+            else:  # mode == ContourMode.DISTANCE_FARTHEST or mode == ContourMode.DISTANCE_CLOSEST:
+                value = math.dist(PLAYER_SCREEN_POS, contour_center)
+
+            if (to_maximize and value > opt_value) or (not to_maximize and value < opt_value):
+                opt_value = value
+                opt_contour = contour
+
+    return opt_contour, opt_value
+
 def locate_image(haystack, needle, threshold=0.7):
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv.minMaxLoc(result)
@@ -40,34 +78,17 @@ def locate_image(haystack, needle, threshold=0.7):
         return None
 
 
-def locate_contour(haystack, color, area_threshold=750, farthest=False):
-    if hasattr(color, 'value'):
-        color = color.value
-
-    hsv = hide_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
-    lower_limit, upper_limit = get_color_limits(color)
-    mask = cv.inRange(hsv, lower_limit, upper_limit)
-
-    opt_distance = 0 if farthest else 1e10
-    opt_position = None
-    contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
-    for contour in contours:
-        if cv.contourArea(contour) > area_threshold:
-            x, y, w, h = cv.boundingRect(contour)
-            contour_center = round(x + w / 2), round(y + h / 2)
-            distance = math.dist(PLAYER_SCREEN_POS, contour_center)
-            if (farthest and distance > opt_distance) or (not farthest and distance < opt_distance):
-                opt_distance = distance
-                opt_position = contour_center
-
-    return opt_position
+def locate_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
+    contour, _ = get_contour(haystack, color, area_threshold, mode)
+    x, y, w, h = cv.boundingRect(contour)
+    return round(x + w / 2), round(y + h / 2)
 
 
 def locate_ground_item(haystack, area_threshold=500):
-    haystack = hide_ui(np.ndarray.copy(haystack))
+    haystack = mask_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(screenshot, color):
-        hsv = hide_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        hsv = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         lower_limit, upper_limit = get_color_limits(color)
         mask = cv.inRange(hsv, lower_limit, upper_limit)
 
