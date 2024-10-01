@@ -1,6 +1,6 @@
 from src.actions.action import Action
 from src.util import robot
-from src.vision.coordinates import Controls, StandardSpellbook
+from src.vision.coordinates import Interface, StandardSpellbook
 
 
 class HomeTeleportAction(Action):
@@ -9,7 +9,7 @@ class HomeTeleportAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:
-            robot.click(Controls.MAGIC_TAB)
+            robot.click(Interface.MAGIC_TAB)
         if self.tick_counter == Action.sec2tick(1):
             robot.click(StandardSpellbook.HOME_TELEPORT)
         return self.tick_counter == Action.sec2tick(4)

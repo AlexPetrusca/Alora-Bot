@@ -4,7 +4,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Controls, Prayer
+from src.vision.coordinates import Interface, Prayer
 from src.vision.vision import ContourDetection
 
 
@@ -41,7 +41,7 @@ class ZulrahAction(Action):
 
         tick_offset = self.color_change_tick
         if self.tick_counter == tick_offset:
-            robot.click(Controls.PRAYER_TAB)
+            robot.click(Interface.PRAYER_TAB)
         tick_offset += Action.sec2tick(0.5)
         if self.tick_counter == tick_offset:
             if self.zulrah_color == Color.GREEN:
@@ -52,7 +52,7 @@ class ZulrahAction(Action):
                 robot.click(Prayer.PROTECT_FROM_MELEE)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Controls.INVENTORY_TAB)
+            robot.click(Interface.INVENTORY_TAB)
 
         return False
 

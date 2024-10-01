@@ -6,7 +6,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Controls, Prayer, Minimap, ArceuusSpellbook
+from src.vision.coordinates import Interface, Prayer, Minimap, ArceuusSpellbook, CerberusCoords
 
 
 class CerberusAction(Action):
@@ -29,22 +29,22 @@ class CerberusAction(Action):
 
         # 1. Click 850, 50 + wait to walk
         if self.tick_counter == tick_offset:
-            robot.click(850, 50)
+            robot.click(CerberusCoords.WALK1)
 
         # 2. Click 750, 90 + wait to walk + wait to enter chamber
         tick_offset += Action.sec2tick(7)
         if self.tick_counter == tick_offset:
-            robot.click(750, 90)
+            robot.click(CerberusCoords.WALK2)
 
         # 3. Click 850, 215 + wait to walk
         tick_offset += Action.sec2tick(14)
         if self.tick_counter == tick_offset:
-            robot.click(850, 215)
+            robot.click(CerberusCoords.WALK3)
 
         # 4. Enable prayers + spec
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Controls.PRAYER_TAB)
+            robot.click(Interface.PRAYER_TAB)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
             robot.click(Prayer.PROTECT_FROM_MAGIC)
@@ -65,13 +65,13 @@ class CerberusAction(Action):
         tick_offset += Action.sec2tick(3)
         if self.tick_counter == tick_offset:
             self.set_status('Fighting Cerberus...')
-            robot.click(Controls.MAGIC_TAB)
+            robot.click(Interface.MAGIC_TAB)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
             robot.click(ArceuusSpellbook.RESURRECT_GREATER_SKELETON)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
-            robot.click(Controls.INVENTORY_TAB)
+            robot.click(Interface.INVENTORY_TAB)
 
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
         if self.tick_counter > tick_offset and self.fight_over_tick is None:
@@ -104,7 +104,7 @@ class CerberusAction(Action):
             # 8. Disable prayers
             tick_offset += Action.sec2tick(1)
             if self.tick_counter == tick_offset:
-                robot.click(Controls.PRAYER_TAB)
+                robot.click(Interface.PRAYER_TAB)
             tick_offset += Action.sec2tick(1)
             if self.tick_counter == tick_offset:
                 robot.click(Prayer.PROTECT_FROM_MAGIC)

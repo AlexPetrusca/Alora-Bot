@@ -7,7 +7,7 @@ from pytesseract import pytesseract
 
 from src.util.common import mask_ui, get_color_limits
 from src.vision.color import Color
-from src.vision.coordinates import PLAYER_SCREEN_POS
+from src.vision.coordinates import Player
 
 
 class ContourDetection(Enum):
@@ -59,7 +59,8 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
             if mode == ContourDetection.AREA_LARGEST or mode == ContourDetection.AREA_SMALLEST:
                 value = contour_area
             else:  # mode == ContourMode.DISTANCE_FARTHEST or mode == ContourMode.DISTANCE_CLOSEST:
-                value = math.dist(PLAYER_SCREEN_POS, contour_center)
+                px, py = Player.POSITION.value
+                value = math.dist((2 * px, 2 * py), contour_center)
 
             if (to_maximize and value > opt_value) or (not to_maximize and value < opt_value):
                 opt_value = value

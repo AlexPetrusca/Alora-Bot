@@ -6,9 +6,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Controls, Prayer
-
-SPADE = 1512, 845
+from src.vision.coordinates import Interface, Prayer, BarrowsCoords
 
 
 class BarrowAction(Action):
@@ -41,16 +39,16 @@ class BarrowAction(Action):
             return self.tick_counter == Action.sec2tick(8)
 
         if self.tick_counter == Action.sec2tick(1):  # open item todo: if item is already open, don't open it again
-            robot.click(Controls.INVENTORY_TAB)
+            robot.click(Interface.INVENTORY_TAB)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
-            robot.click(SPADE)
+            robot.click(BarrowsCoords.SPADE)
 
         if self.tick_counter == Action.sec2tick(11):  # click sarcophagus + fight (50s)
             self.set_status("Fighting...")
             robot.click_contour(Color.YELLOW)
 
         if self.tick_counter == Action.sec2tick(14):  # todo: its annoying to change one of these timings because everything after has to be updated as well
-            robot.click(Controls.PRAYER_TAB)
+            robot.click(Interface.PRAYER_TAB)
         if self.tick_counter == Action.sec2tick(14.5):
             robot.click(self.prayer)
         if self.tick_counter == Action.sec2tick(15):
@@ -72,10 +70,10 @@ class BarrowAction(Action):
 
             # if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):  # todo: this is being done too early
             #     print("COLLECTING REWARDS")
-            #     robot.click(922, 417)
+            #     robot.click(BarrowsCoords.REWARDS_CLOSE)  # collect rewards
             if self.last:
                 if self.tick_counter == self.fight_over_tick + Action.sec2tick(5):
-                    robot.click(922, 417)  # collect rewards
+                    robot.click(BarrowsCoords.REWARDS_CLOSE)  # collect rewards
                     return True
             elif self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
                 self.set_status(f"Completed Barrow {self.barrow}")

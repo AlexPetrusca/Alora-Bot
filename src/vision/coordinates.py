@@ -1,10 +1,11 @@
 from enum import Enum
 
-PLAYER_POS = 855, 585
-PLAYER_SCREEN_POS = 1710, 1170
+
+class Player(Enum):
+    POSITION = 855, 585
 
 
-class Controls(Enum):
+class Interface(Enum):
     MAGIC_TAB = 1674, 801
     PRAYER_TAB = 1641, 801
     EQUIPMENT_TAB = 1608, 801
@@ -12,6 +13,7 @@ class Controls(Enum):
     QUEST_TAB = 1541, 801
     STATS_TAB = 1508, 801
     COMBAT_TAB = 1475, 801
+    BANK_CLOSE = 1074, 110
 
 
 class Minimap(Enum):
@@ -40,3 +42,27 @@ class Prayer(Enum):
     EAGLE_EYE = 1644, 956
     MYSTIC_MIGHT = 1496, 993
     PIETY = 1533, 1030
+
+
+class BarrowsCoords(Enum):
+    SPADE = 1512, 845
+    REWARDS_CLOSE = 922, 417
+
+
+class CerberusCoords(Enum):
+    WALK1 = 850, 50
+    WALK2 = 750, 90
+    WALK3 = 850, 215
+
+
+class HealCoords(Enum):
+    WALK1 = 700, 302
+    PRAYER_ALTAR = 1292, 68
+    HEALER = 805, 520
+    BANK_CHEST = 1080, 524
+
+
+class TeleportCoords(Enum):
+    TELEPORT_WIZARD = 695, 255
+    SEARCH_BUTTON = 608, 363
+    SEARCH_FIRST_RESULT = 800, 400

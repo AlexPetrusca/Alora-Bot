@@ -1,6 +1,7 @@
 import cv2 as cv
 from src.actions.action import Action
 from src.util import robot
+from src.vision.coordinates import HealCoords, Interface
 
 
 class HealAction(Action):
@@ -14,18 +15,18 @@ class HealAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:
-            robot.shift_click(700, 302)  # move to teleport wizard
+            robot.shift_click(HealCoords.WALK1)  # move to teleport wizard
         if self.tick_counter == Action.sec2tick(4):
-            robot.click(1292, 68)  # click prayer altar
+            robot.click(HealCoords.PRAYER_ALTAR)  # click prayer altar
         if self.tick_counter == Action.sec2tick(12):
-            robot.right_click(805, 520)  # right click healer
+            robot.right_click(HealCoords.HEALER)  # right click healer
         if self.tick_counter == Action.sec2tick(13):
             robot.click_image(cv.imread('../resources/target/menu/heal_option.png', cv.IMREAD_UNCHANGED), 0.9)
         if self.bank:
             if self.tick_counter == Action.sec2tick(16):
-                robot.click(1080, 524)  # click bank chest
+                robot.click(HealCoords.BANK_CHEST)  # click bank chest
             if self.tick_counter == Action.sec2tick(20):
-                robot.click(1074, 110)  # close bank
+                robot.click(Interface.BANK_CLOSE)  # close bank
             return self.tick_counter == Action.sec2tick(21)
         else:
             return self.tick_counter == Action.sec2tick(14)
