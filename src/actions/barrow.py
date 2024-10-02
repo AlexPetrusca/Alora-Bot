@@ -31,8 +31,8 @@ class BarrowAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:  # move to barrow (8s)
-            if not robot.click_image(self.available_img, 0.99):  # todo: should only search in minimap
-                robot.click_image(self.unavailable_img, 0.99)
+            if not robot.click_image(self.available_img, 0.97):  # todo: should only search in minimap
+                robot.click_image(self.unavailable_img, 0.97)
                 self.skip = True
 
         if self.skip:
