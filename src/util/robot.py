@@ -25,7 +25,7 @@ def right_click(x=None, y=None):
     pyautogui.rightClick()
 
 
-def shift_click(x, y):
+def shift_click(x=None, y=None):
     with pyautogui.hold('shift'):
         click(x, y)
 
