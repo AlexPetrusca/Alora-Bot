@@ -81,8 +81,11 @@ def locate_image(haystack, needle, threshold=0.7):
 
 def locate_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
     contour, _ = get_contour(haystack, color, area_threshold, mode)
-    x, y, w, h = cv.boundingRect(contour)
-    return round(x + w / 2), round(y + h / 2)
+    if contour is not None:
+        x, y, w, h = cv.boundingRect(contour)
+        return round(x + w / 2), round(y + h / 2)
+    else:
+        return None
 
 
 def locate_ground_item(haystack, area_threshold=500):
