@@ -7,7 +7,7 @@ from pytesseract import pytesseract
 
 from src.util.common import mask_ui, get_color_limits
 from src.vision.color import Color
-from src.vision.coordinates import Player
+from src.vision.coordinates import Player, ScreenRegion
 
 
 class ContourDetection(Enum):
@@ -23,7 +23,7 @@ def grab_screen(sct, hide_ui=False):
 
 
 def grab_damage_ui(sct):
-    return grab_screen(sct)[152:192, 12:264]
+    return grab_screen(sct)[ScreenRegion.DAMAGE_UI.value]
 
 
 def grab_minimap(sct):

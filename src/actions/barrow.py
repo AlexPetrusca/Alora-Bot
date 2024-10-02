@@ -6,7 +6,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Interface, Prayer, BarrowsCoords
+from src.vision.coordinates import Interface, Prayer, BarrowsCoord
 
 
 class BarrowAction(Action):
@@ -31,17 +31,18 @@ class BarrowAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:  # move to barrow (8s)
-            if not robot.click_image(self.available_img, 0.99):  # todo: should only search in minimap
-                robot.click_image(self.unavailable_img, 0.99)
+            # todo: [important] should only search in minimap
+            if not robot.click_image(self.available_img, 0.94):
+                robot.click_image(self.unavailable_img, 0.94)
                 self.skip = True
 
         if self.skip:
             return self.tick_counter == Action.sec2tick(8)
 
-        if self.tick_counter == Action.sec2tick(1):  # open item todo: if item is already open, don't open it again
+        if self.tick_counter == Action.sec2tick(1):  # open inventory
             robot.click(Interface.INVENTORY_TAB)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
-            robot.click(BarrowsCoords.SPADE)
+            robot.click(BarrowsCoord.SPADE)
 
         if self.tick_counter == Action.sec2tick(11):  # click sarcophagus + fight (50s)
             self.set_status("Fighting...")
@@ -59,7 +60,7 @@ class BarrowAction(Action):
                 damage_ui = vision.grab_damage_ui(mss.mss())
                 ocr = pytesseract.image_to_string(damage_ui).strip()
                 print(ocr)
-                if ocr.startswith('0/'):
+                if ocr.startswith('0/') or ocr.startswith('o/'):  # todo: checking 'o/' ain't pretty
                     self.fight_over_tick = self.tick_counter
 
         if self.fight_over_tick is not None:
@@ -73,7 +74,7 @@ class BarrowAction(Action):
             #     robot.click(BarrowsCoords.REWARDS_CLOSE)  # collect rewards
             if self.last:
                 if self.tick_counter == self.fight_over_tick + Action.sec2tick(5):
-                    robot.click(BarrowsCoords.REWARDS_CLOSE)  # collect rewards
+                    robot.click(BarrowsCoord.REWARDS_CLOSE)  # collect rewards
                     return True
             elif self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
                 self.set_status(f"Completed Barrow {self.barrow}")
