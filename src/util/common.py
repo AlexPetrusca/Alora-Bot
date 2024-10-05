@@ -1,20 +1,28 @@
 import cv2 as cv
 import numpy as np
+from src.vision.coordinates import ScreenRegion
 
 
-def hide(img, p1, p2, color=(0, 0, 0)):
-    return cv.rectangle(img, (2 * p1[0], 2 * p1[1]), (2 * p2[0], 2 * p2[1]), color, thickness=-1)
+# def hide(img, p1, p2, color=(0, 0, 0)):
+#     return cv.rectangle(img, (2 * p1[0], 2 * p1[1]), (2 * p2[0], 2 * p2[1]), color, thickness=-1)
+
+
+def mask(img, region, color=(0, 0, 0)):
+    if hasattr(region, 'value'):
+        region = region.value
+    p1 = region[1].start, region[0].start
+    p2 = region[1].stop, region[0].stop
+    return cv.rectangle(img, p1, p2, color, thickness=-1)
 
 
 def mask_ui(img):
-    hide(img, (1328, 40), (1453, 70))  # hide exp bar
-    hide(img, (1455, 784), (1696, 1117))  # hide item
-    hide(img, (0, 922), (520, 1117))  # hide chat
-    hide(img, (1476, 37), (1697, 210))  # hide minimap
-    hide(img, (0, 37), (221, 210))  # hide status ui
-    hide(img, (0, 37), (400, 57))  # hide hover text
-    hide(img, (1696, 37), (1728, 1117))  # hide runelite sidebar
-    # hide(img, (1660, 45), (1697, 60))  # hide ping
+    mask(img, ScreenRegion.EXP_BAR)  # hide exp bar
+    mask(img, ScreenRegion.CONTROL_PANEL)  # hide control panel
+    mask(img, ScreenRegion.CHAT)  # hide chat
+    mask(img, ScreenRegion.MINIMAP)  # hide minimap
+    mask(img, ScreenRegion.STATUS)  # hide status ui
+    mask(img, ScreenRegion.HOVER_ACTION)  # hide hover text
+    mask(img, ScreenRegion.RUNELITE_SIDEBAR)  # hide runelite sidebar
     return img
 
 

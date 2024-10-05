@@ -6,7 +6,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Interface, Prayer, Minimap, ArceuusSpellbook, CerberusCoords
+from src.vision.coordinates import Interface, Prayer, Minimap, ArceuusSpellbook, CerberusCoord
 
 
 class CerberusAction(Action):
@@ -29,17 +29,17 @@ class CerberusAction(Action):
 
         # 1. Click 850, 50 + wait to walk
         if self.tick_counter == tick_offset:
-            robot.click(CerberusCoords.WALK1)
+            robot.click(CerberusCoord.WALK1)
 
         # 2. Click 750, 90 + wait to walk + wait to enter chamber
         tick_offset += Action.sec2tick(7)
         if self.tick_counter == tick_offset:
-            robot.click(CerberusCoords.WALK2)
+            robot.click(CerberusCoord.WALK2)
 
         # 3. Click 850, 215 + wait to walk
         tick_offset += Action.sec2tick(14)
         if self.tick_counter == tick_offset:
-            robot.click(CerberusCoords.WALK3)
+            robot.click(CerberusCoord.WALK3)
 
         # 4. Enable prayers + spec
         tick_offset += Action.sec2tick(1)

@@ -27,15 +27,15 @@ def grab_damage_ui(sct):
 
 
 def grab_minimap(sct):
-    return grab_screen(sct)[74:420, 2952:3394]
+    return grab_screen(sct)[ScreenRegion.MINIMAP.value]
 
 
-def grab_inventory(sct):
-    return grab_screen(sct)[1568:2234, 2910:3392]
+def grab_control_panel(sct):
+    return grab_screen(sct)[ScreenRegion.CONTROL_PANEL.value]
 
 
 def grab_hover_action(sct):
-    return grab_screen(sct)[74:114, 0:800]
+    return grab_screen(sct)[ScreenRegion.HOVER_ACTION.value]
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
@@ -67,6 +67,7 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
                 opt_contour = contour
 
     return opt_contour, opt_value
+
 
 def locate_image(haystack, needle, threshold=0.7):
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
@@ -173,22 +174,22 @@ def read_int(haystack):
 
 
 def read_latest_chat(sct):
-    chat_line_image = grab_screen(sct)[2106:2144, 14:994]
+    chat_line_image = grab_screen(sct)[ScreenRegion.LATEST_CHAT.value]
     return pytesseract.image_to_string(chat_line_image).strip()
-    # return read_text(grab_screen(sct)[2106:2144, 14:994])  # todo: use this instead
+    # return read_text(grab_screen(sct)[ScreenRegion.LATEST_CHAT.value])  # todo: use this instead
 
 
 def read_hitpoints(sct):
-    return read_int(grab_screen(sct)[188:212, 2978:3018])
+    return read_int(grab_screen(sct)[ScreenRegion.HITPOINTS.value])
 
 
 def read_prayer_energy(sct):
-    return read_int(grab_screen(sct)[256:280, 2978:3018])
+    return read_int(grab_screen(sct)[ScreenRegion.PRAYER.value])
 
 
 def read_run_energy(sct):
-    return read_int(grab_screen(sct)[320:344, 2996:3036])
+    return read_int(grab_screen(sct)[ScreenRegion.RUN_ENERGY.value])
 
 
 def read_spec_energy(sct):
-    return read_int(grab_screen(sct)[372:396, 3044:3084])
+    return read_int(grab_screen(sct)[ScreenRegion.SPEC_ENERGY.value])
