@@ -7,7 +7,8 @@ from pytesseract import pytesseract
 
 from src.util.common import mask_ui, get_color_limits
 from src.vision.color import Color
-from src.vision.coordinates import Player, ScreenRegion
+from src.vision.coordinates import Player
+from src.vision.regions import Regions
 
 
 class ContourDetection(Enum):
@@ -23,19 +24,19 @@ def grab_screen(sct, hide_ui=False):
 
 
 def grab_damage_ui(sct):
-    return grab_screen(sct)[ScreenRegion.DAMAGE_UI.value]
+    return grab_screen(sct)[Regions.DAMAGE_UI.as_slice()]
 
 
 def grab_minimap(sct):
-    return grab_screen(sct)[ScreenRegion.MINIMAP.value]
+    return grab_screen(sct)[Regions.MINIMAP.as_slice()]
 
 
 def grab_control_panel(sct):
-    return grab_screen(sct)[ScreenRegion.CONTROL_PANEL.value]
+    return grab_screen(sct)[Regions.CONTROL_PANEL.as_slice()]
 
 
 def grab_hover_action(sct):
-    return grab_screen(sct)[ScreenRegion.HOVER_ACTION.value]
+    return grab_screen(sct)[Regions.HOVER_ACTION.as_slice()]
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
@@ -174,22 +175,22 @@ def read_int(haystack):
 
 
 def read_latest_chat(sct):
-    chat_line_image = grab_screen(sct)[ScreenRegion.LATEST_CHAT.value]
+    chat_line_image = grab_screen(sct)[Regions.LATEST_CHAT.as_slice()]
     return pytesseract.image_to_string(chat_line_image).strip()
-    # return read_text(grab_screen(sct)[ScreenRegion.LATEST_CHAT.value])  # todo: use this instead
+    # return read_text(grab_screen(sct)[Region.LATEST_CHAT.as_slice()])  # todo: use this instead
 
 
 def read_hitpoints(sct):
-    return read_int(grab_screen(sct)[ScreenRegion.HITPOINTS.value])
+    return read_int(grab_screen(sct)[Regions.HITPOINTS.as_slice()])
 
 
 def read_prayer_energy(sct):
-    return read_int(grab_screen(sct)[ScreenRegion.PRAYER.value])
+    return read_int(grab_screen(sct)[Regions.PRAYER.as_slice()])
 
 
 def read_run_energy(sct):
-    return read_int(grab_screen(sct)[ScreenRegion.RUN_ENERGY.value])
+    return read_int(grab_screen(sct)[Regions.RUN_ENERGY.as_slice()])
 
 
 def read_spec_energy(sct):
-    return read_int(grab_screen(sct)[ScreenRegion.SPEC_ENERGY.value])
+    return read_int(grab_screen(sct)[Regions.SPEC_ENERGY.as_slice()])

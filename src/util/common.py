@@ -1,28 +1,23 @@
 import cv2 as cv
 import numpy as np
-from src.vision.coordinates import ScreenRegion
 
-
-# def hide(img, p1, p2, color=(0, 0, 0)):
-#     return cv.rectangle(img, (2 * p1[0], 2 * p1[1]), (2 * p2[0], 2 * p2[1]), color, thickness=-1)
+from src.vision.regions import Regions
 
 
 def mask(img, region, color=(0, 0, 0)):
-    if hasattr(region, 'value'):
-        region = region.value
-    p1 = region[1].start, region[0].start
-    p2 = region[1].stop, region[0].stop
+    p1 = (2 * region.x, 2 * region.y)
+    p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
     return cv.rectangle(img, p1, p2, color, thickness=-1)
 
 
 def mask_ui(img):
-    mask(img, ScreenRegion.EXP_BAR)  # hide exp bar
-    mask(img, ScreenRegion.CONTROL_PANEL)  # hide control panel
-    mask(img, ScreenRegion.CHAT)  # hide chat
-    mask(img, ScreenRegion.MINIMAP)  # hide minimap
-    mask(img, ScreenRegion.STATUS)  # hide status ui
-    mask(img, ScreenRegion.HOVER_ACTION)  # hide hover text
-    mask(img, ScreenRegion.RUNELITE_SIDEBAR)  # hide runelite sidebar
+    mask(img, Regions.EXP_BAR)  # hide exp bar
+    mask(img, Regions.CONTROL_PANEL)  # hide control panel
+    mask(img, Regions.CHAT)  # hide chat
+    mask(img, Regions.MINIMAP)  # hide minimap
+    mask(img, Regions.STATUS)  # hide status ui
+    mask(img, Regions.HOVER_ACTION)  # hide hover text
+    mask(img, Regions.RUNELITE_SIDEBAR)  # hide runelite sidebar
     return img
 
 
