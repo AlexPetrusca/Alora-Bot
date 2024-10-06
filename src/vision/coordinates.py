@@ -4,18 +4,17 @@ from src.vision.regions import Regions
 
 
 # todo: coordinates should be specified in scaled XY (0.0-1.0, 0.0-1.0)
-def rescale_coord(x, y):
+def scale_coord(x, y):
     if (Regions.SCREEN.w, Regions.SCREEN.h) == (1728, 1117):
         return x, y
     else:
-        M2_TOP_OFFSET = 37
         ratio_x = Regions.GAME.w / (1728 - Regions.RUNELITE_SIDEBAR.w)
-        ratio_y = Regions.GAME.h / (1117 - M2_TOP_OFFSET)
-        return round(ratio_x * x), round(ratio_y * (y - M2_TOP_OFFSET))
+        ratio_y = Regions.GAME.h / 1080
+        return round(ratio_x * x), round(ratio_y * (y - 37))
 
 
 class Player(Enum):
-    POSITION = rescale_coord(855, 585)
+    POSITION = scale_coord(855, 585)
 
 
 class ControlPanel(Enum):
@@ -45,10 +44,10 @@ class Minimap(Enum):
 
 
 class Bank(Enum):
+    PLACEHOLDER_TOGGLE = Regions.BANK.offset(350, 776)
     SEARCH = Regions.BANK.offset(388, 776)
     DEPOSIT_INVENTORY = Regions.BANK.offset(426, 776)
     DEPOSIT_WORN_ITEMS = Regions.BANK.offset(464, 776)
-    PLACEHOLDER_TOGGLE = Regions.BANK.offset(350, 776)
     CLOSE = Regions.BANK.offset(470, 17)
 
 
@@ -91,17 +90,17 @@ class BarrowsActionCoord(Enum):
 
 
 class CerberusActionCoord(Enum):
-    WALK1 = rescale_coord(850, 50)
-    WALK2 = rescale_coord(750, 90)
-    WALK3 = rescale_coord(850, 215)
+    WALK1 = scale_coord(850, 50)
+    WALK2 = scale_coord(750, 90)
+    WALK3 = scale_coord(850, 215)
 
 
 class HealActionCoord(Enum):
-    WALK1 = rescale_coord(700, 302)
-    PRAYER_ALTAR = rescale_coord(1292, 68)
-    HEALER = rescale_coord(805, 520)
-    BANK_CHEST = rescale_coord(1080, 524)
+    WALK1 = scale_coord(700, 302)
+    PRAYER_ALTAR = scale_coord(1292, 68)
+    HEALER = scale_coord(805, 520)
+    BANK_CHEST = scale_coord(1080, 524)
 
 
 class TeleportActionCoord(Enum):
-    TELEPORT_WIZARD = rescale_coord(695, 255)
+    TELEPORT_WIZARD = scale_coord(695, 255)
