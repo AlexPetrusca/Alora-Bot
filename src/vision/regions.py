@@ -45,4 +45,4 @@ class Regions:
 
     BANK = Region(GAME.x + (GAME.w - 490) // 2, GAME.y + (GAME.h - 970) // 2, 488, 800)
     REWARD = Region(GAME.x + (GAME.w - 290) // 2, GAME.y + (GAME.h - 356) // 2, 234, 194)
-    TP_MENU = Region(GAME.x + (GAME.w - 528) // 2, GAME.y + (GAME.h - 460) // 2, 488, 306)
+    TELEPORT_MENU = Region(GAME.x + (GAME.w - 528) // 2, GAME.y + (GAME.h - 460) // 2, 488, 306)

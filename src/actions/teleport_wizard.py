@@ -1,6 +1,6 @@
 from src.actions.action import Action
 from src.robot import robot
-from src.vision.coordinates import TeleportCoord
+from src.vision.coordinates import TeleportActionCoord
 
 
 class TeleportWizardAction(Action):
@@ -16,15 +16,15 @@ class TeleportWizardAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:
-            robot.click(TeleportCoord.TELEPORT_WIZARD)  # teleport wizard
+            robot.click(TeleportActionCoord.TELEPORT_WIZARD)  # teleport wizard
         if self.tick_counter == Action.sec2tick(5):
             self.set_status('Routing to Destination...')
-            robot.click(TeleportCoord.SEARCH_BUTTON)  # search
+            robot.click(TeleportActionCoord.SEARCH_BUTTON)  # search
         if self.tick_counter == Action.sec2tick(6):
             robot.press([c for c in self.destination])  # type destination
         if self.tick_counter == Action.sec2tick(7):
             self.set_status('Teleporting to Destination...')
-            robot.click(TeleportCoord.SEARCH_FIRST_RESULT)  # go to destination
+            robot.click(TeleportActionCoord.SEARCH_FIRST_RESULT)  # go to destination
         return self.tick_counter == Action.sec2tick(12)
 
     def last_tick(self):

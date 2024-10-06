@@ -6,7 +6,7 @@ from src.actions.action import Action
 from src.robot import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import ControlPanel, Prayer, BarrowsCoord
+from src.vision.coordinates import ControlPanel, Prayer, BarrowsActionCoord
 
 
 class BarrowAction(Action):
@@ -42,7 +42,7 @@ class BarrowAction(Action):
         if self.tick_counter == Action.sec2tick(1):  # open inventory
             robot.click(ControlPanel.INVENTORY_TAB)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
-            robot.click(BarrowsCoord.SPADE)
+            robot.click(BarrowsActionCoord.SPADE)
 
         if self.tick_counter == Action.sec2tick(11):  # click sarcophagus + fight (50s)
             self.set_status("Fighting...")
@@ -74,7 +74,7 @@ class BarrowAction(Action):
             #     robot.click(BarrowsCoords.REWARDS_CLOSE)  # collect rewards
             if self.last:
                 if self.tick_counter == self.fight_over_tick + Action.sec2tick(5):
-                    robot.click(BarrowsCoord.REWARDS_CLOSE)  # collect rewards
+                    robot.click(BarrowsActionCoord.REWARDS_CLOSE)  # collect rewards
                     return True
             elif self.tick_counter == self.fight_over_tick + Action.sec2tick(2):
                 self.set_status(f"Completed Barrow {self.barrow}")

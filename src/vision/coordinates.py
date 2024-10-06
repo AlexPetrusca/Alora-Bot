@@ -35,8 +35,6 @@ class ControlPanel(Enum):
     EMOTE_TAB = Regions.CONTROL_PANEL.offset(189, 316)
     MUSIC_TAB = Regions.CONTROL_PANEL.offset(222, 316)
 
-    BANK_CLOSE = Regions.BANK.offset(470, 17)
-
 
 class Minimap(Enum):
     COMPASS = Regions.MINIMAP.offset(54, 20)
@@ -44,6 +42,25 @@ class Minimap(Enum):
     PRAYER = Regions.MINIMAP.offset(39, 93)
     RUN = Regions.MINIMAP.offset(50, 126)
     SPECIAL = Regions.MINIMAP.offset(73, 151)
+
+
+class Bank(Enum):
+    SEARCH = Regions.BANK.offset(388, 776)
+    DEPOSIT_INVENTORY = Regions.BANK.offset(426, 776)
+    DEPOSIT_WORN_ITEMS = Regions.BANK.offset(464, 776)
+    PLACEHOLDER_TOGGLE = Regions.BANK.offset(350, 776)
+    CLOSE = Regions.BANK.offset(470, 17)
+
+
+class Reward(Enum):
+    CLOSE = Regions.REWARD.offset(218, 18)
+
+
+class TeleportMenu(Enum):
+    SEARCH = Regions.TELEPORT_MENU.offset(24, 17)
+    CLOSE = Regions.TELEPORT_MENU.offset(472, 17)
+    FIRST_RESULT = Regions.TELEPORT_MENU.offset(217, 52)
+    SECOND_RESULT = Regions.TELEPORT_MENU.offset(217, 82)
 
 
 # dx = 26, dy = 24
@@ -69,27 +86,22 @@ class Prayer(Enum):
     PIETY = Regions.CONTROL_PANEL.offset(82, 248)
 
 
-class BarrowsCoord(Enum):
+class BarrowsActionCoord(Enum):
     SPADE = Regions.CONTROL_PANEL.offset(53, 52)  # todo: replace usages with Inventory.ITEM_1_1
-    REWARDS_CLOSE = Regions.REWARD.offset(218, 18)
 
 
-class CerberusCoord(Enum):
+class CerberusActionCoord(Enum):
     WALK1 = rescale_coord(850, 50)
     WALK2 = rescale_coord(750, 90)
     WALK3 = rescale_coord(850, 215)
 
 
-class HealCoord(Enum):
+class HealActionCoord(Enum):
     WALK1 = rescale_coord(700, 302)
     PRAYER_ALTAR = rescale_coord(1292, 68)
     HEALER = rescale_coord(805, 520)
     BANK_CHEST = rescale_coord(1080, 524)
 
 
-class TeleportCoord(Enum):
+class TeleportActionCoord(Enum):
     TELEPORT_WIZARD = rescale_coord(695, 255)
-
-    SEARCH_BUTTON = Regions.TP_MENU.offset(24, 17)
-    SEARCH_FIRST_RESULT = Regions.TP_MENU.offset(217, 52)
-    SEARCH_SECOND_RESULT = Regions.TP_MENU.offset(217, 82)
