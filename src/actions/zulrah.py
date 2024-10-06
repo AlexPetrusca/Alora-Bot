@@ -4,7 +4,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Interface, Prayer
+from src.vision.coordinates import ControlPanel, Prayer
 from src.vision.vision import ContourDetection
 
 

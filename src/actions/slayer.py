@@ -4,7 +4,7 @@ from src.actions.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.util import robot
-from src.vision.coordinates import Prayer, Interface
+from src.vision.coordinates import Prayer, ControlPanel
 
 
 class SlayerTask(Enum):
@@ -49,11 +49,11 @@ class SlayerAction(Action):
     def tick(self, t):
         dt = t - self.t_ref
         if self.tick_counter == 0:
-            robot.click(Interface.PRAYER_TAB)
+            robot.click(ControlPanel.PRAYER_TAB)
         if self.tick_counter == Action.sec2tick(0.5):
             robot.click(self.prayer)
         if self.tick_counter == Action.sec2tick(1):
-            robot.click(Interface.INVENTORY_TAB)
+            robot.click(ControlPanel.INVENTORY_TAB)
 
         top = self.action_queue[0]
         if top.run(dt):

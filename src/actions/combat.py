@@ -5,7 +5,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Interface, StandardSpellbook
+from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 
 # todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
@@ -30,7 +30,7 @@ class CombatAction(Action):
         if self.tick_counter == 0:
             robot.click_contour(self.target_color)
         if self.tick_counter == Action.sec2tick(1):
-            robot.click(Interface.INVENTORY_TAB)
+            robot.click(ControlPanel.INVENTORY_TAB)
         if self.tick_counter > Action.sec2tick(4) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 # check fight end
@@ -52,7 +52,7 @@ class CombatAction(Action):
 
         if self.tp_home_tick is not None:
             if self.tick_counter == self.tp_home_tick:
-                robot.click(Interface.MAGIC_TAB)
+                robot.click(ControlPanel.MAGIC_TAB)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
             return self.tick_counter > self.tp_home_tick + Action.sec2tick(5)

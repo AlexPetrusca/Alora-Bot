@@ -75,7 +75,7 @@ class Player(Enum):
     POSITION = rescale_coord(855, 585)
 
 
-class Interface(Enum):
+class ControlPanel(Enum):
     COMBAT_TAB = CONTROL_PANEL_LEFT + 24, CONTROL_PANEL_TOP + 18
     STATS_TAB = CONTROL_PANEL_LEFT + 57, CONTROL_PANEL_TOP + 18
     QUEST_TAB = CONTROL_PANEL_LEFT + 90, CONTROL_PANEL_TOP + 18

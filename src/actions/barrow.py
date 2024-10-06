@@ -6,7 +6,7 @@ from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Interface, Prayer, BarrowsCoord
+from src.vision.coordinates import ControlPanel, Prayer, BarrowsCoord
 
 
 class BarrowAction(Action):
@@ -40,7 +40,7 @@ class BarrowAction(Action):
             return self.tick_counter == Action.sec2tick(8)
 
         if self.tick_counter == Action.sec2tick(1):  # open inventory
-            robot.click(Interface.INVENTORY_TAB)
+            robot.click(ControlPanel.INVENTORY_TAB)
         if self.tick_counter == Action.sec2tick(8):  # enter barrow (4s)
             robot.click(BarrowsCoord.SPADE)
 
@@ -49,7 +49,7 @@ class BarrowAction(Action):
             robot.click_contour(Color.YELLOW)
 
         if self.tick_counter == Action.sec2tick(14):  # todo: its annoying to change one of these timings because everything after has to be updated as well
-            robot.click(Interface.PRAYER_TAB)
+            robot.click(ControlPanel.PRAYER_TAB)
         if self.tick_counter == Action.sec2tick(14.5):
             robot.click(self.prayer)
         if self.tick_counter == Action.sec2tick(15):

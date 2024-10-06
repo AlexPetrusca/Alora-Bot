@@ -4,7 +4,7 @@ import mss
 from src.actions.action import Action
 from src.util import robot
 from src.vision import vision
-from src.vision.coordinates import Interface, StandardSpellbook
+from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 
 class PickUpItemsAction(Action):
@@ -48,7 +48,7 @@ class PickUpItemsAction(Action):
 
         if self.tp_home_tick is not None:
             if self.tick_counter == self.tp_home_tick:
-                robot.click(Interface.MAGIC_TAB)
+                robot.click(ControlPanel.MAGIC_TAB)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
             return self.tick_counter > self.tp_home_tick + Action.sec2tick(5)
