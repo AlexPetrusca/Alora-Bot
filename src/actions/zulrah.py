@@ -11,6 +11,7 @@ from src.vision.vision import ContourDetection
 class ZulrahAction(Action):
     sct = mss.mss()
 
+    last_zulrah_color = None
     zulrah_color = None
     color_change_tick = 0
 
@@ -32,30 +33,50 @@ class ZulrahAction(Action):
             if blue_area > max_area:
                 max_area, max_color = blue_area, Color.BLUE
 
-            if self.zulrah_color is None and max_color is not None:
+            if self.zulrah_color is None and max_color is not None and max_color != self.last_zulrah_color:
                 self.color_change_tick = self.tick_counter
                 self.zulrah_color = max_color
                 print(max_color, '-->', max_area)
             elif self.zulrah_color is not None and max_color is None:
+                self.last_zulrah_color = self.zulrah_color
                 self.zulrah_color = None
+
+        # tick_offset = self.color_change_tick
+        # if self.tick_counter == tick_offset:
+        #     robot.click(Interface.PRAYER_TAB)
+        # tick_offset += Action.sec2tick(0.5)
+        # if self.tick_counter == tick_offset:
+        #     if self.zulrah_color == Color.GREEN:
+        #         robot.click(Prayer.PROTECT_FROM_MISSILES)
+        #     elif self.zulrah_color == Color.BLUE:
+        #         robot.click(Prayer.PROTECT_FROM_MAGIC)
+        #     elif self.zulrah_color == Color.RED:
+        #         robot.click(Prayer.PROTECT_FROM_MELEE)
+        # tick_offset += Action.sec2tick(1)
+        # if self.tick_counter == tick_offset:
+        #     robot.click(Interface.INVENTORY_TAB)
 
         tick_offset = self.color_change_tick
         if self.tick_counter == tick_offset:
-            robot.click(Interface.PRAYER_TAB)
-        tick_offset += Action.sec2tick(0.5)
+            robot.press('1')  # prayer tab
+        tick_offset += Action.sec2tick(0.1)
         if self.tick_counter == tick_offset:
             if self.zulrah_color == Color.GREEN:
                 robot.click(Prayer.PROTECT_FROM_MISSILES)
             elif self.zulrah_color == Color.BLUE:
                 robot.click(Prayer.PROTECT_FROM_MAGIC)
             elif self.zulrah_color == Color.RED:
-                robot.click(Prayer.PROTECT_FROM_MELEE)
-        tick_offset += Action.sec2tick(1)
+                if self.last_zulrah_color == Color.GREEN:
+                    robot.click(Prayer.PROTECT_FROM_MISSILES)
+                elif self.last_zulrah_color == Color.BLUE:
+                    robot.click(Prayer.PROTECT_FROM_MAGIC)
+        tick_offset += Action.sec2tick(0.1)
         if self.tick_counter == tick_offset:
-            robot.click(Interface.INVENTORY_TAB)
+            robot.press('space')  # inventory tab
 
         return False
 
     def last_tick(self):
+        self.last_zulrah_color = None
         self.zulrah_color = None
         self.color_change_tick = 0
