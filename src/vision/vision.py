@@ -181,7 +181,7 @@ def read_int(haystack):
     text = text.replace('S', '5')
     text = text.replace('G', '6').replace('E', '6')
     text = text.replace('B8', '8').replace('B', '8').replace('a', '8')
-    text = text.replace('g', '9')
+    text = text.replace('g', '9').replace('q', '9')
     try:
         print("HP:", old_text, "-->", text)
         return int(text)
