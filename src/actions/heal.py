@@ -1,6 +1,6 @@
 import cv2 as cv
 from src.actions.action import Action
-from src.util import robot
+from src.robot import robot
 from src.vision.coordinates import HealCoord, ControlPanel
 
 

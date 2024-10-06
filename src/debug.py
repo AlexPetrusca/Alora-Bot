@@ -1,18 +1,14 @@
-
-from enum import Enum
-
-from src.actions.pick_up_items import PickUpItemsAction
-from src.actions.combat import CombatAction
-from src.actions.zulrah import ZulrahAction
-from src.vision import vision
-from src.vision.color import Color
-from src.util.common import mask_ui, get_color_limits
 import cv2 as cv
 import numpy as np
 import mss
 import time
 
-from src.vision.vision import ContourDetection
+from src.actions.pick_up_items import PickUpItemsAction
+from src.actions.combat import CombatAction
+from src.actions.zulrah import ZulrahAction
+from src.vision import vision
+from src.vision.color import Color, get_color_limits
+from src.vision.vision import ContourDetection, mask_ui
 
 
 class DebugDisplay:

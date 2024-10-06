@@ -5,8 +5,7 @@ import numpy as np
 import cv2 as cv
 from pytesseract import pytesseract
 
-from src.util.common import mask_ui, get_color_limits
-from src.vision.color import Color
+from src.vision.color import Color, get_color_limits
 from src.vision.coordinates import Player
 from src.vision.regions import Regions
 
@@ -16,6 +15,23 @@ class ContourDetection(Enum):
     DISTANCE_FARTHEST = 1
     AREA_LARGEST = 2
     AREA_SMALLEST = 3
+
+
+def mask_region(img, region, color=(0, 0, 0)):
+    p1 = (2 * region.x, 2 * region.y)
+    p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
+    return cv.rectangle(img, p1, p2, color, thickness=-1)
+
+
+def mask_ui(img):
+    mask_region(img, Regions.EXP_BAR)  # hide exp bar
+    mask_region(img, Regions.CONTROL_PANEL)  # hide control panel
+    mask_region(img, Regions.CHAT)  # hide chat
+    mask_region(img, Regions.MINIMAP)  # hide minimap
+    mask_region(img, Regions.STATUS)  # hide status ui
+    mask_region(img, Regions.HOVER_ACTION)  # hide hover text
+    mask_region(img, Regions.RUNELITE_SIDEBAR)  # hide runelite sidebar
+    return img
 
 
 def grab_screen(sct, hide_ui=False):

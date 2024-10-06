@@ -1,7 +1,6 @@
 import cv2 as cv
 
-from src.util.common import get_color_limits
-from src.vision.color import Color
+from src.vision.color import Color, get_color_limits
 
 haystack_img = cv.imread('../resources/experiments/screenshot/breadcrumb_labels.png', cv.IMREAD_UNCHANGED)
 needle_img = cv.imread('../resources/target/label/marker/yellow/3.png', cv.IMREAD_UNCHANGED)

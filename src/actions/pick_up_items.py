@@ -2,7 +2,7 @@ import cv2 as cv
 import mss
 
 from src.actions.action import Action
-from src.util import robot
+from src.robot import robot
 from src.vision import vision
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 

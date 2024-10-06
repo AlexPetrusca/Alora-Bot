@@ -43,6 +43,6 @@ class Regions:
     CHAT = Region(GAME.x, GAME.y + GAME.h - 200, 520, 200)
     LATEST_CHAT = Region(CHAT.x + 7, CHAT.y + 136, 490, 19)  # todo check this
 
-    BANK = Region(GAME.x + (GAME.w - 490) / 2, GAME.y + (GAME.h - 970) / 2, 490, 800)
-    REWARD = Region(GAME.x + (GAME.w - 290) / 2, GAME.y + (GAME.h - 356) / 2, 234, 194)
-    TP_MENU = Region(GAME.x + (GAME.w - 528) / 2, GAME.y + (GAME.h - 460) / 2, 488, 306)
+    BANK = Region(GAME.x + (GAME.w - 490) // 2, GAME.y + (GAME.h - 970) // 2, 488, 800)
+    REWARD = Region(GAME.x + (GAME.w - 290) // 2, GAME.y + (GAME.h - 356) // 2, 234, 194)
+    TP_MENU = Region(GAME.x + (GAME.w - 528) // 2, GAME.y + (GAME.h - 460) // 2, 488, 306)

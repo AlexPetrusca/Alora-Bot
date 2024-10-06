@@ -3,13 +3,14 @@ import numpy as np
 from pytesseract import pytesseract
 
 from src.vision import vision
+from src.vision.regions import Regions
 
 haystack = cv.imread('../resources/experiments/screenshot/damage_ui/not_present.png', cv.IMREAD_UNCHANGED)
 
-health_img = haystack[188:212, 2978:3018]  # w = 40, h = 24
-prayer_img = haystack[256:280, 2978:3018]  # w = 40, h = 24
-energy_img = haystack[320:344, 2996:3036]  # w = 40, h = 24
-spec_img = haystack[372:396, 3044:3084]  # w = 40, h = 24
+health_img = haystack[Regions.HITPOINTS.as_slice()]  # w = 40, h = 24
+prayer_img = haystack[Regions.PRAYER.as_slice()]  # w = 40, h = 24
+energy_img = haystack[Regions.RUN_ENERGY.as_slice()]  # w = 40, h = 24
+spec_img = haystack[Regions.SPEC_ENERGY.as_slice()]  # w = 40, h = 24
 
 grayscale = cv.cvtColor(prayer_img, cv.COLOR_BGR2GRAY)
 threshold = cv.threshold(grayscale, 128, 255, cv.THRESH_BINARY)[1]

@@ -1,4 +1,6 @@
 from enum import Enum
+import numpy as np
+import cv2 as cv
 
 
 class Color(Enum):
@@ -38,3 +40,15 @@ class Color(Enum):
                 return 'white'
             case _:
                 return ''
+
+
+def get_color_limits(color, ht=0.99, st=0.9, vt=0.8):
+    def clip(value, lower=0, upper=255):
+        return lower if value < lower else upper if value > upper else value
+
+    h, s, v = cv.cvtColor(np.uint8([[color]]), cv.COLOR_BGR2HSV)[0][0]
+    dh, ds, dv = max(h, 255 - h), max(s, 255 - s), max(v, 255 - v)
+    hl, hh = clip(h - dh * (1 - ht)), clip(h + dh * (1 - ht))
+    sl, sh = clip(s - ds * (1 - st)), clip(s + ds * (1 - st))
+    vl, vh = clip(v - dv * (1 - vt)), clip(v + dv * (1 - vt))
+    return (hl, sl, vl), (hh, sh, vh)

@@ -2,7 +2,7 @@ import mss
 from pytesseract import pytesseract
 
 from src.actions.action import Action
-from src.util import robot
+from src.robot import robot
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, StandardSpellbook

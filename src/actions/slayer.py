@@ -3,7 +3,7 @@ from enum import Enum
 from src.actions.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
-from src.util import robot
+from src.robot import robot
 from src.vision.coordinates import Prayer, ControlPanel
 
 

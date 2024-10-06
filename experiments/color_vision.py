@@ -1,9 +1,10 @@
 from enum import Enum
 from time import time
-from src.util.common import get_color_limits
 import cv2 as cv
 import numpy as np
 import mss
+
+from src.vision.color import get_color_limits
 
 
 class DisplayType(Enum):
