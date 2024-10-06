@@ -1,7 +1,7 @@
 import cv2 as cv
 from src.actions.action import Action
 from src.robot import robot
-from src.vision.coordinates import HealActionCoord, ControlPanel
+from src.vision.coordinates import HealActionCoord, ControlPanel, BankMenu
 
 
 class HealAction(Action):
@@ -26,7 +26,7 @@ class HealAction(Action):
             if self.tick_counter == Action.sec2tick(16):
                 robot.click(HealActionCoord.BANK_CHEST)  # click bank chest
             if self.tick_counter == Action.sec2tick(20):
-                robot.click(ControlPanel.BANK_CLOSE)  # close bank
+                robot.click(BankMenu.CLOSE)  # close bank
             return self.tick_counter == Action.sec2tick(21)
         else:
             return self.tick_counter == Action.sec2tick(14)

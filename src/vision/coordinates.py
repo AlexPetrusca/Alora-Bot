@@ -43,7 +43,7 @@ class Minimap(Enum):
     SPECIAL = Regions.MINIMAP.offset(73, 151)
 
 
-class Bank(Enum):
+class BankMenu(Enum):
     PLACEHOLDER_TOGGLE = Regions.BANK.offset(350, 776)
     SEARCH = Regions.BANK.offset(388, 776)
     DEPOSIT_INVENTORY = Regions.BANK.offset(426, 776)
@@ -51,7 +51,7 @@ class Bank(Enum):
     CLOSE = Regions.BANK.offset(470, 17)
 
 
-class Reward(Enum):
+class RewardMenu(Enum):
     CLOSE = Regions.REWARD.offset(218, 18)
 
 
