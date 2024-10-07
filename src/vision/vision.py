@@ -167,26 +167,26 @@ def locate_ground_item(haystack, area_threshold=500):
 def read_text(haystack, config=""):
     grayscale = cv.cvtColor(haystack, cv.COLOR_BGR2GRAY)
     threshold = cv.threshold(grayscale, 120, 255, cv.THRESH_BINARY)[1]
-    # dilation = cv.dilate(threshold, np.ones((1, 2), np.uint8), iterations=1)
-    return pytesseract.image_to_string(threshold, config=config).strip()
+    blur = cv.blur(threshold, (3, 3))
+    return pytesseract.image_to_string(blur, config=config).strip()
 
 
 def read_int(haystack):
     text = read_text(haystack, config='--psm 6')
     old_text = text
 
-    # todo: this is fucking crazy (improve text recognition)
     text = text.replace('.', '')
     text = text.replace('o', '0').replace('O', '0')
     text = text.replace('i', '1').replace('I', '1')
-    text = text.replace('z', '2').replace('Z', '2').replace('&2', '2')
+    text = text.replace('z', '2').replace('Z', '2')
     text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('L', '4')
     text = text.replace('S', '5')
     text = text.replace('G', '6').replace('E', '6')
-    text = text.replace('a', '8').replace('B8', '8').replace('B', '8').replace('&', '8')
-    text = text.replace('g', '9').replace('q', '9')
+    text = text.replace('B', '8').replace('&', '8')
+    text = text.replace('a', '9').replace('g', '9').replace('q', '9')
+
     try:
-        # print("HP:", old_text, "-->", text)
+        print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
         print("ERROR: read_int failed with:", text)
@@ -194,17 +194,11 @@ def read_int(haystack):
 
 
 def read_latest_chat(sct):
-    chat_line_image = grab_screen(sct)[Regions.LATEST_CHAT.as_slice()]
-    return pytesseract.image_to_string(chat_line_image).strip()
-    # return read_text(grab_screen(sct)[Region.LATEST_CHAT.as_slice()])  # todo: use this instead
+    return read_text(grab_screen(sct)[Regions.LATEST_CHAT.as_slice()])
 
 
 def read_damage_ui(sct):
-    text = read_text(grab_damage_ui(sct), config='--psm 6')
-    text = text.replace('V', '/').replace('o', '0').replace('O', '0')  # todo: this is fucking crazy (improve text recognition)
-    # ocr = pytesseract.image_to_string(damage_ui_image).strip()
-    print('DAMAGE_UI (OCR) --> ', text)
-    return text
+    return read_text(grab_damage_ui(sct), config='--psm 6')
 
 
 def read_hitpoints(sct):

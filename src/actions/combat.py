@@ -34,15 +34,16 @@ class CombatAction(Action):
         if self.tick_counter > Action.sec2tick(4) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 # check fight end
-                damage_ui = vision.grab_damage_ui(mss.mss())
-                ocr = pytesseract.image_to_string(damage_ui).strip()
+                ocr = vision.read_damage_ui(mss.mss())
                 print('"', ocr, '"', len(ocr))
                 if ocr.startswith("0/"):
                     self.fight_over_tick = self.tick_counter
-                elif ocr.find("/") == -1:  # "/" not found
+                elif ocr.find("/") == -1:  # '/' not found
                     self.retry_count += 1
                     if self.retry_count >= 3:
                         self.fight_over_tick = self.tick_counter
+                else:
+                    self.retry_count = 0  # '/' found
                 # eat food or teleport home on low health
                 if vision.read_hitpoints(self.sct) < self.health_threshold:
                     ate_food = robot.click_food()

@@ -31,11 +31,11 @@ def shift_click(x=None, y=None):
 
 
 def click_food():
-    ate_food = click_image(cv.imread('../resources/target/item/monkfish.png', cv.IMREAD_UNCHANGED), 0.9)
+    ate_food = click_image(cv.imread('../resources/item/monkfish.png', cv.IMREAD_UNCHANGED), 0.9)
     if not ate_food:
-        ate_food = click_image(cv.imread('../resources/target/item/shark.png', cv.IMREAD_UNCHANGED), 0.9)
+        ate_food = click_image(cv.imread('../resources/item/shark.png', cv.IMREAD_UNCHANGED), 0.9)
     if not ate_food:
-        ate_food = click_image(cv.imread('../resources/target/item/manta_ray.png', cv.IMREAD_UNCHANGED), 0.9)
+        ate_food = click_image(cv.imread('../resources/item/manta_ray.png', cv.IMREAD_UNCHANGED), 0.9)
     return ate_food
 
 

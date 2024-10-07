@@ -23,8 +23,8 @@ class BarrowAction(Action):
         self.barrow = barrow
         self.prayer = prayer
         self.last = last
-        self.available_img = cv2.imread(f"../resources/target/label/barrows/available/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
-        self.unavailable_img = cv2.imread(f"../resources/target/label/barrows/unavailable/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
+        self.available_img = cv2.imread(f"../resources/label/barrows/available/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
+        self.unavailable_img = cv2.imread(f"../resources/label/barrows/unavailable/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
 
     def first_tick(self):
         self.set_status(f"Routing to Barrow {self.barrow} ...")
@@ -57,10 +57,9 @@ class BarrowAction(Action):
 
         if self.tick_counter > Action.sec2tick(18) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
-                damage_ui = vision.grab_damage_ui(mss.mss())
-                ocr = pytesseract.image_to_string(damage_ui).strip()
+                ocr = vision.read_damage_ui(mss.mss())
                 print(ocr)
-                if ocr.startswith('0/') or ocr.startswith('o/'):  # todo: checking 'o/' ain't pretty
+                if ocr.startswith('0/'):
                     self.fight_over_tick = self.tick_counter
 
         if self.fight_over_tick is not None:

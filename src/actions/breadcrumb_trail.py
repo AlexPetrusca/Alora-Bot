@@ -19,7 +19,7 @@ class BreadcrumbTrailAction(Action):
     def __init__(self, color=Color.YELLOW):
         self.color = color
         for i in range(0, 9):
-            path = f'../resources/target/label/marker/{self.color.to_string()}/{i}.png'
+            path = f'../resources/label/marker/{self.color.to_string()}/{i}.png'
             self.breadcrumbs.append(cv.imread(path, cv.IMREAD_UNCHANGED))
 
     def first_tick(self):

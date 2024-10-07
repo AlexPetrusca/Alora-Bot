@@ -73,6 +73,7 @@ class CerberusAction(Action):
         if self.tick_counter == tick_offset:
             robot.click(ControlPanel.INVENTORY_TAB)
 
+        # todo: can we replace this with a CombatAction?
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
         if self.tick_counter > tick_offset and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
@@ -92,7 +93,7 @@ class CerberusAction(Action):
             if self.tick_counter % Action.sec2tick(0.5) == 0:
                 chat = vision.read_latest_chat(self.sct)
                 # print(chat, "->", chat.find("Cerberus: Grr"))
-                if chat.find("Cerberus: Grr") == 0 and chat != self.last_chat:
+                if chat.find("Cerberus: Gr") == 0 and chat != self.last_chat:
                     # print("HIT ------------>", chat)
                     self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
                     robot.click_contour(self.tile_color)

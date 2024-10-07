@@ -21,7 +21,7 @@ class HealAction(Action):
         if self.tick_counter == Action.sec2tick(12):
             robot.right_click(HealActionCoord.HEALER)  # right click healer
         if self.tick_counter == Action.sec2tick(13):
-            robot.click_image(cv.imread('../resources/target/menu/heal_option.png', cv.IMREAD_UNCHANGED), 0.9)
+            robot.click_image(cv.imread('../resources/menu/heal_option.png', cv.IMREAD_UNCHANGED), 0.9)
         if self.bank:
             if self.tick_counter == Action.sec2tick(16):
                 robot.click(HealActionCoord.BANK_CHEST)  # click bank chest

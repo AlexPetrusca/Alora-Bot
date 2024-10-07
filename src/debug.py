@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 import cv2 as cv
 import numpy as np
 import mss
@@ -8,7 +10,11 @@ from src.actions.combat import CombatAction
 from src.actions.zulrah import ZulrahAction
 from src.vision import vision
 from src.vision.color import Color, get_color_limits
+from src.vision.regions import Regions
 from src.vision.vision import ContourDetection, mask_ui
+
+TICK_INTERVAL = 0.1
+executor = ThreadPoolExecutor()
 
 
 class DebugDisplay:
@@ -16,12 +22,20 @@ class DebugDisplay:
     sct = mss.mss()
 
     debug_tab = 1
-    tab_name = ""
+    tab_name = ''
+    debug_text = ''
+
+    tick_counter = 0
+    t_last = 0
 
     def __init__(self, bot):
         self.bot = bot
 
     def tick(self, t):
+        if t - self.t_last > TICK_INTERVAL:
+            self.tick_counter += 1
+            self.t_last = t
+
         screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
 
         if isinstance(self.bot.current_action, PickUpItemsAction):
@@ -31,7 +45,7 @@ class DebugDisplay:
         elif isinstance(self.bot.current_action, ZulrahAction):
             screenshot = self.tick_zulrah(screenshot)
         else:
-            screenshot = self.tick_pick_up_items(screenshot)
+            screenshot = self.tick_default(screenshot)
 
         cv.putText(screenshot, f'FPS: {round(1 / (time.perf_counter() - t))}', (10, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)
@@ -154,6 +168,26 @@ class DebugDisplay:
 
         return screenshot
 
+    def tick_default(self, screenshot):
+        self.tab_name = "Default Display"
+
+        def update_debug_info():
+            latest_chat = vision.read_text(screenshot[Regions.LATEST_CHAT.as_slice()], config='--psm 6')
+            hitpoints_text = vision.read_text(screenshot[Regions.HITPOINTS.as_slice()], config='--psm 6')
+            hitpoints_int = vision.read_int(screenshot[Regions.HITPOINTS.as_slice()])
+            damage_ui = vision.read_text(screenshot[Regions.DAMAGE_UI.as_slice()], config='--psm 6')
+
+            hitpoints = f'[Hitpoints]: {hitpoints_text} -> {hitpoints_int}'
+            damage_ui = f'[Damage Ui]: {damage_ui}'
+            latest_chat = f'[Latest Chat]: {latest_chat}'
+            self.debug_text = f'{hitpoints}\n{damage_ui}\n{latest_chat}'
+
+        if self.tick_counter % 10 == 0:  # every second
+            executor.submit(update_debug_info)
+
+        DebugDisplay.draw_text(screenshot, self.debug_text, 10, 500, (0, 255, 0))
+        return screenshot
+
     @staticmethod
     def get_color_mask(screenshot, color):
         screenshot = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
@@ -170,3 +204,8 @@ class DebugDisplay:
             cv.putText(img, label, (x - thickness, y - thickness - 10), cv.FONT_HERSHEY_SIMPLEX, 1, color,
                        2, cv.LINE_AA)
 
+    @staticmethod
+    def draw_text(img, text, x, y, color=(0, 0, 255), thickness=2):
+        for text in text.split('\n'):
+            cv.putText(img, text, (x, y), cv.FONT_HERSHEY_SIMPLEX, 1, color, thickness, cv.LINE_AA)
+            y += 50
