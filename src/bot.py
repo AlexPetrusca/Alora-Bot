@@ -1,5 +1,5 @@
 import logging
-from copy import copy
+from copy import deepcopy
 from time import perf_counter
 
 from src.actions.slayer import SlayerTask
@@ -37,7 +37,7 @@ class Bot:
         self.apply_config(config)
 
     def apply_config(self, config):
-        self.action_queue = copy(config)
+        self.action_queue = deepcopy(config)
         self.current_config = config
         self.current_action = self.action_queue[0]
 
@@ -53,8 +53,8 @@ class Bot:
             if self.paused:
                 logging.info("Pause")
             else:
-                self.t_start = perf_counter() - self.t_duration
                 logging.info("Play")
+                self.t_start = perf_counter() - self.t_duration
         if self.background.key_toggled(Key.F2):  # reset
             logging.info("Reset")
             self.apply_config(self.current_config)

@@ -110,7 +110,7 @@ def locate_ground_item(haystack, area_threshold=500):
     haystack = mask_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(screenshot, color):
-        hsv = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        hsv = cv.cvtColor(screenshot, cv.COLOR_BGR2HSV)
         lower_limit, upper_limit = get_color_limits(color)
         mask = cv.inRange(hsv, lower_limit, upper_limit)
 
