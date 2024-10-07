@@ -75,12 +75,14 @@ class CerberusAction(Action):
 
         # todo: can we replace this with a CombatAction?
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
+        tick_offset += Action.sec2tick(3)
         if self.tick_counter > tick_offset and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 damage_ui = vision.read_damage_ui(self.sct)
                 if damage_ui.startswith('0/'):
                     self.fight_over_tick = self.tick_counter
                 elif damage_ui.find("/") == -1:  # "/" not found
+                    print("DAMAGE_UI not found:", damage_ui)
                     self.retry_count += 1
                     if self.retry_count >= 3:
                         return Action.Status.ABORTED
@@ -113,7 +115,8 @@ class CerberusAction(Action):
                 robot.click(Prayer.PIETY)
 
             # 9. End fight
-            tick_offset += Action.sec2tick(2)
+            tick_offset += Action.sec2tick(25)
+            print(self.tick_counter, 'vs', tick_offset, '-->', t)
             if self.tick_counter == tick_offset:
                 return Action.Status.COMPLETE
 
