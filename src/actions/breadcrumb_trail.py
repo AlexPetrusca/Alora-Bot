@@ -5,12 +5,12 @@ from src.actions.action import Action
 from src.robot import robot
 from src.vision import vision
 from src.vision.color import Color
+from src.vision.images import Images
 
 
 # todo: [bug] sometimes gets stuck before final breadcrumb (maybe related to todo below)
 class BreadcrumbTrailAction(Action):
     color = Color.YELLOW
-    breadcrumbs = []
     sct = mss.mss()
 
     next_label = 0
@@ -18,9 +18,6 @@ class BreadcrumbTrailAction(Action):
 
     def __init__(self, color=Color.YELLOW):
         self.color = color
-        for i in range(0, 9):
-            path = f'../resources/label/marker/{self.color.to_string()}/{i}.png'
-            self.breadcrumbs.append(cv.imread(path, cv.IMREAD_UNCHANGED))
 
     def first_tick(self):
         self.set_status(f'Following {self.color.to_string()} breadcrumb trail...')
@@ -31,7 +28,7 @@ class BreadcrumbTrailAction(Action):
             screenshot = vision.grab_screen(self.sct, hide_ui=True)
             dest_tile = vision.locate_contour(screenshot, Color.WHITE)
             if dest_tile is None:
-                breadcrumb_loc = vision.locate_image(screenshot, self.breadcrumbs[self.next_label], 0.8)
+                breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.8)
                 if breadcrumb_loc is not None:
                     robot.click(breadcrumb_loc[0] / 2, breadcrumb_loc[1] / 2)
                     self.next_label += 1

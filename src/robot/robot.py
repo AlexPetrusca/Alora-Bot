@@ -2,6 +2,7 @@ import mss
 import pyautogui
 import cv2 as cv
 from src.vision import vision
+from src.vision.images import Images
 from src.vision.regions import Regions
 from src.vision.vision import ContourDetection
 
@@ -32,11 +33,11 @@ def shift_click(x=None, y=None):
 
 
 def click_food():
-    ate_food = click_image(cv.imread('../resources/item/monkfish.png', cv.IMREAD_UNCHANGED), 0.9, region=Regions.CONTROL_PANEL)
+    ate_food = click_image(Images.MONKFISH, 0.9, region=Regions.CONTROL_PANEL)
     if not ate_food:
-        ate_food = click_image(cv.imread('../resources/item/shark.png', cv.IMREAD_UNCHANGED), 0.9, region=Regions.CONTROL_PANEL)
+        ate_food = click_image(Images.SHARK, 0.9, region=Regions.CONTROL_PANEL)
     if not ate_food:
-        ate_food = click_image(cv.imread('../resources/item/manta_ray.png', cv.IMREAD_UNCHANGED), 0.9, region=Regions.CONTROL_PANEL)
+        ate_food = click_image(Images.MANTA_RAY, 0.9, region=Regions.CONTROL_PANEL)
     return ate_food
 
 
