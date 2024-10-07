@@ -56,8 +56,8 @@ class Bot:
                 self.timer.play()
         if self.background.key_toggled(Key.F2):  # reset
             logging.info("Reset")
-            self.apply_config(self.current_config)
             self.timer.reset()
+            self.apply_config(self.current_config)
             self.background.untoggle_key(Key.F2)
         if self.background.key_toggled(Key.F3):  # exit
             logging.info("Exit")

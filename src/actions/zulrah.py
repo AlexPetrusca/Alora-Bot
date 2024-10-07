@@ -19,8 +19,8 @@ class ZulrahAction(Action):
     def first_tick(self):
         self.set_progress_message(f'Fighting Zulrah...')
 
-    def tick(self, tick_counter):
-        if tick_counter % Timer.sec2tick(1) == 0:
+    def tick(self):
+        if self.tick_counter % Timer.sec2tick(1) == 0:
             screenshot = vision.grab_screen(self.sct, hide_ui=True)
             red_contour, red_area = vision.get_contour(screenshot, Color.RED, mode=ContourDetection.AREA_LARGEST)
             green_contour, green_area = vision.get_contour(screenshot, Color.GREEN, mode=ContourDetection.AREA_LARGEST)
@@ -35,7 +35,7 @@ class ZulrahAction(Action):
                 max_area, max_color = blue_area, Color.BLUE
 
             if self.zulrah_color is None and max_color is not None and max_color != self.last_zulrah_color:
-                self.color_change_tick = tick_counter
+                self.color_change_tick = self.tick_counter
                 self.zulrah_color = max_color
                 print(max_color, '-->', max_area)
             elif self.zulrah_color is not None and max_color is None:
@@ -43,10 +43,10 @@ class ZulrahAction(Action):
                 self.zulrah_color = None
 
         # tick_offset = self.color_change_tick
-        # if tick_counter == tick_offset:
+        # if self.tick_counter == tick_offset:
         #     robot.click(Interface.PRAYER_TAB)
         # tick_offset += Timer.sec2tick(0.5)
-        # if tick_counter == tick_offset:
+        # if self.tick_counter == tick_offset:
         #     if self.zulrah_color == Color.GREEN:
         #         robot.click(Prayer.PROTECT_FROM_MISSILES)
         #     elif self.zulrah_color == Color.BLUE:
@@ -54,14 +54,14 @@ class ZulrahAction(Action):
         #     elif self.zulrah_color == Color.RED:
         #         robot.click(Prayer.PROTECT_FROM_MELEE)
         # tick_offset += Timer.sec2tick(1)
-        # if tick_counter == tick_offset:
+        # if self.tick_counter == tick_offset:
         #     robot.click(Interface.INVENTORY_TAB)
 
         tick_offset = self.color_change_tick
-        if tick_counter == tick_offset:
+        if self.tick_counter == tick_offset:
             robot.press('1')  # prayer tab
         tick_offset += Timer.sec2tick(0.1)
-        if tick_counter == tick_offset:
+        if self.tick_counter == tick_offset:
             if self.zulrah_color == Color.GREEN:
                 robot.click(Prayer.PROTECT_FROM_MISSILES)
             elif self.zulrah_color == Color.BLUE:
@@ -72,7 +72,7 @@ class ZulrahAction(Action):
                 elif self.last_zulrah_color == Color.BLUE:
                     robot.click(Prayer.PROTECT_FROM_MAGIC)
         tick_offset += Timer.sec2tick(0.1)
-        if tick_counter == tick_offset:
+        if self.tick_counter == tick_offset:
             robot.press('space')  # inventory tab
 
         return Action.Status.IN_PROGRESS

@@ -24,8 +24,8 @@ class BreadcrumbTrailAction(Action):
         self.set_progress_message(f'Following {self.color.to_string()} breadcrumb trail...')
 
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
-    def tick(self, tick_counter):
-        if tick_counter % Timer.sec2tick(1) == 0:
+    def tick(self):
+        if self.tick_counter % Timer.sec2tick(1) == 0:
             screenshot = vision.grab_screen(self.sct, hide_ui=True)
             dest_tile = vision.locate_contour(screenshot, Color.WHITE)
             if dest_tile is None:

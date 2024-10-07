@@ -7,6 +7,8 @@ class Action:
     play_count = -1
     progress_message = ""
 
+    tick_counter = 0
+    tick_offset = 0
     start_tick = -1
     prev_tick = -1
 
@@ -15,31 +17,46 @@ class Action:
         ...
 
     @abstractmethod
-    def tick(self, tick_counter):
+    def tick(self):
         ...
 
     @abstractmethod
     def last_tick(self):
         ...
 
-    def run(self, tick_counter):
+    def run(self, global_tick):
         if self.start_tick == -1:
-            self.start_tick = tick_counter
+            self.start_tick = global_tick
             self.prev_tick = -1
             self.first_tick()
-        local_tick_counter = tick_counter - self.start_tick
-        if local_tick_counter > self.prev_tick:
-            self.prev_tick = local_tick_counter
-            status = self.tick(local_tick_counter)
+
+        self.tick_counter = global_tick - self.start_tick
+        if self.tick_counter > self.prev_tick:
+            self.prev_tick = self.tick_counter
+            self.tick_offset = 0
+            status = self.tick()
             if status.is_terminal():
                 self.last_tick()
                 self.start_tick = -1
                 return status
+
         return Action.Status.IN_PROGRESS
 
     def set_progress_message(self, progress_message):
         self.progress_message = progress_message
         logging.info(self.progress_message)
+
+    def at(self, tick, fn):
+        if self.tick_counter == tick:
+            fn()
+
+    def after(self, tick_duration, fn):
+        self.tick_offset += tick_duration
+        self.at(self.tick_offset, fn)
+
+    def interval(self, tick_interval, fn):
+        if self.tick_counter % tick_interval == 0:
+            fn()
 
     def play(self, count):
         self.play_count = count

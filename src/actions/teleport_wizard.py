@@ -15,18 +15,18 @@ class TeleportWizardAction(Action):
     def first_tick(self):
         self.set_progress_message('Walking to Teleport Wizard...')
 
-    def tick(self, tick_counter):
-        if tick_counter == 0:
+    def tick(self):
+        if self.tick_counter == 0:
             robot.click(TeleportActionCoord.TELEPORT_WIZARD)  # teleport wizard
-        if tick_counter == Timer.sec2tick(5):
+        if self.tick_counter == Timer.sec2tick(5):
             self.set_progress_message('Routing to Destination...')
             robot.click(TeleportMenu.SEARCH)  # search
-        if tick_counter == Timer.sec2tick(6):
+        if self.tick_counter == Timer.sec2tick(6):
             robot.press([c for c in self.destination])  # type destination
-        if tick_counter == Timer.sec2tick(7):
+        if self.tick_counter == Timer.sec2tick(7):
             self.set_progress_message('Teleporting to Destination...')
             robot.click(TeleportMenu.FIRST_RESULT)  # go to destination
-        if tick_counter == Timer.sec2tick(12):
+        if self.tick_counter == Timer.sec2tick(12):
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

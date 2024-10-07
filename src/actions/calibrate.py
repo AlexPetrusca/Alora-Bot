@@ -9,14 +9,14 @@ class CalibrateAction(Action):
     def first_tick(self):
         self.set_progress_message('Calibrating Camera...')
 
-    def tick(self, tick_counter):
-        if tick_counter == 0:
+    def tick(self):
+        if self.tick_counter == 0:
             robot.click(Minimap.COMPASS)
-        elif tick_counter == Timer.sec2tick(0.1):
+        elif self.tick_counter == Timer.sec2tick(0.1):
             robot.key_down('up')
-        elif tick_counter == Timer.sec2tick(2):
+        elif self.tick_counter == Timer.sec2tick(2):
             robot.key_up('up')
-        elif tick_counter == Timer.sec2tick(3):
+        elif self.tick_counter == Timer.sec2tick(3):
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 
