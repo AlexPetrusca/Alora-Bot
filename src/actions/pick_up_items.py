@@ -3,6 +3,7 @@ import mss
 
 from src.actions.action import Action
 from src.robot import robot
+from src.robot.timer import Timer
 from src.vision import vision
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 
@@ -23,8 +24,8 @@ class PickUpItemsAction(Action):
         self.set_progress_message('Picking Up Ground Items...')
         pass
 
-    def tick(self, t):
-        if self.tick_counter == 0:
+    def tick(self, tick_counter):
+        if tick_counter == 0:
             click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
             if click_xy is not None:
                 self.item_found = True
@@ -33,27 +34,27 @@ class PickUpItemsAction(Action):
                 # todo: should we add a reason message to the status here?
                 return Action.Status.COMPLETE  # exit quickly if item not found and not pausing on failure
 
-        if self.tick_counter > Action.sec2tick(3):
+        if tick_counter > Timer.sec2tick(3):
             if self.item_found:
-                if self.tick_counter % Action.sec2tick(0.25) == 0 and self.tp_home_tick is None:
+                if tick_counter % Timer.sec2tick(0.25) == 0 and self.tp_home_tick is None:
                     click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
                     if click_xy is not None:
                         if vision.read_latest_chat(self.sct).find("You do not have enough inventory space.") == 0:
-                            self.tp_home_tick = self.tick_counter
+                            self.tp_home_tick = tick_counter
                         robot.click(click_xy[0] / 2, click_xy[1] / 2)
                         self.click_count += 1
                     else:
                         self.retry_count += 1
             else:
-                if self.tick_counter > Action.sec2tick(10):
+                if tick_counter > Timer.sec2tick(10):
                     return Action.Status.COMPLETE  # item not found, pause in case user wants to take action
 
         if self.tp_home_tick is not None:
-            if self.tick_counter == self.tp_home_tick:
+            if tick_counter == self.tp_home_tick:
                 robot.click(ControlPanel.MAGIC_TAB)
-            if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
+            if tick_counter == self.tp_home_tick + Timer.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            if self.tick_counter > self.tp_home_tick + Action.sec2tick(5):
+            if tick_counter > self.tp_home_tick + Timer.sec2tick(5):
                 return Action.Status.ABORTED
         if self.click_count > 20:
             print("Find item failed - excessive click count")

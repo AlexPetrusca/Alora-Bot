@@ -1,5 +1,6 @@
 from src.actions.action import Action
 from src.robot import robot
+from src.robot.timer import Timer
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 
@@ -7,12 +8,12 @@ class HomeTeleportAction(Action):
     def first_tick(self):
         self.set_progress_message('Teleporting Home...')
 
-    def tick(self, t):
-        if self.tick_counter == 0:
+    def tick(self, tick_counter):
+        if tick_counter == 0:
             robot.click(ControlPanel.MAGIC_TAB)
-        if self.tick_counter == Action.sec2tick(1):
+        if tick_counter == Timer.sec2tick(1):
             robot.click(StandardSpellbook.HOME_TELEPORT)
-        if self.tick_counter == Action.sec2tick(4):
+        if tick_counter == Timer.sec2tick(4):
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

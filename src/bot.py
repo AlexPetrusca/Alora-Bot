@@ -1,15 +1,16 @@
 import logging
 from copy import deepcopy
-from time import perf_counter
 
 from src.actions.slayer import SlayerTask
 from src.background import BackgroundScript
 from src.bot_config import BotConfig
 from src.debug import DebugDisplay
 from src.keylogger.keys import Key
+from src.robot.timer import Timer
 
 
 class Bot:
+    timer = None
     background = None
     play_count = -1
     debug = False
@@ -21,13 +22,11 @@ class Bot:
     loop_length = 0
     action_count = 0
 
-    t_start = perf_counter()
-    t_duration = 0
-
     def __init__(self, play_count=-1, debug=False):
-        self.debug = debug
-        self.play_count = play_count
+        self.timer = Timer()
         self.background = BackgroundScript(self)
+        self.play_count = play_count
+        self.debug = debug
 
         # config = BotConfig.experiment()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
@@ -46,36 +45,33 @@ class Bot:
             if action.play_count == -1:
                 self.loop_length += 1
 
-    # todo: [bug] Pausing then resetting then playing skips actions (reset is broken)
     def handle_user_input(self):
         if self.paused != self.background.key_toggled(Key.F1):  # pause/play
             self.paused = self.background.key_toggled(Key.F1)
             if self.paused:
                 logging.info("Pause")
+                self.timer.pause()
             else:
                 logging.info("Play")
-                self.t_start = perf_counter() - self.t_duration
+                self.timer.play()
         if self.background.key_toggled(Key.F2):  # reset
             logging.info("Reset")
             self.apply_config(self.current_config)
-            self.t_start = perf_counter()
-            self.t_duration = 0
+            self.timer.reset()
             self.background.untoggle_key(Key.F2)
         if self.background.key_toggled(Key.F3):  # exit
             logging.info("Exit")
             exit(1)
 
-    def tick(self):
+    def run(self):
         self.handle_user_input()
         if len(self.action_queue) == 0:  # all actions are done?
             return True
-        if self.paused:
+        if self.paused:  # paused?
             return False
 
-        self.t_duration = perf_counter() - self.t_start
-        status = self.current_action.run(self.t_duration)
+        status = self.current_action.run(self.timer.tick_counter)
         if status.is_terminal():  # current action is done?
-            self.t_start = perf_counter()
             top = self.action_queue.pop(0)
             self.current_action = self.action_queue[0]
             if top.play_count == -1:
@@ -94,9 +90,10 @@ class Bot:
         if self.debug:
             self.debug = DebugDisplay(self)
         while True:
-            self.background.tick(perf_counter())
+            self.timer.run()
+            self.background.run()
             if self.debug:
-                self.debug.tick(perf_counter())
-            if self.tick():
+                self.debug.run()
+            if self.run():
                 logging.info("Done!")
                 return

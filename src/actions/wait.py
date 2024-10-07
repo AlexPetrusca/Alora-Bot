@@ -1,5 +1,5 @@
-import logging
 from src.actions.action import Action
+from src.robot.timer import Timer
 
 
 class WaitAction(Action):
@@ -11,8 +11,8 @@ class WaitAction(Action):
     def first_tick(self):
         self.set_progress_message(f'Waiting {self.d} seconds...')
 
-    def tick(self, t):
-        if t > self.d:
+    def tick(self, tick_counter):
+        if tick_counter > Timer.sec2tick(self.d):
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

@@ -3,6 +3,7 @@ import mss
 
 from src.actions.action import Action
 from src.robot import robot
+from src.robot.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.images import Images
@@ -23,8 +24,8 @@ class BreadcrumbTrailAction(Action):
         self.set_progress_message(f'Following {self.color.to_string()} breadcrumb trail...')
 
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
-    def tick(self, t):
-        if self.tick_counter % Action.sec2tick(1) == 0:
+    def tick(self, tick_counter):
+        if tick_counter % Timer.sec2tick(1) == 0:
             screenshot = vision.grab_screen(self.sct, hide_ui=True)
             dest_tile = vision.locate_contour(screenshot, Color.WHITE)
             if dest_tile is None:

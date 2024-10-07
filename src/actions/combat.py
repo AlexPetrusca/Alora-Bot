@@ -1,8 +1,8 @@
 import mss
-from pytesseract import pytesseract
 
 from src.actions.action import Action
 from src.robot import robot
+from src.robot.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, StandardSpellbook
@@ -26,40 +26,40 @@ class CombatAction(Action):
     def first_tick(self):
         pass
 
-    def tick(self, t):
-        if self.tick_counter == 0:
+    def tick(self, tick_counter):
+        if tick_counter == 0:
             robot.click_contour(self.target_color)
-        if self.tick_counter == Action.sec2tick(1):
+        if tick_counter == Timer.sec2tick(1):
             robot.click(ControlPanel.INVENTORY_TAB)
-        if self.tick_counter > Action.sec2tick(4) and self.fight_over_tick is None:
-            if self.tick_counter % Action.sec2tick(1) == 0:
+        if tick_counter > Timer.sec2tick(4) and self.fight_over_tick is None:
+            if tick_counter % Timer.sec2tick(1) == 0:
                 # check fight end
                 ocr = vision.read_damage_ui(mss.mss())
                 print('"', ocr, '"', len(ocr))
                 if ocr.startswith("0/"):
-                    self.fight_over_tick = self.tick_counter
+                    self.fight_over_tick = tick_counter
                 elif ocr.find("/") == -1:  # '/' not found
                     self.retry_count += 1
                     if self.retry_count >= 3:
-                        self.fight_over_tick = self.tick_counter
+                        self.fight_over_tick = tick_counter
                 else:
                     self.retry_count = 0  # '/' found
                 # eat food or teleport home on low health
                 if vision.read_hitpoints(self.sct) < self.health_threshold:
                     ate_food = robot.click_food()
                     if not ate_food:
-                        self.fight_over_tick = self.tick_counter
-                        self.tp_home_tick = self.tick_counter
+                        self.fight_over_tick = tick_counter
+                        self.tp_home_tick = tick_counter
 
         if self.tp_home_tick is not None:
-            if self.tick_counter == self.tp_home_tick:
+            if tick_counter == self.tp_home_tick:
                 robot.click(ControlPanel.MAGIC_TAB)
-            if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
+            if tick_counter == self.tp_home_tick + Timer.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            if self.tick_counter > self.tp_home_tick + Action.sec2tick(5):
+            if tick_counter > self.tp_home_tick + Timer.sec2tick(5):
                 return Action.Status.ABORTED
         elif self.fight_over_tick is not None:
-            if self.tick_counter > self.fight_over_tick + Action.sec2tick(5):
+            if tick_counter > self.fight_over_tick + Timer.sec2tick(5):
                 return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

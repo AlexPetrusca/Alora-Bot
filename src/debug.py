@@ -1,9 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor
+from time import perf_counter
 
 import cv2 as cv
 import numpy as np
 import mss
-import time
 
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
@@ -13,7 +13,6 @@ from src.vision.color import Color, get_color_limits
 from src.vision.regions import Regions
 from src.vision.vision import ContourDetection, mask_ui
 
-TICK_INTERVAL = 0.1
 executor = ThreadPoolExecutor()
 
 
@@ -25,19 +24,13 @@ class DebugDisplay:
     tab_name = ''
     debug_text = ''
 
-    tick_counter = 0
-    t_last = 0
-
     def __init__(self, bot):
         self.bot = bot
 
-    def tick(self, t):
-        if t - self.t_last > TICK_INTERVAL:
-            self.tick_counter += 1
-            self.t_last = t
+    def run(self):
+        t_start = perf_counter()
 
         screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
-
         if isinstance(self.bot.current_action, PickUpItemsAction):
             screenshot = self.tick_pick_up_items(screenshot)
         elif isinstance(self.bot.current_action, CombatAction):
@@ -47,7 +40,9 @@ class DebugDisplay:
         else:
             screenshot = self.tick_default(screenshot)
 
-        cv.putText(screenshot, f'FPS: {round(1 / (time.perf_counter() - t))}', (10, 50), cv.FONT_HERSHEY_SIMPLEX,
+        t_end = perf_counter()
+
+        cv.putText(screenshot, f'FPS: {round(1 / (t_start - t_end))}', (10, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)
         cv.putText(screenshot, self.bot.action_queue[0].progress_message, (1000, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)
@@ -182,7 +177,7 @@ class DebugDisplay:
             latest_chat = f'[Latest Chat]: {latest_chat}'
             self.debug_text = f'{hitpoints}\n{damage_ui}\n{latest_chat}'
 
-        if self.tick_counter % 10 == 0:  # every second
+        if self.bot.tick_counter % 10 == 0:  # every second
             executor.submit(update_debug_info)
 
         DebugDisplay.draw_text(screenshot, self.debug_text, 10, 500, (0, 255, 0))

@@ -4,6 +4,7 @@ from src.actions.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.robot import robot
+from src.robot.timer import Timer
 from src.vision.coordinates import Prayer, ControlPanel
 
 
@@ -45,21 +46,19 @@ class SlayerAction(Action):
     def first_tick(self):
         self.set_progress_message(f'Slaying {self.task.value}s...')
 
-    def tick(self, t):
-        dt = t - self.t_ref
-        if self.tick_counter == 0:
+    def tick(self, tick_counter):
+        if tick_counter == 0:
             robot.click(ControlPanel.PRAYER_TAB)
-        if self.tick_counter == Action.sec2tick(0.5):
+        if tick_counter == Timer.sec2tick(0.5):
             robot.click(self.prayer)
-        if self.tick_counter == Action.sec2tick(1):
+        if tick_counter == Timer.sec2tick(1):
             robot.click(ControlPanel.INVENTORY_TAB)
 
         top = self.action_queue[0]
-        status = top.run(dt)
+        status = top.run(tick_counter)
         if status == Action.Status.COMPLETE:
             self.action_queue.pop(0)
             self.action_queue.append(top)
-            self.t_ref = t
         elif status == Action.Status.ABORTED:
             return Action.Status.COMPLETE
 

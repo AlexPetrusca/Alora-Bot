@@ -2,37 +2,39 @@ import logging
 from abc import abstractmethod
 from enum import Enum
 
-TICK_INTERVAL = 0.1  # 100ms tick
-    
 
 class Action:
     play_count = -1
-    tick_counter = -1
     progress_message = ""
+
+    start_tick = -1
+    prev_tick = -1
 
     @abstractmethod
     def first_tick(self):
         ...
 
     @abstractmethod
-    def tick(self, t):
+    def tick(self, tick_counter):
         ...
 
     @abstractmethod
     def last_tick(self):
         ...
 
-    def run(self, t):
-        if self.tick_counter == -1:
+    def run(self, tick_counter):
+        if self.start_tick == -1:
+            self.start_tick = tick_counter
+            self.prev_tick = -1
             self.first_tick()
-            self.tick_counter = 0
-        if Action.sec2tick(t) >= self.tick_counter:
-            status = self.tick(t)
+        local_tick_counter = tick_counter - self.start_tick
+        if local_tick_counter > self.prev_tick:
+            self.prev_tick = local_tick_counter
+            status = self.tick(local_tick_counter)
             if status.is_terminal():
                 self.last_tick()
-                self.tick_counter = -1
+                self.start_tick = -1
                 return status
-            self.tick_counter += 1
         return Action.Status.IN_PROGRESS
 
     def set_progress_message(self, progress_message):
@@ -46,14 +48,6 @@ class Action:
     def play_once(self):
         return self.play(1)
 
-    @staticmethod
-    def sec2tick(secs):
-        return secs // TICK_INTERVAL
-
-    @staticmethod
-    def tick2sec(ticks):
-        return ticks * TICK_INTERVAL
-
     class Status(Enum):
         NOT_STARTED = 1
         IN_PROGRESS = 2
@@ -62,7 +56,7 @@ class Action:
 
         # def __init__(self):
         #     self._reason = None
-        #
+
         # def reason(self, reason):
         #     self._reason = reason
 
