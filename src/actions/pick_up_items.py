@@ -2,9 +2,9 @@ import cv2 as cv
 import mss
 
 from src.actions.action import Action
-from src.util import robot
+from src.robot import robot
 from src.vision import vision
-from src.vision.coordinates import Interface, StandardSpellbook
+from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 
 class PickUpItemsAction(Action):
@@ -20,7 +20,7 @@ class PickUpItemsAction(Action):
         self.pause_on_fail = pause_on_fail
 
     def first_tick(self):
-        self.set_status('Picking Up Ground Items...')
+        self.set_progress_message('Picking Up Ground Items...')
         pass
 
     def tick(self, t):
@@ -30,7 +30,8 @@ class PickUpItemsAction(Action):
                 self.item_found = True
                 robot.click(click_xy[0] / 2, click_xy[1] / 2)
             elif not self.pause_on_fail:
-                return True  # exit quickly if item not found and not pausing on failure
+                # todo: should we add a reason message to the status here?
+                return Action.Status.COMPLETE  # exit quickly if item not found and not pausing on failure
 
         if self.tick_counter > Action.sec2tick(3):
             if self.item_found:
@@ -44,29 +45,27 @@ class PickUpItemsAction(Action):
                     else:
                         self.retry_count += 1
             else:
-                return self.tick_counter > Action.sec2tick(10)  # item not found, pause in case user wants to take action
+                if self.tick_counter > Action.sec2tick(10):
+                    return Action.Status.COMPLETE  # item not found, pause in case user wants to take action
 
         if self.tp_home_tick is not None:
             if self.tick_counter == self.tp_home_tick:
-                robot.click(Interface.MAGIC_TAB)
+                robot.click(ControlPanel.MAGIC_TAB)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            return self.tick_counter > self.tp_home_tick + Action.sec2tick(5)
+            if self.tick_counter > self.tp_home_tick + Action.sec2tick(5):
+                return Action.Status.ABORTED
         if self.click_count > 20:
             print("Find item failed - excessive click count")
-            return True
+            return Action.Status.COMPLETE
         if self.retry_count > 4:
             print("Find item stopped - retry timeout")
-            return True
+            return Action.Status.COMPLETE
 
-        return False
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.item_found = False
         self.tp_home_tick = None
         self.click_count = 0
         self.retry_count = 0
-
-    # replace with Status.ABORTED
-    def did_tp_home(self):
-        return self.tp_home_tick is not None

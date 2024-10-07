@@ -20,7 +20,8 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            ZulrahAction()
+            # ZulrahAction(),
+            CerberusAction()
         ]
 
     @staticmethod

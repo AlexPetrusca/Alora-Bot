@@ -5,9 +5,9 @@ import numpy as np
 import cv2 as cv
 from pytesseract import pytesseract
 
-from src.util.common import mask_ui, get_color_limits
-from src.vision.color import Color
+from src.vision.color import Color, get_color_limits
 from src.vision.coordinates import Player
+from src.vision.regions import Regions
 
 
 class ContourDetection(Enum):
@@ -17,25 +17,42 @@ class ContourDetection(Enum):
     AREA_SMALLEST = 3
 
 
+def mask_region(img, region, color=(0, 0, 0)):
+    p1 = (2 * region.x, 2 * region.y)
+    p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
+    return cv.rectangle(img, p1, p2, color, thickness=-1)
+
+
+def mask_ui(img):
+    mask_region(img, Regions.EXP_BAR)  # hide exp bar
+    mask_region(img, Regions.CONTROL_PANEL)  # hide control panel
+    mask_region(img, Regions.CHAT)  # hide chat
+    mask_region(img, Regions.MINIMAP)  # hide minimap
+    mask_region(img, Regions.STATUS)  # hide status ui
+    mask_region(img, Regions.HOVER_ACTION)  # hide hover text
+    mask_region(img, Regions.RUNELITE_SIDEBAR)  # hide runelite sidebar
+    return img
+
+
 def grab_screen(sct, hide_ui=False):
     screen = np.array(sct.grab(sct.monitors[1]))
     return mask_ui(screen) if hide_ui else screen
 
 
 def grab_damage_ui(sct):
-    return grab_screen(sct)[152:192, 12:264]
+    return grab_screen(sct)[Regions.DAMAGE_UI.as_slice()]
 
 
 def grab_minimap(sct):
-    return grab_screen(sct)[74:420, 2952:3394]
+    return grab_screen(sct)[Regions.MINIMAP.as_slice()]
 
 
-def grab_inventory(sct):
-    return grab_screen(sct)[1568:2234, 2910:3392]
+def grab_control_panel(sct):
+    return grab_screen(sct)[Regions.CONTROL_PANEL.as_slice()]
 
 
 def grab_hover_action(sct):
-    return grab_screen(sct)[74:114, 0:800]
+    return grab_screen(sct)[Regions.HOVER_ACTION.as_slice()]
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
@@ -68,6 +85,7 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
 
     return opt_contour, opt_value
 
+
 def locate_image(haystack, needle, threshold=0.7):
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv.minMaxLoc(result)
@@ -92,7 +110,7 @@ def locate_ground_item(haystack, area_threshold=500):
     haystack = mask_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(screenshot, color):
-        hsv = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
+        hsv = cv.cvtColor(screenshot, cv.COLOR_BGR2HSV)
         lower_limit, upper_limit = get_color_limits(color)
         mask = cv.inRange(hsv, lower_limit, upper_limit)
 
@@ -149,23 +167,26 @@ def locate_ground_item(haystack, area_threshold=500):
 def read_text(haystack, config=""):
     grayscale = cv.cvtColor(haystack, cv.COLOR_BGR2GRAY)
     threshold = cv.threshold(grayscale, 120, 255, cv.THRESH_BINARY)[1]
-    # dilation = cv.dilate(threshold, np.ones((1, 2), np.uint8), iterations=1)
-    return pytesseract.image_to_string(threshold, config=config).strip()
+    blur = cv.blur(threshold, (3, 3))
+    return pytesseract.image_to_string(blur, config=config).strip()
 
 
 def read_int(haystack):
-    text = read_text(haystack, config="--psm 6")
+    text = read_text(haystack, config='--psm 6')
     old_text = text
-    text = text.replace('O', '0')
+
+    text = text.replace('.', '')
+    text = text.replace('o', '0').replace('O', '0')
     text = text.replace('i', '1').replace('I', '1')
-    text = text.replace('z', '2').replace('Z', '2').replace('&2', '2')
+    text = text.replace('z', '2').replace('Z', '2')
     text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('L', '4')
     text = text.replace('S', '5')
     text = text.replace('G', '6').replace('E', '6')
-    text = text.replace('B8', '8').replace('B', '8').replace('a', '8')
-    text = text.replace('g', '9')
+    text = text.replace('B', '8').replace('&', '8')
+    text = text.replace('a', '9').replace('g', '9').replace('q', '9')
+
     try:
-        print("HP:", old_text, "-->", text)
+        # print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
         print("ERROR: read_int failed with:", text)
@@ -173,22 +194,24 @@ def read_int(haystack):
 
 
 def read_latest_chat(sct):
-    chat_line_image = grab_screen(sct)[2106:2144, 14:994]
-    return pytesseract.image_to_string(chat_line_image).strip()
-    # return read_text(grab_screen(sct)[2106:2144, 14:994])  # todo: use this instead
+    return read_text(grab_screen(sct)[Regions.LATEST_CHAT.as_slice()])
+
+
+def read_damage_ui(sct):
+    return read_text(grab_damage_ui(sct), config='--psm 6')
 
 
 def read_hitpoints(sct):
-    return read_int(grab_screen(sct)[188:212, 2978:3018])
+    return read_int(grab_screen(sct)[Regions.HITPOINTS.as_slice()])
 
 
 def read_prayer_energy(sct):
-    return read_int(grab_screen(sct)[256:280, 2978:3018])
+    return read_int(grab_screen(sct)[Regions.PRAYER.as_slice()])
 
 
 def read_run_energy(sct):
-    return read_int(grab_screen(sct)[320:344, 2996:3036])
+    return read_int(grab_screen(sct)[Regions.RUN_ENERGY.as_slice()])
 
 
 def read_spec_energy(sct):
-    return read_int(grab_screen(sct)[372:396, 3044:3084])
+    return read_int(grab_screen(sct)[Regions.SPEC_ENERGY.as_slice()])

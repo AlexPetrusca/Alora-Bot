@@ -1,6 +1,6 @@
 from src.actions.action import Action
-from src.util import robot
-from src.vision.coordinates import TeleportCoords
+from src.robot import robot
+from src.vision.coordinates import TeleportActionCoord, TeleportMenu
 
 
 class TeleportWizardAction(Action):
@@ -12,20 +12,22 @@ class TeleportWizardAction(Action):
             self.destination = destination.value
 
     def first_tick(self):
-        self.set_status('Walking to Teleport Wizard...')
+        self.set_progress_message('Walking to Teleport Wizard...')
 
     def tick(self, t):
         if self.tick_counter == 0:
-            robot.click(TeleportCoords.TELEPORT_WIZARD)  # teleport wizard
+            robot.click(TeleportActionCoord.TELEPORT_WIZARD)  # teleport wizard
         if self.tick_counter == Action.sec2tick(5):
-            self.set_status('Routing to Destination...')
-            robot.click(TeleportCoords.SEARCH_BUTTON)  # search
+            self.set_progress_message('Routing to Destination...')
+            robot.click(TeleportMenu.SEARCH)  # search
         if self.tick_counter == Action.sec2tick(6):
             robot.press([c for c in self.destination])  # type destination
         if self.tick_counter == Action.sec2tick(7):
-            self.set_status('Teleporting to Destination...')
-            robot.click(TeleportCoords.SEARCH_FIRST_RESULT)  # go to destination
-        return self.tick_counter == Action.sec2tick(12)
+            self.set_progress_message('Teleporting to Destination...')
+            robot.click(TeleportMenu.FIRST_RESULT)  # go to destination
+        if self.tick_counter == Action.sec2tick(12):
+            return Action.Status.COMPLETE
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         pass

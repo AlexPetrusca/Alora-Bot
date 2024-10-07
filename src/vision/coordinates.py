@@ -1,68 +1,106 @@
 from enum import Enum
 
+from src.vision.regions import Regions
+
+
+# todo: coordinates should be specified in scaled XY (0.0-1.0, 0.0-1.0)
+def scale_coord(x, y):
+    if (Regions.SCREEN.w, Regions.SCREEN.h) == (1728, 1117):
+        return x, y
+    else:
+        ratio_x = Regions.GAME.w / (1728 - Regions.RUNELITE_SIDEBAR.w)
+        ratio_y = Regions.GAME.h / 1080
+        return round(ratio_x * x), round(ratio_y * (y - 37))
+
 
 class Player(Enum):
-    POSITION = 855, 585
+    POSITION = scale_coord(855, 585)
 
 
-class Interface(Enum):
-    MAGIC_TAB = 1674, 801
-    PRAYER_TAB = 1641, 801
-    EQUIPMENT_TAB = 1608, 801
-    INVENTORY_TAB = 1575, 801
-    QUEST_TAB = 1541, 801
-    STATS_TAB = 1508, 801
-    COMBAT_TAB = 1475, 801
-    BANK_CLOSE = 1074, 110
+class ControlPanel(Enum):
+    COMBAT_TAB = Regions.CONTROL_PANEL.offset(24, 18)
+    STATS_TAB = Regions.CONTROL_PANEL.offset(57, 18)
+    QUEST_TAB = Regions.CONTROL_PANEL.offset(90, 18)
+    INVENTORY_TAB = Regions.CONTROL_PANEL.offset(123, 18)
+    EQUIPMENT_TAB = Regions.CONTROL_PANEL.offset(156, 18)
+    PRAYER_TAB = Regions.CONTROL_PANEL.offset(189, 18)
+    MAGIC_TAB = Regions.CONTROL_PANEL.offset(222, 18)
+
+    CLAN_TAB = Regions.CONTROL_PANEL.offset(24, 316)
+    FRIEND_TAB = Regions.CONTROL_PANEL.offset(57, 316)
+    IGNORE_TAB = Regions.CONTROL_PANEL.offset(90, 316)
+    LOGOUT_TAB = Regions.CONTROL_PANEL.offset(123, 316)
+    OPTIONS_TAB = Regions.CONTROL_PANEL.offset(156, 316)
+    EMOTE_TAB = Regions.CONTROL_PANEL.offset(189, 316)
+    MUSIC_TAB = Regions.CONTROL_PANEL.offset(222, 316)
 
 
 class Minimap(Enum):
-    COMPASS = 1535, 57
-    HEALTH = 1522, 95
-    PRAYER = 1522, 130
-    RUN = 1534, 162
-    SPECIAL = 1555, 187
+    COMPASS = Regions.MINIMAP.offset(54, 20)
+    HEALTH = Regions.MINIMAP.offset(39, 58)
+    PRAYER = Regions.MINIMAP.offset(39, 93)
+    RUN = Regions.MINIMAP.offset(50, 126)
+    SPECIAL = Regions.MINIMAP.offset(73, 151)
 
 
+class BankMenu(Enum):
+    PLACEHOLDER_TOGGLE = Regions.BANK.offset(350, 776)
+    SEARCH = Regions.BANK.offset(388, 776)
+    DEPOSIT_INVENTORY = Regions.BANK.offset(426, 776)
+    DEPOSIT_WORN_ITEMS = Regions.BANK.offset(464, 776)
+    CLOSE = Regions.BANK.offset(470, 17)
+
+
+class RewardMenu(Enum):
+    CLOSE = Regions.REWARD.offset(218, 18)
+
+
+class TeleportMenu(Enum):
+    SEARCH = Regions.TELEPORT_MENU.offset(24, 17)
+    CLOSE = Regions.TELEPORT_MENU.offset(472, 17)
+    FIRST_RESULT = Regions.TELEPORT_MENU.offset(217, 52)
+    SECOND_RESULT = Regions.TELEPORT_MENU.offset(217, 82)
+
+
+# dx = 26, dy = 24
 class StandardSpellbook(Enum):
-    HOME_TELEPORT = 1496, 832
+    HOME_TELEPORT = Regions.CONTROL_PANEL.offset(45, 48)
 
 
+# dx = 40, dy = 27
 class ArceuusSpellbook(Enum):
-    HOME_TELEPORT = 1496, 832
-    RESURRECT_GREATER_SKELETON = 1575, 996
+    HOME_TELEPORT = Regions.CONTROL_PANEL.offset(45, 48)
+    RESURRECT_GREATER_GHOST = Regions.CONTROL_PANEL.offset(84, 212)
+    RESURRECT_GREATER_SKELETON = Regions.CONTROL_PANEL.offset(124, 212)
+    RESURRECT_GREATER_ZOMBIE = Regions.CONTROL_PANEL.offset(164, 212)
 
 
-# x: 1496 - 1644  -->  5 columns  -->  37 gap
-# y:  845 - 1030  -->  6 rows     -->  37 gap
+# dx = 37, dy = 37
 class Prayer(Enum):
-    PROTECT_FROM_MAGIC = 1533, 956
-    PROTECT_FROM_MISSILES = 1570, 956
-    PROTECT_FROM_MELEE = 1607, 956
-    EAGLE_EYE = 1644, 956
-    MYSTIC_MIGHT = 1496, 993
-    PIETY = 1533, 1030
+    PROTECT_FROM_MAGIC = Regions.CONTROL_PANEL.offset(82, 174)
+    PROTECT_FROM_MISSILES = Regions.CONTROL_PANEL.offset(119, 174)
+    PROTECT_FROM_MELEE = Regions.CONTROL_PANEL.offset(156, 174)
+    EAGLE_EYE = Regions.CONTROL_PANEL.offset(193, 174)
+    MYSTIC_MIGHT = Regions.CONTROL_PANEL.offset(45, 211)
+    PIETY = Regions.CONTROL_PANEL.offset(82, 248)
 
 
-class BarrowsCoords(Enum):
-    SPADE = 1512, 845
-    REWARDS_CLOSE = 922, 417
+class BarrowsActionCoord(Enum):
+    SPADE = Regions.CONTROL_PANEL.offset(53, 52)  # todo: replace usages with Inventory.ITEM_1_1
 
 
-class CerberusCoords(Enum):
-    WALK1 = 850, 50
-    WALK2 = 750, 90
-    WALK3 = 850, 215
+class CerberusActionCoord(Enum):
+    WALK1 = scale_coord(850, 50)
+    WALK2 = scale_coord(750, 90)
+    WALK3 = scale_coord(850, 215)
 
 
-class HealCoords(Enum):
-    WALK1 = 700, 302
-    PRAYER_ALTAR = 1292, 68
-    HEALER = 805, 520
-    BANK_CHEST = 1080, 524
+class HealActionCoord(Enum):
+    WALK1 = scale_coord(700, 302)
+    PRAYER_ALTAR = scale_coord(1292, 68)
+    HEALER = scale_coord(805, 520)
+    BANK_CHEST = scale_coord(1080, 524)
 
 
-class TeleportCoords(Enum):
-    TELEPORT_WIZARD = 695, 255
-    SEARCH_BUTTON = 608, 363
-    SEARCH_FIRST_RESULT = 800, 400
+class TeleportActionCoord(Enum):
+    TELEPORT_WIZARD = scale_coord(695, 255)

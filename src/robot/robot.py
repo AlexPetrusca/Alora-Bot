@@ -1,0 +1,75 @@
+import mss
+import pyautogui
+import cv2 as cv
+from src.vision import vision
+from src.vision.images import Images
+from src.vision.regions import Regions
+from src.vision.vision import ContourDetection
+
+
+def click(x=None, y=None):
+    if isinstance(x, tuple):
+        pyautogui.moveTo(x)
+    elif hasattr(x, 'value'):
+        pyautogui.moveTo(x.value)
+    else:
+        pyautogui.moveTo(x, y)
+    pyautogui.click()
+
+
+def right_click(x=None, y=None):
+    if isinstance(x, tuple):
+        pyautogui.moveTo(x)
+    elif hasattr(x, 'value'):
+        pyautogui.moveTo(x.value)
+    else:
+        pyautogui.moveTo(x, y)
+    pyautogui.rightClick()
+
+
+def shift_click(x=None, y=None):
+    with pyautogui.hold('shift'):
+        click(x, y)
+
+
+def click_food():
+    ate_food = click_image(Images.MONKFISH, 0.9, region=Regions.CONTROL_PANEL)
+    if not ate_food:
+        ate_food = click_image(Images.SHARK, 0.9, region=Regions.CONTROL_PANEL)
+    if not ate_food:
+        ate_food = click_image(Images.MANTA_RAY, 0.9, region=Regions.CONTROL_PANEL)
+    return ate_food
+
+
+def click_image(image, threshold=0.7, region=Regions.SCREEN):
+    # todo: can we avoid reinitializing mss each time
+    screenshot = vision.grab_screen(mss.mss())[region.as_slice()]
+    loc = vision.locate_image(screenshot, image, threshold)
+    if loc is None:
+        return False
+    else:
+        x, y = region.global_px(loc[0], loc[1])
+        click(x / 2, y / 2)
+        return True
+
+
+def click_contour(color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
+    screenshot = vision.grab_screen(mss.mss())  # todo: can we avoid reinitializing mss each time
+    loc = vision.locate_contour(screenshot, color, area_threshold, mode)
+    if loc is None:
+        return False
+    else:
+        click(loc[0] / 2, loc[1] / 2)
+        return True
+
+
+def press(key):
+    pyautogui.press(key)
+
+
+def key_down(key):
+    pyautogui.keyDown(key)
+
+
+def key_up(key):
+    pyautogui.keyUp(key)

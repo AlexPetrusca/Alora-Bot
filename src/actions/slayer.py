@@ -3,8 +3,8 @@ from enum import Enum
 from src.actions.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
-from src.util import robot
-from src.vision.coordinates import Prayer, Interface
+from src.robot import robot
+from src.vision.coordinates import Prayer, ControlPanel
 
 
 class SlayerTask(Enum):
@@ -20,7 +20,6 @@ class SlayerAction(Action):
     prayer = None
 
     action_queue = []
-    tp_home_tick = None
     t_ref = 0
 
     def __init__(self, task, health_threshold=30):
@@ -44,34 +43,31 @@ class SlayerAction(Action):
             self.prayer = Prayer.PROTECT_FROM_MELEE
 
     def first_tick(self):
-        self.set_status(f'Slaying {self.task.value}s...')
+        self.set_progress_message(f'Slaying {self.task.value}s...')
 
     def tick(self, t):
         dt = t - self.t_ref
         if self.tick_counter == 0:
-            robot.click(Interface.PRAYER_TAB)
+            robot.click(ControlPanel.PRAYER_TAB)
         if self.tick_counter == Action.sec2tick(0.5):
             robot.click(self.prayer)
         if self.tick_counter == Action.sec2tick(1):
-            robot.click(Interface.INVENTORY_TAB)
+            robot.click(ControlPanel.INVENTORY_TAB)
 
         top = self.action_queue[0]
-        if top.run(dt):
-            if self.tp_home_tick is not None:
-                return True
+        status = top.run(dt)
+        if status == Action.Status.COMPLETE:
             self.action_queue.pop(0)
             self.action_queue.append(top)
             self.t_ref = t
+        elif status == Action.Status.ABORTED:
+            return Action.Status.COMPLETE
 
-        if top.did_tp_home():
-            self.tp_home_tick = self.tick_counter
-
-        return False
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.action_queue = [
             CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction(pause_on_fail=False)
         ]
-        self.tp_home_tick = None
         self.t_ref = 0
