@@ -82,7 +82,7 @@ class CerberusAction(Action):
                     self.fight_over_tick = self.tick_counter
                 elif damage_ui.find("/") == -1:  # "/" not found
                     self.retry_count += 1
-                    if self.retry_count > 5:  # todo: calibrate this - 5 may be too high
+                    if self.retry_count >= 3:
                         return Action.Status.ABORTED
                 else:
                     self.retry_count = 0

@@ -1,5 +1,4 @@
 import logging
-import math
 from abc import abstractmethod
 from enum import Enum
 
@@ -49,7 +48,7 @@ class Action:
 
     @staticmethod
     def sec2tick(secs):
-        return math.floor(secs / TICK_INTERVAL)
+        return secs // TICK_INTERVAL
 
     @staticmethod
     def tick2sec(ticks):

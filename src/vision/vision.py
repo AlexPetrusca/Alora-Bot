@@ -106,7 +106,7 @@ def locate_contour(haystack, color, area_threshold=750, mode=ContourDetection.DI
         return None
 
 
-def locate_ground_item(haystack, area_threshold=500):
+def locate_ground_item(haystack, area_threshold=250):
     haystack = mask_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(screenshot, color):
@@ -123,7 +123,6 @@ def locate_ground_item(haystack, area_threshold=500):
         contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
         for contour in contours:
             area = cv.contourArea(contour)
-            # area = w * h
             if area > largest_area:
                 largest_area = area
                 x, y, w, h = cv.boundingRect(contour)
@@ -175,18 +174,19 @@ def read_int(haystack):
     text = read_text(haystack, config='--psm 6')
     old_text = text
 
-    text = text.replace('.', '')
-    text = text.replace('o', '0').replace('O', '0')
-    text = text.replace('i', '1').replace('I', '1')
+    text = text.replace('.', '').replace('"', '')
+    text = text.replace('o', '0').replace('O', '0').replace('Q', '0')
+    text = text.replace('i', '1').replace('l', '1').replace('I', '1')
     text = text.replace('z', '2').replace('Z', '2')
     text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('L', '4')
-    text = text.replace('S', '5')
+    text = text.replace('S', '5').replace('s', '5')
     text = text.replace('G', '6').replace('E', '6')
+    text = text.replace('7?', '7').replace('?', '7')
     text = text.replace('B', '8').replace('&', '8')
     text = text.replace('a', '9').replace('g', '9').replace('q', '9')
 
     try:
-        # print("HP:", old_text, "-->", text)
+        print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
         print("ERROR: read_int failed with:", text)
