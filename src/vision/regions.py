@@ -28,7 +28,7 @@ class Regions:
     RUNELITE_SIDEBAR = Region(GAME.x + GAME.w, GAME.y, 30, GAME.h)
 
     STATUS = Region(GAME.x, GAME.y, 221, 173)
-    DAMAGE_UI = Region(STATUS.x + 2, STATUS.y + 40, 130, 20)
+    DAMAGE_UI = Region(STATUS.x + 8, STATUS.y + 40, 124, 16)
     HOVER_ACTION = Region(STATUS.x, STATUS.y, 400, 20)
 
     MINIMAP = Region(GAME.x + GAME.w - 215, GAME.y, 215, 172)
