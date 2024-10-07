@@ -82,7 +82,8 @@ class CerberusAction(Action):
                     self.fight_over_tick = self.tick_counter
                 elif damage_ui.find("/") == -1:  # "/" not found
                     self.retry_count += 1
-                    if self.retry_count > 5:  # todo: calibrate this - 5 may be too high
+                    if self.retry_count >= 3:
+                        print("DONE INCORRECT: WTF!?")
                         return Action.Status.ABORTED
                 else:
                     self.retry_count = 0
@@ -112,9 +113,10 @@ class CerberusAction(Action):
             if self.tick_counter == tick_offset:
                 robot.click(Prayer.PIETY)
 
+            print(self.tick_counter, 'vs', tick_offset + Action.sec2tick(25), "or", self.fight_over_tick + Action.sec2tick(25), "vs", t)
             # 9. End fight
-            tick_offset += Action.sec2tick(2)
-            if self.tick_counter == tick_offset:
+            if self.tick_counter == (tick_offset + Action.sec2tick(25)):
+                print("DONE CORRECT", '-->', tick_offset)
                 return Action.Status.COMPLETE
 
         return Action.Status.IN_PROGRESS

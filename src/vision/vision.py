@@ -118,18 +118,21 @@ def locate_ground_item(haystack, area_threshold=500):
         mask = cv.blur(mask, (3, 3))
         mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
 
-        largest_area = area_threshold
+        largest_area = 0
         largest_position = None
         contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
         for contour in contours:
             area = cv.contourArea(contour)
-            # area = w * h
             if area > largest_area:
                 largest_area = area
                 x, y, w, h = cv.boundingRect(contour)
                 largest_position = round(x + w / 2), round(y + h / 2)
 
-        return largest_position
+        print(f"{color} - {largest_area}")
+        if largest_area > area_threshold:
+            return largest_position
+        else:
+            return None
 
     insane_value_item = locate_item_by_color(haystack, Color.INSANE_VALUE.value)
     if insane_value_item is not None:
@@ -175,18 +178,19 @@ def read_int(haystack):
     text = read_text(haystack, config='--psm 6')
     old_text = text
 
-    text = text.replace('.', '')
-    text = text.replace('o', '0').replace('O', '0')
-    text = text.replace('i', '1').replace('I', '1')
+    text = text.replace('.', '').replace('"', '')
+    text = text.replace('o', '0').replace('O', '0').replace('Q', '0')
+    text = text.replace('i', '1').replace('l', '1').replace('I', '1')
     text = text.replace('z', '2').replace('Z', '2')
     text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('L', '4')
-    text = text.replace('S', '5')
+    text = text.replace('S', '5').replace('s', '5')
     text = text.replace('G', '6').replace('E', '6')
+    text = text.replace('7?', '7').replace('?', '7')
     text = text.replace('B', '8').replace('&', '8')
     text = text.replace('a', '9').replace('g', '9').replace('q', '9')
 
     try:
-        # print("HP:", old_text, "-->", text)
+        print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
         print("ERROR: read_int failed with:", text)
