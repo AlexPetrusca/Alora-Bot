@@ -76,14 +76,15 @@ class CerberusAction(Action):
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
         if self.tick_counter > tick_offset and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
-                damage_ui = vision.grab_damage_ui(self.sct)
-                ocr = pytesseract.image_to_string(damage_ui).strip()  # todo: move ocr to vision module
-                if ocr.startswith('0/'):
+                damage_ui = vision.read_damage_ui(self.sct)
+                if damage_ui.startswith('0/'):
                     self.fight_over_tick = self.tick_counter
-                elif ocr.find("/") == -1:  # "/" not found
+                elif damage_ui.find("/") == -1:  # "/" not found
                     self.retry_count += 1
-                    if self.retry_count > 5:
+                    if self.retry_count > 5:  # todo: calibrate this - 5 may be too high
                         return True
+                else:
+                    self.retry_count = 0
 
                 if vision.read_hitpoints(self.sct) <= 30:
                     robot.click_food()
