@@ -20,7 +20,7 @@ class BreadcrumbTrailAction(Action):
         self.color = color
 
     def first_tick(self):
-        self.set_status(f'Following {self.color.to_string()} breadcrumb trail...')
+        self.set_progress_message(f'Following {self.color.to_string()} breadcrumb trail...')
 
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
     def tick(self, t):
@@ -37,9 +37,9 @@ class BreadcrumbTrailAction(Action):
                     print("Failed looking for breadcrumb: ", self.next_label)
                     self.retry_count += 1
                     if self.retry_count >= 4:
-                        return True  # reached destination
+                        return Action.Status.COMPLETE  # reached destination
 
-        return False
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.next_label = 0

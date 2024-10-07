@@ -27,7 +27,7 @@ class BarrowAction(Action):
         self.unavailable_img = cv2.imread(f"../resources/label/barrows/unavailable/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
 
     def first_tick(self):
-        self.set_status(f"Routing to Barrow {self.barrow} ...")
+        self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
 
     def tick(self, t):
         tick_offset = 0
@@ -37,8 +37,8 @@ class BarrowAction(Action):
                 robot.click_image(self.unavailable_img, region=Regions.MINIMAP)
                 self.skip = True
 
-        if self.skip:
-            return self.tick_counter == tick_offset + Action.sec2tick(8)
+        if self.skip and self.tick_counter == tick_offset + Action.sec2tick(8):
+            return Action.Status.COMPLETE
 
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:  # open inventory
@@ -49,7 +49,7 @@ class BarrowAction(Action):
 
         tick_offset += Action.sec2tick(3)
         if self.tick_counter == tick_offset:  # click sarcophagus + fight
-            self.set_status("Fighting...")
+            self.set_progress_message("Fighting...")
             robot.click_contour(Color.YELLOW)
 
         tick_offset += Action.sec2tick(3)
@@ -85,14 +85,15 @@ class BarrowAction(Action):
                 tick_offset += Action.sec2tick(3)
                 if self.tick_counter == tick_offset:
                     robot.click(RewardMenu.CLOSE)  # collect rewards
-                    return True
+                    return Action.Status.COMPLETE
             elif self.tick_counter == tick_offset:
-                self.set_status(f"Completed Barrow {self.barrow}")
+                self.set_progress_message(f"Completed Barrow {self.barrow}")
                 robot.click_contour(Color.MAGENTA)  # exit barrow
 
-            return self.tick_counter == tick_offset + Action.sec2tick(5)
+            if self.tick_counter == tick_offset + Action.sec2tick(5):
+                return Action.Status.COMPLETE
 
-        return False
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.fight_over_tick = None

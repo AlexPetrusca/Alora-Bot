@@ -56,17 +56,14 @@ class CombatAction(Action):
                 robot.click(ControlPanel.MAGIC_TAB)
             if self.tick_counter == self.tp_home_tick + Action.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            return self.tick_counter > self.tp_home_tick + Action.sec2tick(5)
+            if self.tick_counter > self.tp_home_tick + Action.sec2tick(5):
+                return Action.Status.ABORTED
         elif self.fight_over_tick is not None:
-            return self.tick_counter > self.fight_over_tick + Action.sec2tick(5)
-        else:
-            return False
+            if self.tick_counter > self.fight_over_tick + Action.sec2tick(5):
+                return Action.Status.COMPLETE
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.fight_over_tick = None
         self.tp_home_tick = None
         self.retry_count = 0
-
-    # replace with Status.ABORTED
-    def did_tp_home(self):
-        return self.tp_home_tick is not None

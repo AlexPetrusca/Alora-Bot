@@ -9,10 +9,12 @@ class WaitAction(Action):
         self.d = d
 
     def first_tick(self):
-        self.set_status(f'Waiting {self.d} seconds...')
+        self.set_progress_message(f'Waiting {self.d} seconds...')
 
     def tick(self, t):
-        return t > self.d
+        if t > self.d:
+            return Action.Status.COMPLETE
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         pass

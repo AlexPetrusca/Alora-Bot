@@ -16,7 +16,7 @@ class ZulrahAction(Action):
     color_change_tick = 0
 
     def first_tick(self):
-        self.set_status(f'Fighting Zulrah...')
+        self.set_progress_message(f'Fighting Zulrah...')
 
     def tick(self, t):
         if self.tick_counter % Action.sec2tick(1) == 0:
@@ -74,7 +74,7 @@ class ZulrahAction(Action):
         if self.tick_counter == tick_offset:
             robot.press('space')  # inventory tab
 
-        return False
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.last_zulrah_color = None

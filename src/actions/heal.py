@@ -12,7 +12,7 @@ class HealAction(Action):
         self.bank = bank
 
     def first_tick(self):
-        self.set_status(f"Routing to Healer... tick={self.tick_counter}")
+        self.set_progress_message("Routing to Healer...")
 
     def tick(self, t):
         if self.tick_counter == 0:
@@ -28,9 +28,12 @@ class HealAction(Action):
                 robot.click(HealActionCoord.BANK_CHEST)  # click bank chest
             if self.tick_counter == Action.sec2tick(20):
                 robot.click(BankMenu.CLOSE)  # close bank
-            return self.tick_counter == Action.sec2tick(21)
+            if self.tick_counter == Action.sec2tick(21):
+                return Action.Status.COMPLETE
         else:
-            return self.tick_counter == Action.sec2tick(14)
+            if self.tick_counter == Action.sec2tick(14):
+                return Action.Status.COMPLETE
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         pass

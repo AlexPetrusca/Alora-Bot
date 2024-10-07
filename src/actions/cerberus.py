@@ -21,7 +21,7 @@ class CerberusAction(Action):
         pass
 
     def first_tick(self):
-        self.set_status('Routing to Cerberus...')
+        self.set_progress_message('Routing to Cerberus...')
         pass
 
     def tick(self, t):
@@ -64,7 +64,7 @@ class CerberusAction(Action):
         # 6. summon thrall
         tick_offset += Action.sec2tick(3)
         if self.tick_counter == tick_offset:
-            self.set_status('Fighting Cerberus...')
+            self.set_progress_message('Fighting Cerberus...')
             robot.click(ControlPanel.MAGIC_TAB)
         tick_offset += Action.sec2tick(1)
         if self.tick_counter == tick_offset:
@@ -83,7 +83,7 @@ class CerberusAction(Action):
                 elif damage_ui.find("/") == -1:  # "/" not found
                     self.retry_count += 1
                     if self.retry_count > 5:  # todo: calibrate this - 5 may be too high
-                        return True
+                        return Action.Status.ABORTED
                 else:
                     self.retry_count = 0
 
@@ -115,9 +115,9 @@ class CerberusAction(Action):
             # 9. End fight
             tick_offset += Action.sec2tick(2)
             if self.tick_counter == tick_offset:
-                return True
+                return Action.Status.COMPLETE
 
-        return False
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         self.tile_color = None

@@ -49,7 +49,7 @@ class DebugDisplay:
 
         cv.putText(screenshot, f'FPS: {round(1 / (time.perf_counter() - t))}', (10, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)
-        cv.putText(screenshot, self.bot.action_queue[0].status, (1000, 50), cv.FONT_HERSHEY_SIMPLEX,
+        cv.putText(screenshot, self.bot.action_queue[0].progress_message, (1000, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)
         cv.putText(screenshot, self.tab_name, (2000, 50), cv.FONT_HERSHEY_SIMPLEX,
                    1, (0, 0, 255), 2, cv.LINE_AA)

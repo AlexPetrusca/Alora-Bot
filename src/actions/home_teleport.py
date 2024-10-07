@@ -5,14 +5,16 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 class HomeTeleportAction(Action):
     def first_tick(self):
-        self.set_status('Teleporting Home...')
+        self.set_progress_message('Teleporting Home...')
 
     def tick(self, t):
         if self.tick_counter == 0:
             robot.click(ControlPanel.MAGIC_TAB)
         if self.tick_counter == Action.sec2tick(1):
             robot.click(StandardSpellbook.HOME_TELEPORT)
-        return self.tick_counter == Action.sec2tick(4)
+        if self.tick_counter == Action.sec2tick(4):
+            return Action.Status.COMPLETE
+        return Action.Status.IN_PROGRESS
 
     def last_tick(self):
         pass
