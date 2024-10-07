@@ -1,12 +1,12 @@
 import cv2
 import mss
-from pytesseract import pytesseract
 
 from src.actions.action import Action
 from src.robot import robot
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, Prayer, BarrowsActionCoord, RewardMenu
+from src.vision.regions import Regions
 
 
 class BarrowAction(Action):
@@ -31,9 +31,8 @@ class BarrowAction(Action):
 
     def tick(self, t):
         if self.tick_counter == 0:  # move to barrow (8s)
-            # todo: [important] should only search in minimap
-            if not robot.click_image(self.available_img, 0.94):
-                robot.click_image(self.unavailable_img, 0.94)
+            if not robot.click_image(self.available_img, region=Regions.MINIMAP):
+                robot.click_image(self.unavailable_img, region=Regions.MINIMAP)
                 self.skip = True
 
         if self.skip:
@@ -48,17 +47,17 @@ class BarrowAction(Action):
             self.set_status("Fighting...")
             robot.click_contour(Color.YELLOW)
 
-        if self.tick_counter == Action.sec2tick(14):  # todo: its annoying to change one of these timings because everything after has to be updated as well
+        if self.tick_counter == Action.sec2tick(14):
             robot.click(ControlPanel.PRAYER_TAB)
         if self.tick_counter == Action.sec2tick(14.5):
             robot.click(self.prayer)
         if self.tick_counter == Action.sec2tick(15):
             robot.click(Prayer.PIETY)
 
+        # todo: replace with combat action
         if self.tick_counter > Action.sec2tick(18) and self.fight_over_tick is None:
             if self.tick_counter % Action.sec2tick(1) == 0:
                 ocr = vision.read_damage_ui(mss.mss())
-                print(ocr)
                 if ocr.startswith('0/'):
                     self.fight_over_tick = self.tick_counter
 
@@ -68,9 +67,6 @@ class BarrowAction(Action):
             if self.tick_counter == self.fight_over_tick + Action.sec2tick(1):
                 robot.click(self.prayer)
 
-            # if self.last and self.tick_counter == self.fight_over_tick + Action.sec2tick(2):  # todo: this is being done too early
-            #     print("COLLECTING REWARDS")
-            #     robot.click(BarrowsCoords.REWARDS_CLOSE)  # collect rewards
             if self.last:
                 if self.tick_counter == self.fight_over_tick + Action.sec2tick(5):
                     robot.click(RewardMenu.CLOSE)  # collect rewards

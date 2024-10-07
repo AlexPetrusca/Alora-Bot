@@ -2,6 +2,7 @@ import mss
 import pyautogui
 import cv2 as cv
 from src.vision import vision
+from src.vision.regions import Regions
 from src.vision.vision import ContourDetection
 
 
@@ -39,13 +40,15 @@ def click_food():
     return ate_food
 
 
-def click_image(image, threshold=0.7):
-    screenshot = vision.grab_screen(mss.mss())  # todo: can we avoid reinitializing mss each time
+def click_image(image, threshold=0.7, region=Regions.SCREEN):
+    # todo: can we avoid reinitializing mss each time
+    screenshot = vision.grab_screen(mss.mss())[region.as_slice()]
     loc = vision.locate_image(screenshot, image, threshold)
     if loc is None:
         return False
     else:
-        click(loc[0] / 2, loc[1] / 2)
+        x, y = region.global_px(loc[0], loc[1])
+        click(x / 2, y / 2)
         return True
 
 

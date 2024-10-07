@@ -21,6 +21,11 @@ class Region:
     def offset(self, x, y):
         return self.x + x, self.y + y
 
+    def global_px(self, x, y):
+        return 2 * self.x + x, 2 * self.y + y
+
+    def local_px(self, x, y):
+        return x - 2 * self.x, y - 2 * self.y
 
 class Regions:
     SCREEN = Region(0, 0, monitor['width'], monitor['height'])
