@@ -2,7 +2,6 @@ import logging
 from copy import deepcopy
 from time import perf_counter
 
-from src.actions.action import Action
 from src.actions.slayer import SlayerTask
 from src.background import BackgroundScript
 from src.bot_config import BotConfig
@@ -30,9 +29,9 @@ class Bot:
         self.play_count = play_count
         self.background = BackgroundScript(self)
 
-        # config = BotConfig.experiment()
+        config = BotConfig.experiment()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
-        config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=40)
+        # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=40)
         # config = BotConfig.cerberus()
         # config = BotConfig.barrows()
         self.apply_config(config)
@@ -95,9 +94,9 @@ class Bot:
         if self.debug:
             self.debug = DebugDisplay(self)
         while True:
-            self.background.tick(perf_counter())
-            if self.debug:
-                self.debug.tick(perf_counter())
+            # self.background.tick(perf_counter())
+            # if self.debug:
+            #     self.debug.tick(perf_counter())
             if self.tick():
                 logging.info("Done!")
                 return

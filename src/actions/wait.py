@@ -12,6 +12,7 @@ class WaitAction(Action):
         self.set_progress_message(f'Waiting {self.d} seconds...')
 
     def tick(self, t):
+        print("TICK:", t)
         if t > self.d:
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
