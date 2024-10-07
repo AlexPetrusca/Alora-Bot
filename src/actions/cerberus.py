@@ -92,9 +92,7 @@ class CerberusAction(Action):
 
             if self.tick_counter % Action.sec2tick(0.5) == 0:
                 chat = vision.read_latest_chat(self.sct)
-                # print(chat, "->", chat.find("Cerberus: Grr"))
-                if chat.find("Cerberus: Gr") == 0 and chat != self.last_chat:
-                    # print("HIT ------------>", chat)
+                if chat.find("Cerberus: Gr") != -1 and chat != self.last_chat:
                     self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
                     robot.click_contour(self.tile_color)
                     robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])

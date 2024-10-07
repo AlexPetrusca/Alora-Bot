@@ -186,7 +186,7 @@ def read_int(haystack):
     text = text.replace('a', '9').replace('g', '9').replace('q', '9')
 
     try:
-        print("HP:", old_text, "-->", text)
+        # print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
         print("ERROR: read_int failed with:", text)
