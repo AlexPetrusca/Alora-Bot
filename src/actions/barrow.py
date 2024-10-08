@@ -77,6 +77,7 @@ class BarrowAction(Action):
 
     def poll_fight_over(self):
         ocr = vision.read_damage_ui(mss.mss())
+        print('DAMAGE_UI:', ocr)
         if ocr.startswith('0/'):
             self.fight_over_tick = self.tick_counter
 
