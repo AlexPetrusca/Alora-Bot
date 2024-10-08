@@ -12,23 +12,23 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 #   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
     sct = mss.mss()
-    target_color = Color.RED
+    target = Color.RED
     health_threshold = 30
 
     fight_over_tick = None
     tp_home_tick = None
     retry_count = 0
 
-    def __init__(self, target_color=Color.RED, health_threshold=30):
-        self.target_color = target_color
+    def __init__(self, target=Color.RED, health_threshold=30):
+        self.target = target
         self.health_threshold = health_threshold
 
     def first_tick(self):
         pass
 
     def tick(self):
-        if self.tick_counter == 0:
-            robot.click_contour(self.target_color)
+        if self.tick_counter == 0 and self.target is not None:
+            robot.click_contour(self.target)
         if self.tick_counter == Timer.sec2tick(1):
             robot.click(ControlPanel.INVENTORY_TAB)
         if self.tick_counter > Timer.sec2tick(4) and self.fight_over_tick is None:

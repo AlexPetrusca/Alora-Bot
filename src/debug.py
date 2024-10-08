@@ -114,7 +114,7 @@ class DebugDisplay:
             return self.tick_pick_up_items(screenshot)
 
     def tick_slayer(self, screenshot):
-        slayer_color = self.bot.current_action.target_color
+        slayer_color = self.bot.current_action.target
 
         screenshot = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
         lower_limit, upper_limit = get_color_limits(slayer_color)

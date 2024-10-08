@@ -46,6 +46,13 @@ class Action:
         self.progress_message = progress_message
         logging.info(self.progress_message)
 
+    def play(self, count):
+        self.play_count = count
+        return self
+
+    def play_once(self):
+        return self.play(1)
+
     def wait(self, tick_duration):
         self.tick_offset += tick_duration
         return self.tick_counter == self.tick_offset
@@ -88,12 +95,9 @@ class Action:
             fn()
         return self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0
 
-    def play(self, count):
-        self.play_count = count
-        return self
-
-    def play_once(self):
-        return self.play(1)
+    def action(self, action):
+        if self.tick_counter == self.tick_offset:
+            action.tick()
 
     class Status(Enum):
         NOT_STARTED = 1
