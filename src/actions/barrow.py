@@ -31,70 +31,54 @@ class BarrowAction(Action):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
 
     def tick(self):
-        tick_offset = 0
+        self.execute(self.navigate_to_barrow)
 
-        if self.tick_counter == tick_offset:
-            if not robot.click_image(self.available_img, region=Regions.MINIMAP):
-                robot.click_image(self.unavailable_img, region=Regions.MINIMAP)
-                self.skip = True
+        if self.skip:
+            return self.complete_after(Timer.sec2tick(8))
 
-        if self.skip and self.tick_counter == tick_offset + Timer.sec2tick(8):
-            return Action.Status.COMPLETE
+        self.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))  # open inventory
+        self.execute_after(Timer.sec2tick(7), lambda: robot.click(BarrowsActionCoord.SPADE))  # enter barrow
 
-        tick_offset += Timer.sec2tick(1)
-        if self.tick_counter == tick_offset:  # open inventory
-            robot.click(ControlPanel.INVENTORY_TAB)
-        tick_offset += Timer.sec2tick(7)
-        if self.tick_counter == tick_offset:  # enter barrow
-            robot.click(BarrowsActionCoord.SPADE)
+        self.execute_after(Timer.sec2tick(3), lambda: (
+            self.set_progress_message("Fighting..."),
+            robot.click_contour(Color.YELLOW)  # click sarcophagus + fight
+        ))
 
-        tick_offset += Timer.sec2tick(3)
-        if self.tick_counter == tick_offset:  # click sarcophagus + fight
-            self.set_progress_message("Fighting...")
-            robot.click_contour(Color.YELLOW)
-
-        tick_offset += Timer.sec2tick(3)
-        if self.tick_counter == tick_offset:
-            robot.click(ControlPanel.PRAYER_TAB)
-        tick_offset += Timer.sec2tick(0.5)
-        if self.tick_counter == tick_offset:
-            robot.click(self.prayer)
-        tick_offset += Timer.sec2tick(0.5)
-        if self.tick_counter == tick_offset:
-            robot.click(Prayer.PIETY)
+        self.execute_after(Timer.sec2tick(3), lambda: robot.click(ControlPanel.PRAYER_TAB))  # open prayer
+        self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # enable custom prayer
+        self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # enable piety
 
         # todo: replace with combat action
-        tick_offset += Timer.sec2tick(3)
-        if self.tick_counter > tick_offset and self.fight_over_tick is None:
-            if self.tick_counter % Timer.sec2tick(1) == 0:
-                ocr = vision.read_damage_ui(mss.mss())
-                if ocr.startswith('0/'):
-                    self.fight_over_tick = self.tick_counter
+        if self.fight_over_tick is None:
+            self.wait(Timer.sec2tick(3))
+            self.interval(Timer.sec2tick(1), self.poll_fight_over)
+        else:
+            self.tick_offset = self.fight_over_tick  # todo: this ain't pretty
 
-        if self.fight_over_tick is not None:
-            tick_offset = self.fight_over_tick
+            self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # disable piety
+            self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # disable custom prayer
 
-            tick_offset += Timer.sec2tick(0.5)
-            if self.tick_counter == tick_offset:
-                robot.click(Prayer.PIETY)
-            tick_offset += Timer.sec2tick(0.5)
-            if self.tick_counter == tick_offset:
-                robot.click(self.prayer)
-
-            tick_offset += Timer.sec2tick(1)
             if self.last:
-                tick_offset += Timer.sec2tick(3)
-                if self.tick_counter == tick_offset:
-                    robot.click(RewardMenu.CLOSE)  # collect rewards
-                    return Action.Status.COMPLETE
-            elif self.tick_counter == tick_offset:
-                self.set_progress_message(f"Completed Barrow {self.barrow}")
-                robot.click_contour(Color.MAGENTA)  # exit barrow
-
-            if self.tick_counter == tick_offset + Timer.sec2tick(5):
-                return Action.Status.COMPLETE
+                self.execute_after(Timer.sec2tick(4), lambda: robot.click(RewardMenu.CLOSE))  # collect rewards
+                return self.complete()
+            else:
+                self.execute_after(Timer.sec2tick(1), lambda: (
+                    self.set_progress_message(f"Completed Barrow {self.barrow}"),
+                    robot.click_contour(Color.MAGENTA)  # exit barrow
+                ))
+                return self.complete_after(Timer.sec2tick(6))
 
         return Action.Status.IN_PROGRESS
+
+    def navigate_to_barrow(self):
+        if not robot.click_image(self.available_img, region=Regions.MINIMAP):
+            robot.click_image(self.unavailable_img, region=Regions.MINIMAP)
+            self.skip = True
+
+    def poll_fight_over(self):
+        ocr = vision.read_damage_ui(mss.mss())
+        if ocr.startswith('0/'):
+            self.fight_over_tick = self.tick_counter
 
     def last_tick(self):
         self.fight_over_tick = None

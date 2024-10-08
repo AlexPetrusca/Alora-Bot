@@ -46,17 +46,47 @@ class Action:
         self.progress_message = progress_message
         logging.info(self.progress_message)
 
-    def at(self, tick, fn):
-        if self.tick_counter == tick:
-            fn()
-
-    def after(self, tick_duration, fn):
+    def wait(self, tick_duration):
         self.tick_offset += tick_duration
-        self.at(self.tick_offset, fn)
+        return self.tick_counter == self.tick_offset
+
+    def execute(self, fn):
+        if self.tick_counter == self.tick_offset:
+            fn()
+        return self.tick_counter == self.tick_offset
+
+    def complete(self):
+        if self.tick_counter == self.tick_offset:
+            return Action.Status.COMPLETE
+        else:
+            return Action.Status.IN_PROGRESS
+
+    def abort(self):
+        if self.tick_counter == self.tick_offset:
+            return Action.Status.COMPLETE
+        else:
+            return Action.Status.ABORTED
+
+    def execute_after(self, tick_duration, fn):
+        self.wait(tick_duration)
+        return self.execute(fn)
+
+    def complete_after(self, tick_duration):
+        if self.wait(tick_duration):
+            return Action.Status.COMPLETE
+        else:
+            return Action.Status.IN_PROGRESS
+
+    def abort_after(self, tick_duration):
+        if self.wait(tick_duration):
+            return Action.Status.ABORTED
+        else:
+            return Action.Status.IN_PROGRESS
 
     def interval(self, tick_interval, fn):
-        if self.tick_counter % tick_interval == 0:
+        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
             fn()
+        return self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0
 
     def play(self, count):
         self.play_count = count
