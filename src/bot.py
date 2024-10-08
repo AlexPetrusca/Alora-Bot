@@ -29,6 +29,7 @@ class Bot:
         self.debug = debug
 
         # config = BotConfig.experiment()
+        # config = BotConfig.combat()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
         # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=40)
         # config = BotConfig.cerberus()

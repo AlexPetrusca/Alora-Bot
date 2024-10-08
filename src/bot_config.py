@@ -25,6 +25,15 @@ class BotConfig:
         ]
 
     @staticmethod
+    def combat():
+        return [
+            WaitAction(5).play_once(),
+
+            CombatAction(),
+            PickUpItemsAction(pause_on_fail=False)
+        ]
+
+    @staticmethod
     def slayer(task, color=Color.YELLOW, health_threshold=30):
         return [
             WaitAction(5).play_once(),
