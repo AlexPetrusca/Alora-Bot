@@ -17,6 +17,7 @@ class PickUpItemsAction(Action):
     retry_count = 0
 
     def __init__(self, pause_on_fail=True):
+        super().__init__()
         self.pause_on_fail = pause_on_fail
 
     def first_tick(self):

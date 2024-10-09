@@ -6,6 +6,7 @@ class WaitAction(Action):
     d = 0
 
     def __init__(self, d):
+        super().__init__()
         self.d = d
 
     def first_tick(self):

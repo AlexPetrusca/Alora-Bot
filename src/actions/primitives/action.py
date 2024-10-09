@@ -1,16 +1,93 @@
 import logging
+import math
 from abc import abstractmethod
 from enum import Enum
 
 
-class Action:
-    play_count = -1
-    progress_message = ""
+class ActionTiming:
+    def __init__(self):
+        self.tick_counter = -1
+        self.tick_offset = 0
+        self.action_records = dict()
 
-    tick_counter = 0
-    tick_offset = 0
-    start_tick = -1
-    prev_tick = -1
+    def update(self, tick_counter):
+        self.tick_offset = 0
+        self.tick_counter = tick_counter
+
+    def reset(self):
+        self.tick_counter = -1
+        self.tick_offset = 0
+        self.action_records.clear()
+
+    def wait(self, tick_duration):
+        self.tick_offset += tick_duration
+        return self.tick_counter == self.tick_offset
+
+    def execute(self, fn):
+        if self.tick_counter == self.tick_offset:
+            fn()
+        return self.tick_counter == self.tick_offset
+
+    def complete(self):
+        if self.tick_counter >= self.tick_offset:
+            return Action.Status.COMPLETE
+        else:
+            return Action.Status.IN_PROGRESS
+
+    def abort(self):
+        if self.tick_counter >= self.tick_offset:
+            return Action.Status.COMPLETE
+        else:
+            return Action.Status.ABORTED
+
+    def execute_after(self, tick_duration, fn):
+        self.wait(tick_duration)
+        return self.execute(fn)
+
+    def complete_after(self, tick_duration):
+        self.wait(tick_duration)
+        return self.complete()
+
+    def abort_after(self, tick_duration):
+        self.wait(tick_duration)
+        return self.abort()
+
+    def interval(self, tick_interval, fn):
+        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+            fn()
+        return self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0
+
+    def action(self, action):
+        if self.tick_counter >= self.tick_offset:
+            action_record = self.action_records.get(action)
+            if action_record is None:  # in progress?
+                status = action.run(self.tick_counter)
+                if status.is_terminal():
+                    self.action_records[action] = dict(completion_tick=self.tick_counter, status=status)
+                self.tick_offset = math.inf
+                return status
+            else:  # completed?
+                self.tick_offset = action_record['completion_tick']
+                return action_record['status']
+        else:  # not started?
+            self.tick_offset = math.inf
+            return Action.Status.NOT_STARTED
+
+    def actions(self, *actions):
+        for action in actions:
+            self.action(action)
+
+
+class Action:
+    def __init__(self):
+        self.T = ActionTiming()
+        self.play_count = -1
+        self.progress_message = ""
+
+        # todo: move these to T
+        self.tick_counter = 0
+        self.start_tick = -1
+        self.prev_tick = -1
 
     @abstractmethod
     def first_tick(self):
@@ -33,11 +110,12 @@ class Action:
         self.tick_counter = global_tick - self.start_tick
         if self.tick_counter > self.prev_tick:
             self.prev_tick = self.tick_counter
-            self.tick_offset = 0
+            self.T.update(self.tick_counter)
             status = self.tick()
             if status.is_terminal():
                 self.last_tick()
                 self.start_tick = -1
+                self.T.reset()
                 return status
 
         return Action.Status.IN_PROGRESS
@@ -52,52 +130,6 @@ class Action:
 
     def play_once(self):
         return self.play(1)
-
-    def wait(self, tick_duration):
-        self.tick_offset += tick_duration
-        return self.tick_counter == self.tick_offset
-
-    def execute(self, fn):
-        if self.tick_counter == self.tick_offset:
-            fn()
-        return self.tick_counter == self.tick_offset
-
-    def complete(self):
-        if self.tick_counter == self.tick_offset:
-            return Action.Status.COMPLETE
-        else:
-            return Action.Status.IN_PROGRESS
-
-    def abort(self):
-        if self.tick_counter == self.tick_offset:
-            return Action.Status.COMPLETE
-        else:
-            return Action.Status.ABORTED
-
-    def execute_after(self, tick_duration, fn):
-        self.wait(tick_duration)
-        return self.execute(fn)
-
-    def complete_after(self, tick_duration):
-        if self.wait(tick_duration):
-            return Action.Status.COMPLETE
-        else:
-            return Action.Status.IN_PROGRESS
-
-    def abort_after(self, tick_duration):
-        if self.wait(tick_duration):
-            return Action.Status.ABORTED
-        else:
-            return Action.Status.IN_PROGRESS
-
-    def interval(self, tick_interval, fn):
-        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
-            fn()
-        return self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0
-
-    def action(self, action):
-        if self.tick_counter == self.tick_offset:
-            action.tick()
 
     class Status(Enum):
         NOT_STARTED = 1

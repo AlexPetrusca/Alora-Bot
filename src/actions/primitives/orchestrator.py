@@ -5,14 +5,8 @@ from src.actions.primitives.null import NullAction
 
 
 class OrchestratorAction(Action):
-    quit_on_abort = True
-    original_play_count = -1
-    original_action_queue = []
-
-    action_queue = []
-    play_count = -1
-
     def __init__(self, actions, play_count=-1, quit_on_abort=True):
+        super().__init__()
         self.action_queue = actions
         self.action_queue.append(NullAction())
         self.play_count = play_count

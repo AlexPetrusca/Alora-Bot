@@ -16,9 +16,6 @@ class CerberusAction(Action):
     fight_over_tick = None
     retry_count = 0
 
-    def __init__(self):
-        pass
-
     def first_tick(self):
         self.set_progress_message('Routing to Cerberus...')
         pass

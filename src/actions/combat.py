@@ -20,6 +20,7 @@ class CombatAction(Action):
     retry_count = 0
 
     def __init__(self, target=Color.RED, health_threshold=30):
+        super().__init__()
         self.target = target
         self.health_threshold = health_threshold
 

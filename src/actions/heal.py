@@ -9,6 +9,7 @@ class HealAction(Action):
     bank = False
 
     def __init__(self, bank=False):
+        super().__init__()
         self.bank = bank
 
     def first_tick(self):

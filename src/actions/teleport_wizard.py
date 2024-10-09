@@ -8,9 +8,11 @@ class TeleportWizardAction(Action):
     destination = ""
 
     def __init__(self, destination):
-        self.destination = destination
-        if hasattr(self.destination, 'value'):
+        super().__init__()
+        if hasattr(destination, 'value'):
             self.destination = destination.value
+        else:
+            self.destination = destination
 
     def first_tick(self):
         self.set_progress_message('Walking to Teleport Wizard...')

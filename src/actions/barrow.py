@@ -21,6 +21,7 @@ class BarrowAction(Action):
     fight_over_tick = None
 
     def __init__(self, barrow, prayer=Prayer.PROTECT_FROM_MELEE, last=False):
+        super().__init__()
         self.barrow = barrow
         self.prayer = prayer
         self.last = last
@@ -31,42 +32,42 @@ class BarrowAction(Action):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
 
     def tick(self):
-        self.execute(self.navigate_to_barrow)
+        self.T.execute(self.navigate_to_barrow)
 
         if self.skip:
-            return self.complete_after(Timer.sec2tick(8))
+            return self.T.complete_after(Timer.sec2tick(8))
 
-        self.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))  # open inventory
-        self.execute_after(Timer.sec2tick(7), lambda: robot.click(BarrowsActionCoord.SPADE))  # enter barrow
+        self.T.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))  # open inventory
+        self.T.execute_after(Timer.sec2tick(7), lambda: robot.click(BarrowsActionCoord.SPADE))  # enter barrow
 
-        self.execute_after(Timer.sec2tick(3), lambda: (
+        self.T.execute_after(Timer.sec2tick(3), lambda: (
             self.set_progress_message("Fighting..."),
             robot.click_contour(Color.YELLOW)  # click sarcophagus + fight
         ))
 
-        self.execute_after(Timer.sec2tick(3), lambda: robot.click(ControlPanel.PRAYER_TAB))  # open prayer
-        self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # enable custom prayer
-        self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # enable piety
+        self.T.execute_after(Timer.sec2tick(3), lambda: robot.click(ControlPanel.PRAYER_TAB))  # open prayer
+        self.T.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # enable custom prayer
+        self.T.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # enable piety
 
         # todo: replace with combat action
         if self.fight_over_tick is None:
-            self.wait(Timer.sec2tick(3))
-            self.interval(Timer.sec2tick(1), self.poll_fight_over)
+            self.T.wait(Timer.sec2tick(3))
+            self.T.interval(Timer.sec2tick(1), self.poll_fight_over)
         else:
-            self.tick_offset = self.fight_over_tick  # todo: this ain't pretty
+            self.T.tick_offset = self.fight_over_tick  # todo: this ain't pretty
 
-            self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # disable piety
-            self.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # disable custom prayer
+            self.T.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # disable piety
+            self.T.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # disable custom prayer
 
             if self.last:
-                self.execute_after(Timer.sec2tick(4), lambda: robot.click(RewardMenu.CLOSE))  # collect rewards
-                return self.complete()
+                self.T.execute_after(Timer.sec2tick(4), lambda: robot.click(RewardMenu.CLOSE))  # collect rewards
+                return self.T.complete()
             else:
-                self.execute_after(Timer.sec2tick(1), lambda: (
+                self.T.execute_after(Timer.sec2tick(1), lambda: (
                     self.set_progress_message(f"Completed Barrow {self.barrow}"),
                     robot.click_contour(Color.MAGENTA)  # exit barrow
                 ))
-                return self.complete_after(Timer.sec2tick(6))
+                return self.T.complete_after(Timer.sec2tick(6))
 
         return Action.Status.IN_PROGRESS
 

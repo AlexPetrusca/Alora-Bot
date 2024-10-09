@@ -24,6 +24,7 @@ class SlayerAction(Action):
     t_ref = 0
 
     def __init__(self, task, health_threshold=30):
+        super().__init__()
         self.task = task
         self.health_threshold = health_threshold
         self.action_queue = [

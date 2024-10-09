@@ -17,6 +17,7 @@ class BreadcrumbTrailAction(Action):
     retry_count = 0
 
     def __init__(self, color=Color.YELLOW):
+        super().__init__()
         self.color = color
 
     def first_tick(self):
