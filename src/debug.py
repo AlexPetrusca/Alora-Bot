@@ -17,15 +17,14 @@ executor = ThreadPoolExecutor()
 
 
 class DebugDisplay:
-    bot = None
     sct = mss.mss()
-
-    debug_tab = 1
-    tab_name = ''
-    debug_text = ''
 
     def __init__(self, bot):
         self.bot = bot
+
+        self.debug_tab = 1
+        self.tab_name = ''
+        self.debug_text = ''
 
     def run(self):
         t_start = perf_counter()

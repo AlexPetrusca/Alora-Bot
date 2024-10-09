@@ -10,15 +10,14 @@ from src.vision.images import Images
 
 # todo: [bug] sometimes gets stuck before final breadcrumb (maybe related to todo below)
 class BreadcrumbTrailAction(Action):
-    color = Color.YELLOW
     sct = mss.mss()
-
-    next_label = 0
-    retry_count = 0
 
     def __init__(self, color=Color.YELLOW):
         super().__init__()
         self.color = color
+
+        self.next_label = 0
+        self.retry_count = 0
 
     def first_tick(self):
         self.set_progress_message(f'Following {self.color.to_string()} breadcrumb trail...')

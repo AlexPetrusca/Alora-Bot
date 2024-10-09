@@ -11,10 +11,12 @@ from src.vision.coordinates import ControlPanel, Prayer, Minimap, ArceuusSpellbo
 class CerberusAction(Action):
     sct = mss.mss()
 
-    tile_color = None
-    last_chat = None
-    fight_over_tick = None
-    retry_count = 0
+    def __init__(self):
+        super().__init__()
+        self.tile_color = None
+        self.last_chat = None
+        self.fight_over_tick = None
+        self.retry_count = 0
 
     def first_tick(self):
         self.set_progress_message('Routing to Cerberus...')

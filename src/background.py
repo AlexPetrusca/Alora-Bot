@@ -5,12 +5,10 @@ KEYLOGGER_HOST = "http://localhost:8080"
 
 
 class BackgroundScript:
-    bot = None
-    key_toggles = set()
-    prev_tick = -1
-
     def __init__(self, bot):
         self.bot = bot
+        self.key_toggles = set()
+        self.prev_tick = -1
 
     def run(self):
         if self.bot.timer.tick_counter != self.prev_tick:

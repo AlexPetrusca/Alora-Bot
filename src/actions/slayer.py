@@ -16,13 +16,6 @@ class SlayerTask(Enum):
 
 # todo: [bug] sometimes heal action is messed up and fails after tp back
 class SlayerAction(Action):
-    task = None
-    health_threshold = 30
-    prayer = None
-
-    action_queue = []
-    t_ref = 0
-
     def __init__(self, task, health_threshold=30):
         super().__init__()
         self.task = task
@@ -70,4 +63,3 @@ class SlayerAction(Action):
             CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction(pause_on_fail=False)
         ]
-        self.t_ref = 0

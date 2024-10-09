@@ -12,17 +12,15 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 #   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
     sct = mss.mss()
-    target = Color.RED
-    health_threshold = 30
-
-    fight_over_tick = None
-    tp_home_tick = None
-    retry_count = 0
 
     def __init__(self, target=Color.RED, health_threshold=30):
         super().__init__()
         self.target = target
         self.health_threshold = health_threshold
+
+        self.fight_over_tick = None
+        self.tp_home_tick = None
+        self.retry_count = 0
 
     def first_tick(self):
         pass

@@ -1,6 +1,5 @@
 import mss
 import pyautogui
-import cv2 as cv
 from src.vision import vision
 from src.vision.images import Images
 from src.vision.regions import Regions

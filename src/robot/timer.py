@@ -4,9 +4,10 @@ from time import perf_counter
 class Timer:
     TICK_INTERVAL = 0.1  # 100ms tick
 
-    tick_counter = 0
-    t_last = 0
-    paused = False
+    def __init__(self):
+        self.tick_counter = 0
+        self.t_last = 0
+        self.paused = False
 
     def run(self):
         if not self.paused:

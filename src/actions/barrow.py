@@ -11,14 +11,6 @@ from src.vision.regions import Regions
 
 
 class BarrowAction(Action):
-    barrow = None
-    prayer = None
-    last = False
-    available_img = None
-    unavailable_img = None
-
-    skip = False
-    fight_over_tick = None
 
     def __init__(self, barrow, prayer=Prayer.PROTECT_FROM_MELEE, last=False):
         super().__init__()
@@ -27,6 +19,9 @@ class BarrowAction(Action):
         self.last = last
         self.available_img = cv2.imread(f"../resources/label/barrows/available/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
         self.unavailable_img = cv2.imread(f"../resources/label/barrows/unavailable/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
+
+        self.skip = False
+        self.fight_over_tick = None
 
     def first_tick(self):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")

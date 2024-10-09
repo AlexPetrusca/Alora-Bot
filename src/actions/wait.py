@@ -3,17 +3,15 @@ from src.robot.timer import Timer
 
 
 class WaitAction(Action):
-    d = 0
-
-    def __init__(self, d):
+    def __init__(self, duration):
         super().__init__()
-        self.d = d
+        self.duration = duration
 
     def first_tick(self):
-        self.set_progress_message(f'Waiting {self.d} seconds...')
+        self.set_progress_message(f'Waiting {self.duration} seconds...')
 
     def tick(self):
-        if self.tick_counter > Timer.sec2tick(self.d):
+        if self.tick_counter > Timer.sec2tick(self.duration):
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

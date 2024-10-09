@@ -5,8 +5,6 @@ from src.vision.coordinates import TeleportActionCoord, TeleportMenu
 
 
 class TeleportWizardAction(Action):
-    destination = ""
-
     def __init__(self, destination):
         super().__init__()
         if hasattr(destination, 'value'):

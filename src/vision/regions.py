@@ -1,4 +1,3 @@
-from enum import Enum
 import mss
 
 monitor = mss.mss().monitors[1]
@@ -26,6 +25,7 @@ class Region:
 
     def local_px(self, x, y):
         return x - 2 * self.x, y - 2 * self.y
+
 
 class Regions:
     SCREEN = Region(0, 0, monitor['width'], monitor['height'])

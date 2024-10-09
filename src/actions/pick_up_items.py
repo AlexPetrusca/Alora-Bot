@@ -9,16 +9,15 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 class PickUpItemsAction(Action):
     sct = mss.mss()
-    pause_on_fail = True
-
-    item_found = False
-    tp_home_tick = None
-    click_count = 0
-    retry_count = 0
 
     def __init__(self, pause_on_fail=True):
         super().__init__()
         self.pause_on_fail = pause_on_fail
+
+        self.item_found = False
+        self.tp_home_tick = None
+        self.click_count = 0
+        self.retry_count = 0
 
     def first_tick(self):
         self.set_progress_message('Picking Up Ground Items...')

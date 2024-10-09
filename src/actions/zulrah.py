@@ -12,9 +12,11 @@ from src.vision.vision import ContourDetection
 class ZulrahAction(Action):
     sct = mss.mss()
 
-    last_zulrah_color = None
-    zulrah_color = None
-    color_change_tick = 0
+    def __init__(self):
+        super().__init__()
+        self.last_zulrah_color = None
+        self.zulrah_color = None
+        self.color_change_tick = 0
 
     def first_tick(self):
         self.set_progress_message(f'Fighting Zulrah...')

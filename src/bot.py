@@ -11,21 +11,16 @@ from src.robot.timer import Timer
 
 
 class Bot:
-    timer = None
-    background = None
-    play_count = -1
-    debug = False
-    paused = False
-
-    action_queue = []
-    current_config = None
-    current_action = None
-
     def __init__(self, play_count=-1, debug=False):
         self.timer = Timer()
         self.background = BackgroundScript(self)
         self.play_count = play_count
         self.debug = debug
+        self.paused = False
+
+        self.action_queue = []
+        self.current_config = None
+        self.current_action = None
 
         config = BotConfig.experiment()
         # config = BotConfig.combat()
