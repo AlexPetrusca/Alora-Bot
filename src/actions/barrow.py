@@ -1,4 +1,4 @@
-import cv2
+from enum import Enum
 
 from src.actions.primitives.action import Action
 from src.robot import robot
@@ -6,18 +6,27 @@ from src.robot.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, Prayer, BarrowsActionCoord, RewardMenu
+from src.vision.images import Images
 from src.vision.regions import Regions
 
 
-class BarrowAction(Action):
+class BarrowBrother:
+    AHRIM = 'A'
+    KARIL = 'K'
+    GUTHAN = 'G'
+    DHAROK = 'D'
+    VERAC = 'V'
+    TORAG = 'T'
 
+
+class BarrowAction(Action):
     def __init__(self, barrow, prayer=Prayer.PROTECT_FROM_MELEE, last=False):
         super().__init__()
         self.barrow = barrow
         self.prayer = prayer
         self.last = last
-        self.available_img = cv2.imread(f"../resources/label/barrows/available/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
-        self.unavailable_img = cv2.imread(f"../resources/label/barrows/unavailable/{self.barrow}.png", cv2.IMREAD_UNCHANGED)
+        self.available_img = Images.Barrows.AVAILABLE_LABELS[barrow]
+        self.unavailable_img = Images.Barrows.UNAVAILABLE_LABELS[barrow]
 
         self.skip = False
         self.fight_over_tick = None

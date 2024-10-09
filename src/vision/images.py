@@ -19,3 +19,21 @@ class Images:
         cv.imread('../resources/label/marker/yellow/8.png', cv.IMREAD_UNCHANGED),
         cv.imread('../resources/label/marker/yellow/9.png', cv.IMREAD_UNCHANGED),
     ]
+
+    class Barrows:
+        AVAILABLE_LABELS = dict(
+            A=cv.imread(f"../resources/label/barrows/available/A.png", cv.IMREAD_UNCHANGED),
+            D=cv.imread(f"../resources/label/barrows/available/D.png", cv.IMREAD_UNCHANGED),
+            G=cv.imread(f"../resources/label/barrows/available/G.png", cv.IMREAD_UNCHANGED),
+            K=cv.imread(f"../resources/label/barrows/available/K.png", cv.IMREAD_UNCHANGED),
+            T=cv.imread(f"../resources/label/barrows/available/T.png", cv.IMREAD_UNCHANGED),
+            V=cv.imread(f"../resources/label/barrows/available/V.png", cv.IMREAD_UNCHANGED)
+        )
+        UNAVAILABLE_LABELS = dict(
+            A=cv.imread(f"../resources/label/barrows/unavailable/A.png", cv.IMREAD_UNCHANGED),
+            D=cv.imread(f"../resources/label/barrows/unavailable/D.png", cv.IMREAD_UNCHANGED),
+            G=cv.imread(f"../resources/label/barrows/unavailable/G.png", cv.IMREAD_UNCHANGED),
+            K=cv.imread(f"../resources/label/barrows/unavailable/K.png", cv.IMREAD_UNCHANGED),
+            T=cv.imread(f"../resources/label/barrows/unavailable/T.png", cv.IMREAD_UNCHANGED),
+            V=cv.imread(f"../resources/label/barrows/unavailable/V.png", cv.IMREAD_UNCHANGED)
+        )

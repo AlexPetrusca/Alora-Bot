@@ -1,4 +1,4 @@
-from src.actions.barrow import BarrowAction
+from src.actions.barrow import BarrowAction, BarrowBrother
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
 from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
@@ -58,12 +58,12 @@ class BotConfig:
             HomeTeleportAction(),
             TeleportWizardAction("barrows"),
 
-            BarrowAction("A", prayer=Prayer.PROTECT_FROM_MAGIC),
-            BarrowAction("K", prayer=Prayer.PROTECT_FROM_MISSILES),
-            BarrowAction("G"),
-            BarrowAction("D"),
-            BarrowAction("V"),
-            BarrowAction("T", last=True),
+            BarrowAction(BarrowBrother.AHRIM, prayer=Prayer.PROTECT_FROM_MAGIC),
+            BarrowAction(BarrowBrother.KARIL, prayer=Prayer.PROTECT_FROM_MISSILES),
+            BarrowAction(BarrowBrother.GUTHAN),
+            BarrowAction(BarrowBrother.GUTHAN),
+            BarrowAction(BarrowBrother.VERAC),
+            BarrowAction(BarrowBrother.TORAG, last=True),
 
             HomeTeleportAction(),
             HealAction(bank=True)
