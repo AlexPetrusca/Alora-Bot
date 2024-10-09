@@ -1,5 +1,3 @@
-import mss
-
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -11,8 +9,6 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 # todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
 #   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
-    sct = mss.mss()
-
     def __init__(self, target=Color.RED, health_threshold=30):
         super().__init__()
         self.target = target
@@ -33,7 +29,7 @@ class CombatAction(Action):
         if self.tick_counter > Timer.sec2tick(4) and self.fight_over_tick is None:
             if self.tick_counter % Timer.sec2tick(1) == 0:
                 # check fight end
-                ocr = vision.read_damage_ui(mss.mss())
+                ocr = vision.read_damage_ui()
                 print('"', ocr, '"', len(ocr))
                 if ocr.startswith("0/"):
                     self.fight_over_tick = self.tick_counter
@@ -44,7 +40,7 @@ class CombatAction(Action):
                 else:
                     self.retry_count = 0  # '/' found
                 # eat food or teleport home on low health
-                if vision.read_hitpoints(self.sct) < self.health_threshold:
+                if vision.read_hitpoints() < self.health_threshold:
                     ate_food = robot.click_food()
                     if not ate_food:
                         self.fight_over_tick = self.tick_counter

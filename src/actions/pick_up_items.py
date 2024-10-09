@@ -1,5 +1,3 @@
-import mss
-
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -8,8 +6,6 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 
 class PickUpItemsAction(Action):
-    sct = mss.mss()
-
     def __init__(self, pause_on_fail=True):
         super().__init__()
         self.pause_on_fail = pause_on_fail
@@ -25,7 +21,7 @@ class PickUpItemsAction(Action):
 
     def tick(self):
         if self.tick_counter == 0:
-            click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
+            click_xy = vision.locate_ground_item(vision.grab_screen())
             if click_xy is not None:
                 self.item_found = True
                 robot.click(click_xy[0] / 2, click_xy[1] / 2)
@@ -36,9 +32,9 @@ class PickUpItemsAction(Action):
         if self.tick_counter > Timer.sec2tick(3):
             if self.item_found:
                 if self.tick_counter % Timer.sec2tick(0.25) == 0 and self.tp_home_tick is None:
-                    click_xy = vision.locate_ground_item(vision.grab_screen(self.sct))
+                    click_xy = vision.locate_ground_item(vision.grab_screen())
                     if click_xy is not None:
-                        if vision.read_latest_chat(self.sct).find("You do not have enough inventory space.") == 0:
+                        if vision.read_latest_chat().find("You do not have enough inventory space.") == 0:
                             self.tp_home_tick = self.tick_counter
                         robot.click(click_xy[0] / 2, click_xy[1] / 2)
                         self.click_count += 1

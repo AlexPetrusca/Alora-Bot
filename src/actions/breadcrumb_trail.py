@@ -1,5 +1,3 @@
-import mss
-
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -10,8 +8,6 @@ from src.vision.images import Images
 
 # todo: [bug] sometimes gets stuck before final breadcrumb (maybe related to todo below)
 class BreadcrumbTrailAction(Action):
-    sct = mss.mss()
-
     def __init__(self, color=Color.YELLOW):
         super().__init__()
         self.color = color
@@ -25,7 +21,7 @@ class BreadcrumbTrailAction(Action):
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
     def tick(self):
         if self.tick_counter % Timer.sec2tick(1) == 0:
-            screenshot = vision.grab_screen(self.sct, hide_ui=True)
+            screenshot = vision.grab_screen(hide_ui=True)
             dest_tile = vision.locate_contour(screenshot, Color.WHITE)
             if dest_tile is None:
                 breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.8)

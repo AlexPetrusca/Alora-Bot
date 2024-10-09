@@ -1,5 +1,4 @@
 import cv2
-import mss
 
 from src.actions.primitives.action import Action
 from src.robot import robot
@@ -72,7 +71,7 @@ class BarrowAction(Action):
             self.skip = True
 
     def poll_fight_over(self):
-        ocr = vision.read_damage_ui(mss.mss())
+        ocr = vision.read_damage_ui()
         print('DAMAGE_UI:', ocr)
         if ocr.startswith('0/'):
             self.fight_over_tick = self.tick_counter

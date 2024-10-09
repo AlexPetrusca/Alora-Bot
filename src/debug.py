@@ -3,7 +3,6 @@ from time import perf_counter
 
 import cv2 as cv
 import numpy as np
-import mss
 
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
@@ -17,8 +16,6 @@ executor = ThreadPoolExecutor()
 
 
 class DebugDisplay:
-    sct = mss.mss()
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -29,7 +26,7 @@ class DebugDisplay:
     def run(self):
         t_start = perf_counter()
 
-        screenshot = np.array(self.sct.grab(self.sct.monitors[1]))
+        screenshot = vision.grab_screen()
         if isinstance(self.bot.current_action, PickUpItemsAction):
             screenshot = self.tick_pick_up_items(screenshot)
         elif isinstance(self.bot.current_action, CombatAction):

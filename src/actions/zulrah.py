@@ -1,5 +1,3 @@
-import mss
-
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -10,8 +8,6 @@ from src.vision.vision import ContourDetection
 
 
 class ZulrahAction(Action):
-    sct = mss.mss()
-
     def __init__(self):
         super().__init__()
         self.last_zulrah_color = None
@@ -23,7 +19,7 @@ class ZulrahAction(Action):
 
     def tick(self):
         if self.tick_counter % Timer.sec2tick(1) == 0:
-            screenshot = vision.grab_screen(self.sct, hide_ui=True)
+            screenshot = vision.grab_screen(hide_ui=True)
             red_contour, red_area = vision.get_contour(screenshot, Color.RED, mode=ContourDetection.AREA_LARGEST)
             green_contour, green_area = vision.get_contour(screenshot, Color.GREEN, mode=ContourDetection.AREA_LARGEST)
             blue_contour, blue_area = vision.get_contour(screenshot, Color.BLUE, mode=ContourDetection.AREA_LARGEST)

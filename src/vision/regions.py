@@ -1,8 +1,4 @@
-import mss
-
-monitor = mss.mss().monitors[1]
-IS_M2 = (monitor['width'], monitor['height']) == (1728, 1117)
-TOP_GAP = 37 if IS_M2 else 0
+from src.vision.screen import Screen
 
 
 class Region:
@@ -28,8 +24,8 @@ class Region:
 
 
 class Regions:
-    SCREEN = Region(0, 0, monitor['width'], monitor['height'])
-    GAME = Region(SCREEN.x, SCREEN.y + TOP_GAP, SCREEN.w - 30, SCREEN.h - TOP_GAP)
+    SCREEN = Region(0, 0, Screen.WIDTH, Screen.HEIGHT)
+    GAME = Region(SCREEN.x, SCREEN.y + Screen.TOP_GAP, SCREEN.w - 30, SCREEN.h - Screen.TOP_GAP)
     RUNELITE_SIDEBAR = Region(GAME.x + GAME.w, GAME.y, 30, GAME.h)
 
     STATUS = Region(GAME.x, GAME.y, 221, 173)

@@ -8,6 +8,7 @@ from pytesseract import pytesseract
 from src.vision.color import Color, get_color_limits
 from src.vision.coordinates import Player
 from src.vision.regions import Regions
+from src.vision.screen import Screen
 
 
 class ContourDetection(Enum):
@@ -34,25 +35,49 @@ def mask_ui(img):
     return img
 
 
-def grab_screen(sct, hide_ui=False):
-    screen = np.array(sct.grab(sct.monitors[1]))
-    return mask_ui(screen) if hide_ui else screen
+def grab_screen(hide_ui=False):
+    screenshot = Screen.grab()
+    return mask_ui(screenshot) if hide_ui else screenshot
 
 
-def grab_damage_ui(sct):
-    return grab_screen(sct)[Regions.DAMAGE_UI.as_slice()]
+def grab_damage_ui():
+    return grab_screen()[Regions.DAMAGE_UI.as_slice()]
 
 
-def grab_minimap(sct):
-    return grab_screen(sct)[Regions.MINIMAP.as_slice()]
+def grab_minimap():
+    return grab_screen()[Regions.MINIMAP.as_slice()]
 
 
-def grab_control_panel(sct):
-    return grab_screen(sct)[Regions.CONTROL_PANEL.as_slice()]
+def grab_control_panel():
+    return grab_screen()[Regions.CONTROL_PANEL.as_slice()]
 
 
-def grab_hover_action(sct):
-    return grab_screen(sct)[Regions.HOVER_ACTION.as_slice()]
+def grab_hover_action():
+    return grab_screen()[Regions.HOVER_ACTION.as_slice()]
+
+
+def read_latest_chat():
+    return read_text(grab_screen()[Regions.LATEST_CHAT.as_slice()])
+
+
+def read_damage_ui():
+    return read_text(grab_damage_ui(), config='--psm 6')
+
+
+def read_hitpoints():
+    return read_int(grab_screen()[Regions.HITPOINTS.as_slice()])
+
+
+def read_prayer_energy():
+    return read_int(grab_screen()[Regions.PRAYER.as_slice()])
+
+
+def read_run_energy():
+    return read_int(grab_screen()[Regions.RUN_ENERGY.as_slice()])
+
+
+def read_spec_energy():
+    return read_int(grab_screen()[Regions.SPEC_ENERGY.as_slice()])
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
@@ -191,27 +216,3 @@ def read_int(haystack):
     except ValueError:
         print("ERROR: read_int failed with:", text)
         return -1
-
-
-def read_latest_chat(sct):
-    return read_text(grab_screen(sct)[Regions.LATEST_CHAT.as_slice()])
-
-
-def read_damage_ui(sct):
-    return read_text(grab_damage_ui(sct), config='--psm 6')
-
-
-def read_hitpoints(sct):
-    return read_int(grab_screen(sct)[Regions.HITPOINTS.as_slice()])
-
-
-def read_prayer_energy(sct):
-    return read_int(grab_screen(sct)[Regions.PRAYER.as_slice()])
-
-
-def read_run_energy(sct):
-    return read_int(grab_screen(sct)[Regions.RUN_ENERGY.as_slice()])
-
-
-def read_spec_energy(sct):
-    return read_int(grab_screen(sct)[Regions.SPEC_ENERGY.as_slice()])

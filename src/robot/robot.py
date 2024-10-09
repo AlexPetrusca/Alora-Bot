@@ -1,4 +1,3 @@
-import mss
 import pyautogui
 from src.vision import vision
 from src.vision.images import Images
@@ -41,9 +40,7 @@ def click_food():
 
 
 def click_image(image, threshold=0.7, region=Regions.SCREEN):
-    # todo: can we avoid reinitializing mss each time
-    screenshot = vision.grab_screen(mss.mss())[region.as_slice()]
-    loc = vision.locate_image(screenshot, image, threshold)
+    loc = vision.locate_image(vision.grab_screen()[region.as_slice()], image, threshold)
     if loc is None:
         return False
     else:
@@ -53,8 +50,7 @@ def click_image(image, threshold=0.7, region=Regions.SCREEN):
 
 
 def click_contour(color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
-    screenshot = vision.grab_screen(mss.mss())  # todo: can we avoid reinitializing mss each time
-    loc = vision.locate_contour(screenshot, color, area_threshold, mode)
+    loc = vision.locate_contour(vision.grab_screen(), color, area_threshold, mode)
     if loc is None:
         return False
     else:

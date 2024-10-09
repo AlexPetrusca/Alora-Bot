@@ -1,5 +1,3 @@
-import mss
-
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -9,8 +7,6 @@ from src.vision.coordinates import ControlPanel, Prayer, Minimap, ArceuusSpellbo
 
 
 class CerberusAction(Action):
-    sct = mss.mss()
-
     def __init__(self):
         super().__init__()
         self.tile_color = None
@@ -76,7 +72,7 @@ class CerberusAction(Action):
         tick_offset += Timer.sec2tick(3)
         if self.tick_counter > tick_offset and self.fight_over_tick is None:
             if self.tick_counter % Timer.sec2tick(1) == 0:
-                damage_ui = vision.read_damage_ui(self.sct)
+                damage_ui = vision.read_damage_ui()
                 if damage_ui.startswith('0/'):
                     self.fight_over_tick = self.tick_counter
                 elif damage_ui.find("/") == -1:  # "/" not found
@@ -87,11 +83,11 @@ class CerberusAction(Action):
                 else:
                     self.retry_count = 0
 
-                if vision.read_hitpoints(self.sct) <= 30:
+                if vision.read_hitpoints() <= 30:
                     robot.click_food()
 
             if self.tick_counter % Timer.sec2tick(0.5) == 0:
-                chat = vision.read_latest_chat(self.sct)
+                chat = vision.read_latest_chat()
                 if chat.find("Cerberus: Gr") != -1 and chat != self.last_chat:
                     self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
                     robot.click_contour(self.tile_color)
