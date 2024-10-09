@@ -61,7 +61,7 @@ class BotConfig:
             BarrowAction(BarrowBrother.AHRIM, prayer=Prayer.PROTECT_FROM_MAGIC),
             BarrowAction(BarrowBrother.KARIL, prayer=Prayer.PROTECT_FROM_MISSILES),
             BarrowAction(BarrowBrother.GUTHAN),
-            BarrowAction(BarrowBrother.GUTHAN),
+            BarrowAction(BarrowBrother.DHAROK),
             BarrowAction(BarrowBrother.VERAC),
             BarrowAction(BarrowBrother.TORAG, last=True),
 
