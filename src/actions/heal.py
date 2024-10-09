@@ -1,8 +1,7 @@
-import cv2 as cv
-from src.actions.action import Action
+from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
-from src.vision.coordinates import HealActionCoord, ControlPanel, BankMenu
+from src.vision.coordinates import HealActionCoord, BankMenu
 from src.vision.images import Images
 
 

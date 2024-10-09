@@ -1,7 +1,6 @@
-import cv2 as cv
 import mss
 
-from src.actions.action import Action
+from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
 from src.vision import vision

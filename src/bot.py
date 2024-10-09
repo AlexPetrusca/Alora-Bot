@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
 
+from src.actions.primitives.null import NullAction
 from src.actions.slayer import SlayerTask
 from src.background import BackgroundScript
 from src.bot_config import BotConfig
@@ -19,8 +20,6 @@ class Bot:
     action_queue = []
     current_config = None
     current_action = None
-    loop_length = 0
-    action_count = 0
 
     def __init__(self, play_count=-1, debug=False):
         self.timer = Timer()
@@ -38,13 +37,9 @@ class Bot:
 
     def apply_config(self, config):
         self.action_queue = deepcopy(config)
+        self.action_queue.append(NullAction())
         self.current_config = config
         self.current_action = self.action_queue[0]
-
-        self.loop_length = 0
-        for action in self.action_queue:
-            if action.play_count == -1:
-                self.loop_length += 1
 
     def handle_user_input(self):
         if self.paused != self.background.key_toggled(Key.F1):  # pause/play
@@ -66,7 +61,7 @@ class Bot:
 
     def run(self):
         self.handle_user_input()
-        if len(self.action_queue) == 0:  # all actions are done?
+        if len(self.action_queue) == 1:
             return True
         if self.paused:  # paused?
             return False
@@ -75,17 +70,22 @@ class Bot:
         if status.is_terminal():  # current action is done?
             top = self.action_queue.pop(0)
 
-            if top.play_count == -1:
-                self.action_count += 1
-            if self.action_count / self.loop_length != self.play_count:  # more loops to perform?
+            if self.play_count != 0:  # more loops to perform?
                 if top.play_count > 0:
                     top.play_count -= 1
                 if top.play_count != 0:
                     self.action_queue.append(top)
-            else:
-                return True
+
+            if isinstance(self.action_queue[0], NullAction):
+                logging.info("")
+                self.play_count -= 1
+                null_action = self.action_queue.pop(0)
+                self.action_queue.append(null_action)
 
             self.current_action = self.action_queue[0]
+
+            if self.play_count == 0:
+                return True
 
         return False
 

@@ -4,7 +4,7 @@ from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
-from src.actions.orchestrator import OrchestratorAction
+from src.actions.primitives.orchestrator import OrchestratorAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
 from src.actions.slayer import SlayerAction
@@ -19,19 +19,10 @@ class BotConfig:
     @staticmethod
     def experiment():
         return [
-            # WaitAction(1).play_once(),
-            #
-            # # ZulrahAction(),
-            # CerberusAction()
+            WaitAction(1).play_once(),
 
-            OrchestratorAction([
-                WaitAction(0.5).play_once(),
-
-                WaitAction(0.1),
-                WaitAction(0.2),
-
-                WaitAction(0.3).play(3)
-            ], play_count=2),
+            # ZulrahAction(),
+            CerberusAction()
         ]
 
     @staticmethod
