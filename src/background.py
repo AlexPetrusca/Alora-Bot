@@ -1,6 +1,8 @@
 import requests
 from requests import request
 
+from src.robot.timer import Timer
+
 KEYLOGGER_HOST = "http://localhost:8080"
 
 
@@ -9,10 +11,12 @@ class BackgroundScript:
         self.bot = bot
         self.key_toggles = set()
         self.prev_tick = -1
+        self.timer = Timer()
 
     def run(self):
-        if self.bot.timer.tick_counter != self.prev_tick:
-            self.prev_tick = self.bot.timer.tick_counter
+        self.timer.run()
+        if self.timer.tick_counter != self.prev_tick:
+            self.prev_tick = self.timer.tick_counter
             self.tick()
 
     def tick(self):
