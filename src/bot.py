@@ -28,12 +28,12 @@ class Bot:
         self.play_count = play_count
         self.debug = debug
 
-        # config = BotConfig.experiment()
+        config = BotConfig.experiment()
         # config = BotConfig.combat()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
         # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN, health_threshold=40)
         # config = BotConfig.cerberus()
-        config = BotConfig.barrows()
+        # config = BotConfig.barrows()
         self.apply_config(config)
 
     def apply_config(self, config):
@@ -74,7 +74,7 @@ class Bot:
         status = self.current_action.run(self.timer.tick_counter)
         if status.is_terminal():  # current action is done?
             top = self.action_queue.pop(0)
-            self.current_action = self.action_queue[0]
+
             if top.play_count == -1:
                 self.action_count += 1
             if self.action_count / self.loop_length != self.play_count:  # more loops to perform?
@@ -84,6 +84,8 @@ class Bot:
                     self.action_queue.append(top)
             else:
                 return True
+
+            self.current_action = self.action_queue[0]
 
         return False
 
