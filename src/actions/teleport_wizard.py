@@ -21,7 +21,7 @@ class TeleportWizardAction(Action):
             self.set_progress_message('Routing to Destination...'),
             robot.click(TeleportMenu.SEARCH)
         ))
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.press([c for c in self.destination]))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.type_text(self.destination))
         timing.execute_after(Timer.sec2tick(1), lambda: (
             self.set_progress_message('Teleporting to Destination...'),
             robot.click(TeleportMenu.FIRST_RESULT)
