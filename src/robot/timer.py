@@ -1,3 +1,4 @@
+from enum import Enum
 from time import perf_counter
 
 
@@ -15,6 +16,11 @@ class Timer:
             if t - self.t_last >= Timer.TICK_INTERVAL:
                 self.tick_counter += 1
                 self.t_last = t
+                return Timer.Status.TICK
+            else:
+                return Timer.Status.WAITING
+        else:
+            return Timer.Status.PAUSED
 
     def pause(self):
         self.paused = True
@@ -34,3 +40,8 @@ class Timer:
     @staticmethod
     def tick2sec(ticks):
         return ticks * Timer.TICK_INTERVAL
+
+    class Status(Enum):
+        TICK = 0
+        WAITING = 1
+        PAUSED = 2

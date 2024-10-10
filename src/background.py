@@ -10,13 +10,10 @@ class BackgroundScript:
     def __init__(self, bot):
         self.bot = bot
         self.key_toggles = set()
-        self.prev_tick = -1
         self.timer = Timer()
 
     def run(self):
-        self.timer.run()
-        if self.timer.tick_counter != self.prev_tick:
-            self.prev_tick = self.timer.tick_counter
+        if self.timer.run() == Timer.Status.TICK:
             self.tick()
 
     def tick(self):

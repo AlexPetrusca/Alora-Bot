@@ -64,7 +64,9 @@ class ActionTiming:
                 status = action.run(self.tick_counter)
                 if status.is_terminal():
                     self.action_records[action] = dict(completion_tick=self.tick_counter, status=status)
-                self.tick_offset = math.inf
+                    self.tick_offset = self.tick_counter
+                else:
+                    self.tick_offset = math.inf
                 return status
             else:  # completed?
                 self.tick_offset = action_record['completion_tick']

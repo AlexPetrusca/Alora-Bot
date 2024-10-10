@@ -1,5 +1,6 @@
 import logging
 from copy import deepcopy
+from enum import Enum
 
 from src.actions.primitives.null import NullAction
 from src.actions.slayer import SlayerTask
@@ -55,11 +56,10 @@ class Bot:
             exit(1)
 
     def run(self):
-        self.handle_user_input()
         if len(self.action_queue) == 1:
-            return True
+            return Bot.Status.DONE
         if self.paused:  # paused?
-            return False
+            return Bot.Status.PAUSED
 
         status = self.current_action.run(self.timer.tick_counter)
         if status.is_terminal():  # current action is done?
@@ -80,18 +80,25 @@ class Bot:
             self.current_action = self.action_queue[0]
 
             if self.play_count == 0:
-                return True
+                return Bot.Status.DONE
 
-        return False
+        return Bot.Status.WORKING
 
     def start(self):
         if self.debug:
             self.debug = DebugDisplay(self)
         while True:
-            self.timer.run()
             self.background.run()
             if self.debug:
                 self.debug.run()
-            if self.run():
-                logging.info("Done!")
-                return
+
+            self.handle_user_input()
+            if self.timer.run() == Timer.Status.TICK:  # did timer tick?
+                if self.run() == Bot.Status.DONE:  # is bot done?
+                    logging.info("Done!")
+                    return
+
+    class Status(Enum):
+        PAUSED = 0
+        WORKING = 1
+        DONE = 2
