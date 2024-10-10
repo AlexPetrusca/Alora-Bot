@@ -21,7 +21,7 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            PickUpItemsAction()
+            ZulrahAction()
         ]
 
     @staticmethod
