@@ -21,9 +21,7 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            # ZulrahAction(),
-            # CerberusAction(),
-            CombatAction()
+            PickUpItemsAction()
         ]
 
     @staticmethod
@@ -32,7 +30,7 @@ class BotConfig:
             WaitAction(5).play_once(),
 
             CombatAction(),
-            PickUpItemsAction(pause_on_fail=False)
+            PickUpItemsAction()
         ]
 
     @staticmethod

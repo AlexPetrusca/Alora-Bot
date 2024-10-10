@@ -22,7 +22,7 @@ class SlayerAction(Action):
         self.health_threshold = health_threshold
         self.action_queue = [
             CombatAction(health_threshold=self.health_threshold),
-            PickUpItemsAction(pause_on_fail=False)
+            PickUpItemsAction()
         ]
 
         magic_tasks = {SlayerTask.CAVE_KRAKEN, SlayerTask.RUNE_DRAGON, SlayerTask.BASILISK_KNIGHT}
@@ -61,5 +61,5 @@ class SlayerAction(Action):
     def last_tick(self):
         self.action_queue = [
             CombatAction(health_threshold=self.health_threshold),
-            PickUpItemsAction(pause_on_fail=False)
+            PickUpItemsAction()
         ]
