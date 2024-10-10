@@ -20,13 +20,13 @@ class BreadcrumbTrailAction(Action):
 
     # todo: wait about a second after dest_tile disappears before clicking next breadcrumb
     def tick(self, timing):
-        timing.interval(Timer.sec2tick(1), self.poll_breadcrumbs)
+        timing.interval(Timer.sec2tick(1), self.click_next_breadcrumb)
         if self.retry_count >= 4:
             return Action.Status.COMPLETE  # reached destination
         else:
             return Action.Status.IN_PROGRESS
 
-    def poll_breadcrumbs(self):
+    def click_next_breadcrumb(self):
         screenshot = vision.grab_screen(hide_ui=True)
         dest_tile = vision.locate_contour(screenshot, Color.WHITE)
         if dest_tile is None:
