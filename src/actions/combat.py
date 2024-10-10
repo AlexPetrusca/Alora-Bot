@@ -32,12 +32,12 @@ class CombatAction(Action):
             timing.interval(Timer.sec2tick(1), lambda: self.poll_combat(timing.tick_counter))
 
         if self.tp_home_tick is not None:
-            timing.tick_counter = self.tp_home_tick  # todo: any way to make this nicer?
+            timing.tick_offset = self.tp_home_tick  # todo: any way to make this nicer?
             timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
             timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
             return timing.abort_after(Timer.sec2tick(5))
         elif self.fight_over_tick is not None:
-            timing.tick_counter = self.fight_over_tick    # todo: any way to make this nicer?
+            timing.tick_offset = self.fight_over_tick    # todo: any way to make this nicer?
             return timing.complete_after(Timer.sec2tick(5))
         return Action.Status.IN_PROGRESS
 

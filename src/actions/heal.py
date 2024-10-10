@@ -14,25 +14,16 @@ class HealAction(Action):
         self.set_progress_message("Routing to Healer...")
 
     def tick(self, timing):
-        if timing.tick_counter == 0:
-            robot.shift_click(HealActionCoord.WALK1)  # move to teleport wizard
-        if timing.tick_counter == Timer.sec2tick(4):
-            robot.click(HealActionCoord.PRAYER_ALTAR)  # click prayer altar
-        if timing.tick_counter == Timer.sec2tick(12):
-            robot.right_click(HealActionCoord.HEALER)  # right click healer
-        if timing.tick_counter == Timer.sec2tick(13):
-            robot.click_image(Images.HEAL_OPTION, 0.9)
+        timing.execute(lambda: robot.shift_click(HealActionCoord.WALK1))  # move to teleport wizard
+        timing.execute_after(Timer.sec2tick(4), lambda: robot.click(HealActionCoord.PRAYER_ALTAR))
+        timing.execute_after(Timer.sec2tick(8), lambda: robot.right_click(HealActionCoord.HEALER))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click_image(Images.HEAL_OPTION, 0.9))
         if self.bank:
-            if timing.tick_counter == Timer.sec2tick(16):
-                robot.click(HealActionCoord.BANK_CHEST)  # click bank chest
-            if timing.tick_counter == Timer.sec2tick(20):
-                robot.click(BankMenu.CLOSE)  # close bank
-            if timing.tick_counter == Timer.sec2tick(21):
-                return Action.Status.COMPLETE
+            timing.execute_after(Timer.sec2tick(3), lambda: robot.click(HealActionCoord.BANK_CHEST))
+            timing.execute_after(Timer.sec2tick(4), lambda: robot.click(BankMenu.CLOSE))
+            return timing.complete_after(Timer.sec2tick(1))
         else:
-            if timing.tick_counter == Timer.sec2tick(14):
-                return Action.Status.COMPLETE
-        return Action.Status.IN_PROGRESS
+            return timing.complete_after(Timer.sec2tick(1))
 
     def last_tick(self):
         pass

@@ -40,9 +40,9 @@ class ActionTiming:
 
     def abort(self):
         if self.tick_counter >= self.tick_offset:
-            return Action.Status.COMPLETE
-        else:
             return Action.Status.ABORTED
+        else:
+            return Action.Status.IN_PROGRESS
 
     def execute_after(self, tick_duration, fn):
         self.wait(tick_duration)
