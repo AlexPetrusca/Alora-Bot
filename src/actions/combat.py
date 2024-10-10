@@ -22,41 +22,44 @@ class CombatAction(Action):
         pass
 
     def tick(self, timing):
-        if timing.tick_counter == 0 and self.target is not None:
-            robot.click_contour(self.target)
-        if timing.tick_counter == Timer.sec2tick(1):
-            robot.click(ControlPanel.INVENTORY_TAB)
-        if timing.tick_counter > Timer.sec2tick(4) and self.fight_over_tick is None:
-            if timing.tick_counter % Timer.sec2tick(1) == 0:
-                # check fight end
-                ocr = vision.read_damage_ui()
-                print('"', ocr, '"', len(ocr))
-                if ocr.startswith("0/"):
-                    self.fight_over_tick = timing.tick_counter
-                elif ocr.find("/") == -1:  # '/' not found
-                    self.retry_count += 1
-                    if self.retry_count >= 3:
-                        self.fight_over_tick = timing.tick_counter
-                else:
-                    self.retry_count = 0  # '/' found
-                # eat food or teleport home on low health
-                if vision.read_hitpoints() < self.health_threshold:
-                    ate_food = robot.click_food()
-                    if not ate_food:
-                        self.fight_over_tick = timing.tick_counter
-                        self.tp_home_tick = timing.tick_counter
+        if self.target is not None:
+            timing.execute(lambda: robot.click_contour(self.target))
+
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))
+
+        timing.wait(Timer.sec2tick(3))
+        if self.fight_over_tick is None:
+            timing.interval(Timer.sec2tick(1), lambda: self.poll_combat(timing.tick_counter))
 
         if self.tp_home_tick is not None:
-            if timing.tick_counter == self.tp_home_tick:
-                robot.click(ControlPanel.MAGIC_TAB)
-            if timing.tick_counter == self.tp_home_tick + Timer.sec2tick(0.5):
-                robot.click(StandardSpellbook.HOME_TELEPORT)
-            if timing.tick_counter > self.tp_home_tick + Timer.sec2tick(5):
-                return Action.Status.ABORTED
+            timing.tick_counter = self.tp_home_tick  # todo: any way to make this nicer?
+            timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
+            timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
+            return timing.abort_after(Timer.sec2tick(5))
         elif self.fight_over_tick is not None:
-            if timing.tick_counter > self.fight_over_tick + Timer.sec2tick(5):
-                return Action.Status.COMPLETE
+            timing.tick_counter = self.fight_over_tick    # todo: any way to make this nicer?
+            return timing.complete_after(Timer.sec2tick(5))
         return Action.Status.IN_PROGRESS
+
+    def poll_combat(self, tick_counter):
+        # check fight end
+        ocr = vision.read_damage_ui()
+        print('"', ocr, '"', len(ocr))
+        if ocr.startswith("0/"):
+            self.fight_over_tick = tick_counter
+        elif ocr.find("/") == -1:  # '/' not found
+            self.retry_count += 1
+            if self.retry_count >= 3:
+                self.fight_over_tick = tick_counter
+        else:
+            self.retry_count = 0  # '/' found
+
+        # eat food or teleport home on low health
+        if vision.read_hitpoints() < self.health_threshold:
+            ate_food = robot.click_food()
+            if not ate_food:
+                self.fight_over_tick = tick_counter
+                self.tp_home_tick = tick_counter
 
     def last_tick(self):
         self.fight_over_tick = None

@@ -22,7 +22,8 @@ class BotConfig:
             WaitAction(1).play_once(),
 
             # ZulrahAction(),
-            CerberusAction()
+            # CerberusAction(),
+            CombatAction()
         ]
 
     @staticmethod
