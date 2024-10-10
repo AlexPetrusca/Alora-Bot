@@ -24,7 +24,7 @@ class OrchestratorAction(Action):
             return Action.Status.COMPLETE
 
         current_action = self.action_queue[0]
-        status = current_action.run(self.timing.tick_counter)
+        status = current_action.run(timing.tick_counter)
 
         if self.quit_on_abort and status == Action.Status.ABORTED:
             return Action.Status.COMPLETE
