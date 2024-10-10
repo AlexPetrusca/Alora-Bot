@@ -95,7 +95,7 @@ class Action:
         ...
 
     @abstractmethod
-    def tick(self, timing):
+    def tick(self, timing: ActionTiming):
         ...
 
     @abstractmethod
