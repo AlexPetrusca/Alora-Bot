@@ -3,6 +3,7 @@ from enum import Enum
 from src.actions.primitives.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
+from src.actions.primitives.orchestrator import OrchestratorAction
 from src.robot import robot
 from src.robot.timer import Timer
 from src.vision.coordinates import Prayer, ControlPanel
@@ -20,10 +21,10 @@ class SlayerAction(Action):
         super().__init__()
         self.task = task
         self.health_threshold = health_threshold
-        self.action_queue = [
+        self.combat_loop_action = OrchestratorAction([
             CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction()
-        ]
+        ])
 
         magic_tasks = {SlayerTask.CAVE_KRAKEN, SlayerTask.RUNE_DRAGON, SlayerTask.BASILISK_KNIGHT}
         melee_tasks = {}
@@ -41,25 +42,10 @@ class SlayerAction(Action):
         self.set_progress_message(f'Slaying {self.task.value}s...')
 
     def tick(self, timing):
-        if timing.tick_counter == 0:
-            robot.click(ControlPanel.PRAYER_TAB)
-        if timing.tick_counter == Timer.sec2tick(0.5):
-            robot.click(self.prayer)
-        if timing.tick_counter == Timer.sec2tick(1):
-            robot.click(ControlPanel.INVENTORY_TAB)
-
-        top = self.action_queue[0]
-        status = top.run(timing.tick_counter)
-        if status == Action.Status.COMPLETE:
-            self.action_queue.pop(0)
-            self.action_queue.append(top)
-        elif status == Action.Status.ABORTED:
-            return Action.Status.COMPLETE
-
-        return Action.Status.IN_PROGRESS
+        timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))
+        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))
+        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(ControlPanel.INVENTORY_TAB))
+        return timing.action(self.combat_loop_action)
 
     def last_tick(self):
-        self.action_queue = [
-            CombatAction(health_threshold=self.health_threshold),
-            PickUpItemsAction()
-        ]
+        pass
