@@ -28,6 +28,9 @@ class ActionTiming:
         return self.tick_counter == self.tick_offset
 
     def execute(self, fn):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
         if self.tick_counter == self.tick_offset:
             fn()
         return self.tick_counter == self.tick_offset
@@ -45,6 +48,9 @@ class ActionTiming:
             return Action.Status.IN_PROGRESS
 
     def execute_after(self, tick_duration, fn):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
         self.wait(tick_duration)
         return self.execute(fn)
 
@@ -57,6 +63,9 @@ class ActionTiming:
         return self.abort()
 
     def interval(self, tick_interval, fn):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
         if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
             fn()
         return self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0
