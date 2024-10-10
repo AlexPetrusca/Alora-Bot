@@ -9,114 +9,85 @@ from src.vision.coordinates import ControlPanel, Prayer, Minimap, ArceuusSpellbo
 class CerberusAction(Action):
     def __init__(self):
         super().__init__()
-        self.tile_color = None
+        self.tile_color = Color.MAGENTA
         self.last_chat = None
         self.fight_over_tick = None
         self.retry_count = 0
 
     def first_tick(self):
         self.set_progress_message('Routing to Cerberus...')
-        pass
 
     def tick(self, timing):
-        tick_offset = 0
-
         # 1. Click 850, 50 + wait to walk
-        if timing.tick_counter == tick_offset:
-            robot.click(CerberusActionCoord.WALK1)
+        timing.execute(lambda: robot.click(CerberusActionCoord.WALK1))
 
         # 2. Click 750, 90 + wait to walk + wait to enter chamber
-        tick_offset += Timer.sec2tick(7)
-        if timing.tick_counter == tick_offset:
-            robot.click(CerberusActionCoord.WALK2)
+        timing.execute_after(Timer.sec2tick(7), lambda: robot.click(CerberusActionCoord.WALK2))
 
         # 3. Click 850, 215 + wait to walk
-        tick_offset += Timer.sec2tick(14)
-        if timing.tick_counter == tick_offset:
-            robot.click(CerberusActionCoord.WALK3)
+        timing.execute_after(Timer.sec2tick(14), lambda: robot.click(CerberusActionCoord.WALK3))
 
         # 4. Enable prayers + spec
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            robot.click(ControlPanel.PRAYER_TAB)
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            robot.click(Prayer.PROTECT_FROM_MAGIC)
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            robot.click(Prayer.PIETY)
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            robot.click(Minimap.SPECIAL)
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.PRAYER_TAB))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MAGIC))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PIETY))
+
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Minimap.SPECIAL))
 
         # 5. click magenta contour + wait to start fight
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            self.tile_color = Color.MAGENTA
-            robot.click_contour(self.tile_color)
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click_contour(self.tile_color))
 
         # 6. summon thrall
-        tick_offset += Timer.sec2tick(3)
-        if timing.tick_counter == tick_offset:
-            self.set_progress_message('Fighting Cerberus...')
+        timing.execute_after(Timer.sec2tick(3), lambda: (
+            self.set_progress_message('Fighting Cerberus...'),
             robot.click(ControlPanel.MAGIC_TAB)
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            robot.click(ArceuusSpellbook.RESURRECT_GREATER_SKELETON)
-        tick_offset += Timer.sec2tick(1)
-        if timing.tick_counter == tick_offset:
-            robot.click(ControlPanel.INVENTORY_TAB)
+        ))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ArceuusSpellbook.RESURRECT_GREATER_SKELETON))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))
 
         # todo: can we replace this with a CombatAction?
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
-        tick_offset += Timer.sec2tick(3)
-        if timing.tick_counter > tick_offset and self.fight_over_tick is None:
-            if timing.tick_counter % Timer.sec2tick(1) == 0:
-                damage_ui = vision.read_damage_ui()
-                if damage_ui.startswith('0/'):
-                    self.fight_over_tick = timing.tick_counter
-                elif damage_ui.find("/") == -1:  # "/" not found
-                    print("DAMAGE_UI not found:", damage_ui)
-                    self.retry_count += 1
-                    if self.retry_count >= 3:
-                        return Action.Status.ABORTED
-                else:
-                    self.retry_count = 0
-
-                if vision.read_hitpoints() <= 30:
-                    robot.click_food()
-
-            if timing.tick_counter % Timer.sec2tick(0.5) == 0:
-                chat = vision.read_latest_chat()
-                if chat.find("Cerberus: Gr") != -1 and chat != self.last_chat:
-                    self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
-                    robot.click_contour(self.tile_color)
-                    robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
-                self.last_chat = chat
-
-        if self.fight_over_tick is not None:
-            tick_offset = self.fight_over_tick
+        timing.wait(Timer.sec2tick(3))
+        if self.fight_over_tick is None:
+            timing.interval(Timer.sec2tick(1), lambda: self.poll_combat(timing))
+            timing.interval(Timer.sec2tick(0.5), self.poll_cerberus_special)
+            return Action.Status.IN_PROGRESS
+        else:
+            timing.tick_offset = self.fight_over_tick
 
             # 8. Disable prayers
-            tick_offset += Timer.sec2tick(1)
-            if timing.tick_counter == tick_offset:
-                robot.click(ControlPanel.PRAYER_TAB)
-            tick_offset += Timer.sec2tick(1)
-            if timing.tick_counter == tick_offset:
-                robot.click(Prayer.PROTECT_FROM_MAGIC)
-            tick_offset += Timer.sec2tick(1)
-            if timing.tick_counter == tick_offset:
-                robot.click(Prayer.PIETY)
+            timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.PRAYER_TAB))
+            timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MAGIC))
+            timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PIETY))
 
             # 9. End fight
-            tick_offset += Timer.sec2tick(25)
-            if timing.tick_counter == tick_offset:
-                return Action.Status.COMPLETE
+            return timing.complete_after(Timer.sec2tick(5))
 
-        return Action.Status.IN_PROGRESS
+    def poll_combat(self, timing):
+        damage_ui = vision.read_damage_ui()
+        if damage_ui.startswith('0/'):
+            self.fight_over_tick = timing.tick_counter
+        elif damage_ui.find("/") == -1:  # "/" not found
+            print("DAMAGE_UI not found:", damage_ui)
+            self.retry_count += 1
+            if self.retry_count >= 3:
+                return Action.Status.ABORTED
+        else:
+            self.retry_count = 0
+
+        if vision.read_hitpoints() <= 30:
+            robot.click_food()
+
+    def poll_cerberus_special(self):
+        chat = vision.read_latest_chat()
+        if chat.find("Cerberus: Gr") != -1 and chat != self.last_chat:
+            self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
+            robot.click_contour(self.tile_color)
+            robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
+        self.last_chat = chat
 
     def last_tick(self):
-        self.tile_color = None
+        self.tile_color = Color.MAGENTA
         self.last_chat = None
         self.fight_over_tick = None
         self.retry_count = 0
