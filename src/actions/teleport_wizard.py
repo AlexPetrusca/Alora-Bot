@@ -16,19 +16,17 @@ class TeleportWizardAction(Action):
         self.set_progress_message('Walking to Teleport Wizard...')
 
     def tick(self, timing):
-        if timing.tick_counter == 0:
-            robot.click(TeleportActionCoord.TELEPORT_WIZARD)  # teleport wizard
-        if timing.tick_counter == Timer.sec2tick(5):
-            self.set_progress_message('Routing to Destination...')
-            robot.click(TeleportMenu.SEARCH)  # search
-        if timing.tick_counter == Timer.sec2tick(6):
-            robot.press([c for c in self.destination])  # type destination
-        if timing.tick_counter == Timer.sec2tick(7):
-            self.set_progress_message('Teleporting to Destination...')
-            robot.click(TeleportMenu.FIRST_RESULT)  # go to destination
-        if timing.tick_counter == Timer.sec2tick(12):
-            return Action.Status.COMPLETE
-        return Action.Status.IN_PROGRESS
+        timing.execute(lambda: robot.click(TeleportActionCoord.TELEPORT_WIZARD))
+        timing.execute_after(Timer.sec2tick(5), lambda: (
+            self.set_progress_message('Routing to Destination...'),
+            robot.click(TeleportMenu.SEARCH)
+        ))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.press([c for c in self.destination]))
+        timing.execute_after(Timer.sec2tick(1), lambda: (
+            self.set_progress_message('Teleporting to Destination...'),
+            robot.click(TeleportMenu.FIRST_RESULT)
+        ))
+        return timing.complete_after(Timer.sec2tick(5))
 
     def last_tick(self):
         pass
