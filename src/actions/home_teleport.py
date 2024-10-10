@@ -9,13 +9,9 @@ class HomeTeleportAction(Action):
         self.set_progress_message('Teleporting Home...')
 
     def tick(self, timing):
-        if timing.tick_counter == 0:
-            robot.click(ControlPanel.MAGIC_TAB)
-        if timing.tick_counter == Timer.sec2tick(1):
-            robot.click(StandardSpellbook.HOME_TELEPORT)
-        if timing.tick_counter == Timer.sec2tick(4):
-            return Action.Status.COMPLETE
-        return Action.Status.IN_PROGRESS
+        timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
+        return timing.complete_after(Timer.sec2tick(3))
 
     def last_tick(self):
         pass
