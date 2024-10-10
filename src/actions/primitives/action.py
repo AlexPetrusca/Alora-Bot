@@ -8,15 +8,19 @@ class ActionTiming:
     def __init__(self):
         self.tick_counter = -1
         self.tick_offset = 0
+        self.start_tick = -1
         self.action_records = dict()
 
-    def update(self, tick_counter):
+    def update(self, global_tick):
+        if self.start_tick == -1:
+            self.start_tick = global_tick
+        self.tick_counter = global_tick - self.start_tick
         self.tick_offset = 0
-        self.tick_counter = tick_counter
 
     def reset(self):
         self.tick_counter = -1
         self.tick_offset = 0
+        self.start_tick = -1
         self.action_records.clear()
 
     def wait(self, tick_duration):
@@ -82,21 +86,16 @@ class ActionTiming:
 
 class Action:
     def __init__(self):
-        self.T = ActionTiming()
+        self.timing = ActionTiming()
         self.play_count = -1
         self.progress_message = ""
-
-        # todo: move these to T
-        self.tick_counter = 0
-        self.start_tick = -1
-        self.prev_tick = -1
 
     @abstractmethod
     def first_tick(self):
         ...
 
     @abstractmethod
-    def tick(self):
+    def tick(self, timing):
         ...
 
     @abstractmethod
@@ -104,21 +103,15 @@ class Action:
         ...
 
     def run(self, global_tick):
-        if self.start_tick == -1:
-            self.start_tick = global_tick
-            self.prev_tick = -1
+        if self.timing.tick_counter == -1:
             self.first_tick()
 
-        self.tick_counter = global_tick - self.start_tick
-        if self.tick_counter > self.prev_tick:
-            self.prev_tick = self.tick_counter
-            self.T.update(self.tick_counter)
-            status = self.tick()
-            if status.is_terminal():
-                self.last_tick()
-                self.start_tick = -1
-                self.T.reset()
-                return status
+        self.timing.update(global_tick)
+        status = self.tick(self.timing)
+        if status.is_terminal():
+            self.last_tick()
+            self.timing.reset()
+            return status
 
         return Action.Status.IN_PROGRESS
 

@@ -8,12 +8,12 @@ class HomeTeleportAction(Action):
     def first_tick(self):
         self.set_progress_message('Teleporting Home...')
 
-    def tick(self):
-        if self.tick_counter == 0:
+    def tick(self, timing):
+        if timing.tick_counter == 0:
             robot.click(ControlPanel.MAGIC_TAB)
-        if self.tick_counter == Timer.sec2tick(1):
+        if timing.tick_counter == Timer.sec2tick(1):
             robot.click(StandardSpellbook.HOME_TELEPORT)
-        if self.tick_counter == Timer.sec2tick(4):
+        if timing.tick_counter == Timer.sec2tick(4):
             return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

@@ -21,40 +21,40 @@ class CombatAction(Action):
     def first_tick(self):
         pass
 
-    def tick(self):
-        if self.tick_counter == 0 and self.target is not None:
+    def tick(self, timing):
+        if timing.tick_counter == 0 and self.target is not None:
             robot.click_contour(self.target)
-        if self.tick_counter == Timer.sec2tick(1):
+        if timing.tick_counter == Timer.sec2tick(1):
             robot.click(ControlPanel.INVENTORY_TAB)
-        if self.tick_counter > Timer.sec2tick(4) and self.fight_over_tick is None:
-            if self.tick_counter % Timer.sec2tick(1) == 0:
+        if timing.tick_counter > Timer.sec2tick(4) and self.fight_over_tick is None:
+            if timing.tick_counter % Timer.sec2tick(1) == 0:
                 # check fight end
                 ocr = vision.read_damage_ui()
                 print('"', ocr, '"', len(ocr))
                 if ocr.startswith("0/"):
-                    self.fight_over_tick = self.tick_counter
+                    self.fight_over_tick = timing.tick_counter
                 elif ocr.find("/") == -1:  # '/' not found
                     self.retry_count += 1
                     if self.retry_count >= 3:
-                        self.fight_over_tick = self.tick_counter
+                        self.fight_over_tick = timing.tick_counter
                 else:
                     self.retry_count = 0  # '/' found
                 # eat food or teleport home on low health
                 if vision.read_hitpoints() < self.health_threshold:
                     ate_food = robot.click_food()
                     if not ate_food:
-                        self.fight_over_tick = self.tick_counter
-                        self.tp_home_tick = self.tick_counter
+                        self.fight_over_tick = timing.tick_counter
+                        self.tp_home_tick = timing.tick_counter
 
         if self.tp_home_tick is not None:
-            if self.tick_counter == self.tp_home_tick:
+            if timing.tick_counter == self.tp_home_tick:
                 robot.click(ControlPanel.MAGIC_TAB)
-            if self.tick_counter == self.tp_home_tick + Timer.sec2tick(0.5):
+            if timing.tick_counter == self.tp_home_tick + Timer.sec2tick(0.5):
                 robot.click(StandardSpellbook.HOME_TELEPORT)
-            if self.tick_counter > self.tp_home_tick + Timer.sec2tick(5):
+            if timing.tick_counter > self.tp_home_tick + Timer.sec2tick(5):
                 return Action.Status.ABORTED
         elif self.fight_over_tick is not None:
-            if self.tick_counter > self.fight_over_tick + Timer.sec2tick(5):
+            if timing.tick_counter > self.fight_over_tick + Timer.sec2tick(5):
                 return Action.Status.COMPLETE
         return Action.Status.IN_PROGRESS
 

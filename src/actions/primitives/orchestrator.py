@@ -19,12 +19,12 @@ class OrchestratorAction(Action):
         pass
 
     # todo: this code is very similar to Bot.run(). Can we consolidate the two?
-    def tick(self):
+    def tick(self, timing):
         if len(self.action_queue) == 1:
             return Action.Status.COMPLETE
 
         current_action = self.action_queue[0]
-        status = current_action.run(self.tick_counter)
+        status = current_action.run(self.timing.tick_counter)
 
         if self.quit_on_abort and status == Action.Status.ABORTED:
             return Action.Status.COMPLETE

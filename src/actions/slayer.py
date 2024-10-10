@@ -40,16 +40,16 @@ class SlayerAction(Action):
     def first_tick(self):
         self.set_progress_message(f'Slaying {self.task.value}s...')
 
-    def tick(self):
-        if self.tick_counter == 0:
+    def tick(self, timing):
+        if timing.tick_counter == 0:
             robot.click(ControlPanel.PRAYER_TAB)
-        if self.tick_counter == Timer.sec2tick(0.5):
+        if timing.tick_counter == Timer.sec2tick(0.5):
             robot.click(self.prayer)
-        if self.tick_counter == Timer.sec2tick(1):
+        if timing.tick_counter == Timer.sec2tick(1):
             robot.click(ControlPanel.INVENTORY_TAB)
 
         top = self.action_queue[0]
-        status = top.run(self.tick_counter)
+        status = top.run(timing.tick_counter)
         if status == Action.Status.COMPLETE:
             self.action_queue.pop(0)
             self.action_queue.append(top)
