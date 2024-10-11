@@ -4,12 +4,18 @@ from abc import abstractmethod
 from enum import Enum
 
 
+class TimingRecord:
+    def __init__(self, tick, status):
+        self.tick = tick
+        self.status = status
+
+
 class ActionTiming:
     def __init__(self):
         self.tick_counter = -1
         self.tick_offset = 0
         self.start_tick = -1
-        self.action_records = dict()
+        self.timing_records = dict()
 
     def update(self, global_tick):
         if self.start_tick == -1:
@@ -21,7 +27,7 @@ class ActionTiming:
         self.tick_counter = -1
         self.tick_offset = 0
         self.start_tick = -1
-        self.action_records.clear()
+        self.timing_records.clear()
 
     def wait(self, tick_duration):
         self.tick_offset += tick_duration
@@ -67,23 +73,43 @@ class ActionTiming:
             raise AssertionError(f"{fn} is not callable")
 
         if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
-            fn()
-        return self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0
+            return fn()
+        return None
+
+    # todo: [important] poll doesn't work with lambdas... fn needs to be a fixed address
+    def poll(self, tick_interval, fn):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
+        poll_record = self.timing_records.get(fn)
+        if poll_record is None:
+            if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+                status = fn()
+                if status is not None:
+                    self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+                    self.tick_offset = self.tick_counter
+                    return status
+            else:
+                self.tick_offset = math.inf
+                return None
+        else:
+            self.tick_offset = poll_record.tick
+            return poll_record.status
 
     def action(self, action):
         if self.tick_counter >= self.tick_offset:
-            action_record = self.action_records.get(action)
+            action_record = self.timing_records.get(action)
             if action_record is None:  # in progress?
                 status = action.run(self.tick_counter)
                 if status.is_terminal():
-                    self.action_records[action] = dict(completion_tick=self.tick_counter, status=status)
+                    self.timing_records[action] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                 else:
                     self.tick_offset = math.inf
                 return status
             else:  # completed?
-                self.tick_offset = action_record['completion_tick']
-                return action_record['status']
+                self.tick_offset = action_record.tick
+                return action_record.status
         else:  # not started?
             self.tick_offset = math.inf
             return Action.Status.NOT_STARTED

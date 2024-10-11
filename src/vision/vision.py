@@ -195,6 +195,7 @@ def read_text(haystack, config=""):
     return pytesseract.image_to_string(blur, config=config).strip()
 
 
+# todo: this needs to be better >.<
 def read_int(haystack):
     text = read_text(haystack, config='--psm 6')
     old_text = text
