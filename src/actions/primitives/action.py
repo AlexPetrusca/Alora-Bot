@@ -33,6 +33,7 @@ class ActionTiming:
         self.tick_offset += tick_duration
         return self.tick_counter == self.tick_offset
 
+    # todo: should this also latch and return the result of the function?
     def execute(self, fn):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")

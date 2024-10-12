@@ -28,12 +28,12 @@ class CombatAction(Action):
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))
 
         timing.wait(Timer.sec2tick(3))
-        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat)
-        if combat_status == CombatAction.Event.FLEE:
+        event = timing.poll(Timer.sec2tick(1), self.poll_combat)
+        if event == CombatAction.Event.FLEE:
             timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
             timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
             return timing.abort_after(Timer.sec2tick(5))
-        elif combat_status == CombatAction.Event.FIGHT_OVER:
+        elif event == CombatAction.Event.FIGHT_OVER:
             return timing.complete_after(Timer.sec2tick(5))
 
         return Action.Status.IN_PROGRESS
@@ -56,8 +56,6 @@ class CombatAction(Action):
             ate_food = robot.click_food()
             if not ate_food:
                 return CombatAction.Event.FLEE
-
-        return None
 
     def last_tick(self):
         self.retry_count = 0
