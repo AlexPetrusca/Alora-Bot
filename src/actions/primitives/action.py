@@ -69,11 +69,12 @@ class ActionTiming:
         self.wait(tick_duration)
         return self.abort()
 
-    def interval(self, tick_interval, fn):
+    def interval(self, tick_interval, fn, ignore_scheduling=False):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
-        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+        is_scheduled = ignore_scheduling or self.tick_counter >= self.tick_offset
+        if is_scheduled and self.tick_counter % tick_interval == 0:
             return fn()
         return None
 
@@ -90,12 +91,12 @@ class ActionTiming:
                     self.timing_records[fn] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                     return status
-            else:
-                self.tick_offset = math.inf
-                return None
-        else:
-            self.tick_offset = poll_record.tick
-            return poll_record.status
+
+            self.tick_offset = math.inf
+            return None
+
+        self.tick_offset = poll_record.tick
+        return poll_record.status
 
     def action(self, action):
         if self.tick_counter >= self.tick_offset:

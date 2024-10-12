@@ -1,3 +1,4 @@
+from src.actions.combat import CombatAction
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -11,7 +12,6 @@ class CerberusAction(Action):
         super().__init__()
         self.tile_color = Color.MAGENTA
         self.last_chat = None
-        self.fight_over_tick = None
         self.retry_count = 0
 
     def first_tick(self):
@@ -48,30 +48,27 @@ class CerberusAction(Action):
         # todo: can we replace this with a CombatAction?
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
         timing.wait(Timer.sec2tick(3))
-        if self.fight_over_tick is None:
-            timing.interval(Timer.sec2tick(1), lambda: self.poll_combat(timing))
-            timing.interval(Timer.sec2tick(0.5), self.poll_cerberus_special)
-            return Action.Status.IN_PROGRESS
-        else:
-            timing.tick_offset = self.fight_over_tick
+        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat)
+        if combat_status is not CombatAction.Event.FIGHT_OVER:
+            timing.interval(Timer.sec2tick(0.5), self.poll_cerberus_special, ignore_scheduling=True)
 
-            # 8. Disable prayers
-            timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.PRAYER_TAB))
-            timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MAGIC))
-            timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PIETY))
+        # 8. Disable prayers
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.PRAYER_TAB))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MAGIC))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PIETY))
 
-            # 9. End fight
-            return timing.complete_after(Timer.sec2tick(5))
+        # 9. End fight
+        return timing.complete_after(Timer.sec2tick(5))
 
-    def poll_combat(self, timing):
+    def poll_combat(self):
         damage_ui = vision.read_damage_ui()
         if damage_ui.startswith('0/'):
-            self.fight_over_tick = timing.tick_counter
+            return CombatAction.Event.FIGHT_OVER
         elif damage_ui.find("/") == -1:  # "/" not found
             print("DAMAGE_UI not found:", damage_ui)
             self.retry_count += 1
             if self.retry_count >= 3:
-                return Action.Status.ABORTED
+                return CombatAction.Event.FIGHT_OVER
         else:
             self.retry_count = 0
 
@@ -89,5 +86,4 @@ class CerberusAction(Action):
     def last_tick(self):
         self.tile_color = Color.MAGENTA
         self.last_chat = None
-        self.fight_over_tick = None
         self.retry_count = 0
