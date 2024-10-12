@@ -33,8 +33,8 @@ class BarrowAction(Action):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
 
     def tick(self, timing):
+        # todo: example of execute that should return a value
         timing.execute(self.navigate_to_barrow)
-
         if self.skip:
             return timing.complete_after(Timer.sec2tick(8))
 

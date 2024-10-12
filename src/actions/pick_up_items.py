@@ -19,6 +19,7 @@ class PickUpItemsAction(Action):
         self.set_progress_message('Picking Up Ground Items...')
 
     def tick(self, timing):
+        # todo: example of execute that should return a value
         timing.execute(self.pickup_first_item)
         if not self.item_found:
             return Action.Status.COMPLETE
