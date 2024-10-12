@@ -5,9 +5,10 @@ from enum import Enum
 
 
 class TimingRecord:
-    def __init__(self, tick, status):
+    def __init__(self, tick, status, prev_status=None):
         self.tick = tick
         self.status = status
+        self.prev_status = prev_status
 
 
 class ActionTiming:
@@ -86,17 +87,24 @@ class ActionTiming:
         if (ignore_scheduling or self.tick_counter >= self.tick_offset) and self.tick_counter % tick_interval == 0:
             status = fn()
             self.timing_records[fn] = TimingRecord(self.tick_counter, status)
-            return status
+            return status  # current interval value
         elif interval_record is not None:
-            return interval_record.status
+            return interval_record.status  # last interval value
         else:
-            return None
+            return None  # interval not called yet
 
     # todo: [important] poll doesn't work with lambdas... fn needs to be a fixed address
     def poll(self, tick_interval, fn):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
+        # reset latch on first tick
+        if self.tick_counter == self.tick_offset:
+            action_record = self.timing_records.get(fn)
+            if action_record is not None:
+                self.timing_records.pop(fn)
+
+        # process poll on subsequent ticks
         poll_record = self.timing_records.get(fn)
         if poll_record is None:
             if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
@@ -104,13 +112,13 @@ class ActionTiming:
                 if status is not None:
                     self.timing_records[fn] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
-                    return status
+                    return status  # event found
 
             self.tick_offset = math.inf
-            return None
+            return None  # event not found
 
         self.tick_offset = poll_record.tick
-        return poll_record.status
+        return poll_record.status  # event previously found
 
     def observe(self, tick_interval, fn, starting_status=None):
         if not callable(fn):
@@ -120,19 +128,26 @@ class ActionTiming:
         if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
             status = fn()
             prev_status = prev_record.status if (prev_record is not None) else starting_status
-            if status != prev_status:
-                self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+            if status != prev_status:  # change observed?
+                self.timing_records[fn] = TimingRecord(self.tick_counter, status, prev_status)
                 self.tick_offset = self.tick_counter
-                return status
+                return prev_status, status
 
-        if prev_record is not None:
+        if prev_record is not None:  # no change observed?
             self.tick_offset = prev_record.tick
-            return prev_record.status
-        else:
+            return prev_record.prev_status, prev_record.status
+        else:  # no value observed?
             self.tick_offset = math.inf
-            return None
+            return None, None
 
     def action(self, action):
+        # reset latch on first tick
+        if self.tick_counter == self.tick_offset:
+            action_record = self.timing_records.get(action)
+            if action_record is not None:
+                self.timing_records.pop(action)
+
+        # process action on subsequent ticks
         if self.tick_counter >= self.tick_offset:
             action_record = self.timing_records.get(action)
             if action_record is None:  # in progress?

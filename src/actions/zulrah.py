@@ -1,9 +1,12 @@
+from copy import copy
+
+from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import Prayer, ControlPanel
+from src.vision.coordinates import Prayer
 from src.vision.vision import ContourDetection
 
 
@@ -12,35 +15,17 @@ class ZulrahAction(Action):
         super().__init__()
         self.last_zulrah_color = None
         self.zulrah_color = None
+        self.prayer_action = PrayerAction()
 
     def first_tick(self):
         self.set_progress_message(f'Fighting Zulrah...')
 
     def tick(self, timing):
+        # todo: this is somewhat convoluted. (Maybe add an Observer class with an on_change method on it)
         timing.observe(Timer.sec2tick(1), self.detect_color_change)
-
-        # # Slow prayer change
-        # timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))  # prayer tab
-        # timing.execute_after(Timer.sec2tick(0.5), self.protect_against_color)
-        # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(ControlPanel.INVENTORY_TAB))  # inventory tab
-
-        # Fast prayer change
-        timing.execute(lambda: robot.press('1'))  # prayer tab
-        timing.execute_after(Timer.sec2tick(0.1), self.protect_against_color)
-        timing.execute_after(Timer.sec2tick(0.1), lambda: robot.press('space'))  # inventory tab
+        timing.action(self.prayer_action)
 
         return Action.Status.IN_PROGRESS
-
-    def protect_against_color(self):
-        if self.zulrah_color == Color.GREEN:
-            robot.click(Prayer.PROTECT_FROM_MISSILES)
-        elif self.zulrah_color == Color.BLUE:
-            robot.click(Prayer.PROTECT_FROM_MAGIC)
-        elif self.zulrah_color is None:
-            if self.last_zulrah_color == Color.GREEN:
-                robot.click(Prayer.PROTECT_FROM_MISSILES)
-            elif self.last_zulrah_color == Color.BLUE:
-                robot.click(Prayer.PROTECT_FROM_MAGIC)
 
     def detect_color_change(self):
         screenshot = vision.grab_screen(hide_ui=True)
@@ -56,11 +41,19 @@ class ZulrahAction(Action):
             max_area, max_color = blue_area, Color.BLUE
         if self.zulrah_color is None and max_color is not None and max_color != self.last_zulrah_color:
             self.zulrah_color = max_color
+            self.prayer_action.set_prayer(self.protect_against_color())
             print(max_color, '-->', max_area)
         elif self.zulrah_color is not None and max_color is None:
             self.last_zulrah_color = self.zulrah_color
             self.zulrah_color = None
+            self.prayer_action.disable_all_prayers()
         return self.zulrah_color
+
+    def protect_against_color(self):
+        if self.zulrah_color == Color.GREEN:
+            return Prayer.PROTECT_FROM_MISSILES
+        elif self.zulrah_color == Color.BLUE:
+            return Prayer.PROTECT_FROM_MAGIC
 
     def last_tick(self):
         self.last_zulrah_color = None
