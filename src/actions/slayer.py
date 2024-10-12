@@ -21,22 +21,26 @@ class SlayerAction(Action):
         super().__init__()
         self.task = task
         self.health_threshold = health_threshold
+        self.prayer = SlayerAction.determine_prayer(task)
+
         self.combat_loop_action = OrchestratorAction([
             CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction()
         ])
 
+    @staticmethod
+    def determine_prayer(task):
         magic_tasks = {SlayerTask.CAVE_KRAKEN, SlayerTask.RUNE_DRAGON, SlayerTask.BASILISK_KNIGHT}
         melee_tasks = {}
         ranged_tasks = {}
-
-        self.prayer = Prayer.PROTECT_FROM_MELEE
         if task in magic_tasks:
-            self.prayer = Prayer.PROTECT_FROM_MAGIC
+            return Prayer.PROTECT_FROM_MAGIC
         elif task in ranged_tasks:
-            self.prayer = Prayer.PROTECT_FROM_MISSILES
+            return Prayer.PROTECT_FROM_MISSILES
         elif task in melee_tasks:
-            self.prayer = Prayer.PROTECT_FROM_MELEE
+            return Prayer.PROTECT_FROM_MELEE
+        else:
+            raise AssertionError(f"No prayer mapped to slayer task: {task}")
 
     def first_tick(self):
         self.set_progress_message(f'Slaying {self.task.value}s...')

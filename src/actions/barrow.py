@@ -23,9 +23,10 @@ class BarrowAction(Action):
         self.barrow = barrow
         self.prayer = prayer
         self.last = last
-        self.combat_action = CombatAction(target=None)
         self.available_img = Images.Barrows.AVAILABLE_LABELS[barrow]
         self.unavailable_img = Images.Barrows.UNAVAILABLE_LABELS[barrow]
+
+        self.combat_action = CombatAction(target=None)
 
     def first_tick(self):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")

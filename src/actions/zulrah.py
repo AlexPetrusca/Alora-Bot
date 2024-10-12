@@ -2,7 +2,6 @@ from copy import copy
 
 from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
-from src.robot import robot
 from src.robot.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
@@ -15,6 +14,7 @@ class ZulrahAction(Action):
         super().__init__()
         self.last_zulrah_color = None
         self.zulrah_color = None
+
         self.prayer_action = PrayerAction()
 
     def first_tick(self):
