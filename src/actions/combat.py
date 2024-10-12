@@ -29,25 +29,25 @@ class CombatAction(Action):
 
         timing.wait(Timer.sec2tick(3))
         combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat)
-        if combat_status == CombatAction.Status.FLEE:
+        if combat_status == CombatAction.Event.FLEE:
             timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
             timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
             return timing.abort_after(Timer.sec2tick(5))
-        elif combat_status == CombatAction.Status.DONE:
+        elif combat_status == CombatAction.Event.FIGHT_OVER:
             return timing.complete_after(Timer.sec2tick(5))
-        else:
-            return Action.Status.IN_PROGRESS
+
+        return Action.Status.IN_PROGRESS
 
     def poll_combat(self):
         # check fight end
         ocr = vision.read_damage_ui()
         print('"', ocr, '"', len(ocr))
         if ocr.startswith("0/"):
-            return CombatAction.Status.DONE
+            return CombatAction.Event.FIGHT_OVER
         elif ocr.find("/") == -1:  # '/' not found
             self.retry_count += 1
             if self.retry_count >= 3:
-                return CombatAction.Status.DONE
+                return CombatAction.Event.FIGHT_OVER
         else:
             self.retry_count = 0  # '/' found
 
@@ -55,14 +55,13 @@ class CombatAction(Action):
         if vision.read_hitpoints() < self.health_threshold:
             ate_food = robot.click_food()
             if not ate_food:
-                return CombatAction.Status.FLEE
+                return CombatAction.Event.FLEE
 
-        return CombatAction.Status.FIGHT
+        return None
 
     def last_tick(self):
         self.retry_count = 0
 
-    class Status(Enum):
-        FIGHT = 0
+    class Event(Enum):
         FLEE = 1
-        DONE = 2
+        FIGHT_OVER = 2
