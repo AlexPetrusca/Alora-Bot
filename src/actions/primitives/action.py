@@ -73,6 +73,16 @@ class ActionTiming:
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
+        # poll_record = self.timing_records.get(fn)
+        # if (ignore_scheduling or self.tick_counter >= self.tick_offset) and self.tick_counter % tick_interval == 0:
+        #     status = fn()
+        #     self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+        #     return status
+        # elif poll_record is not None:
+        #     return poll_record.status
+        # else:
+        #     return None
+
         is_scheduled = ignore_scheduling or self.tick_counter >= self.tick_offset
         if is_scheduled and self.tick_counter % tick_interval == 0:
             return fn()
