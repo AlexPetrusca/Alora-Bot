@@ -15,6 +15,7 @@ class ActionTiming:
         self.tick_counter = -1
         self.tick_offset = 0
         self.start_tick = -1
+        # todo: [important] don't store actions, one-time functions, and polling functions together
         self.timing_records = dict()
 
     def update(self, global_tick):
@@ -73,20 +74,15 @@ class ActionTiming:
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
-        # poll_record = self.timing_records.get(fn)
-        # if (ignore_scheduling or self.tick_counter >= self.tick_offset) and self.tick_counter % tick_interval == 0:
-        #     status = fn()
-        #     self.timing_records[fn] = TimingRecord(self.tick_counter, status)
-        #     return status
-        # elif poll_record is not None:
-        #     return poll_record.status
-        # else:
-        #     return None
-
-        is_scheduled = ignore_scheduling or self.tick_counter >= self.tick_offset
-        if is_scheduled and self.tick_counter % tick_interval == 0:
-            return fn()
-        return None
+        interval_record = self.timing_records.get(fn)
+        if (ignore_scheduling or self.tick_counter >= self.tick_offset) and self.tick_counter % tick_interval == 0:
+            status = fn()
+            self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+            return status
+        elif interval_record is not None:
+            return interval_record.status
+        else:
+            return None
 
     # todo: [important] poll doesn't work with lambdas... fn needs to be a fixed address
     def poll(self, tick_interval, fn):
@@ -107,6 +103,26 @@ class ActionTiming:
 
         self.tick_offset = poll_record.tick
         return poll_record.status
+
+    def observe(self, tick_interval, fn, starting_status=None):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
+        prev_record = self.timing_records.get(fn)
+        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+            status = fn()
+            prev_status = prev_record.status if (prev_record is not None) else starting_status
+            if status != prev_status:
+                self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+                self.tick_offset = self.tick_counter
+                return status
+
+        if prev_record is not None:
+            self.tick_offset = prev_record.tick
+            return prev_record.status
+        else:
+            self.tick_offset = math.inf
+            return None
 
     def action(self, action):
         if self.tick_counter >= self.tick_offset:

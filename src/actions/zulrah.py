@@ -12,15 +12,12 @@ class ZulrahAction(Action):
         super().__init__()
         self.last_zulrah_color = None
         self.zulrah_color = None
-        self.color_change_tick = 0
 
     def first_tick(self):
         self.set_progress_message(f'Fighting Zulrah...')
 
     def tick(self, timing):
-        timing.interval(Timer.sec2tick(1), lambda: self.detect_color_change(timing))
-
-        timing.tick_offset = self.color_change_tick
+        timing.observe(Timer.sec2tick(1), self.detect_color_change)
 
         # # Slow prayer change
         # timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))  # prayer tab
@@ -39,13 +36,13 @@ class ZulrahAction(Action):
             robot.click(Prayer.PROTECT_FROM_MISSILES)
         elif self.zulrah_color == Color.BLUE:
             robot.click(Prayer.PROTECT_FROM_MAGIC)
-        elif self.zulrah_color == Color.RED:
+        elif self.zulrah_color is None:
             if self.last_zulrah_color == Color.GREEN:
                 robot.click(Prayer.PROTECT_FROM_MISSILES)
             elif self.last_zulrah_color == Color.BLUE:
                 robot.click(Prayer.PROTECT_FROM_MAGIC)
 
-    def detect_color_change(self, timing):
+    def detect_color_change(self):
         screenshot = vision.grab_screen(hide_ui=True)
         red_contour, red_area = vision.get_contour(screenshot, Color.RED, mode=ContourDetection.AREA_LARGEST)
         green_contour, green_area = vision.get_contour(screenshot, Color.GREEN, mode=ContourDetection.AREA_LARGEST)
@@ -58,14 +55,13 @@ class ZulrahAction(Action):
         if blue_area > max_area:
             max_area, max_color = blue_area, Color.BLUE
         if self.zulrah_color is None and max_color is not None and max_color != self.last_zulrah_color:
-            self.color_change_tick = timing.tick_counter
             self.zulrah_color = max_color
             print(max_color, '-->', max_area)
         elif self.zulrah_color is not None and max_color is None:
             self.last_zulrah_color = self.zulrah_color
             self.zulrah_color = None
+        return self.zulrah_color
 
     def last_tick(self):
         self.last_zulrah_color = None
         self.zulrah_color = None
-        self.color_change_tick = 0
