@@ -25,15 +25,15 @@ class PickUpItemsAction(Action):
             return Action.Status.COMPLETE
 
         timing.wait(Timer.sec2tick(3))
-        event = timing.poll(Timer.sec2tick(0.2), self.pickup_subsequent_items)
-        if event == PickUpItemsAction.Event.INVENTORY_FULL:
+        pickup_status = timing.poll(Timer.sec2tick(0.2), self.pickup_subsequent_items)
+        if pickup_status == PickUpItemsAction.Event.INVENTORY_FULL:
             timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
             timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
             return timing.abort_after(Timer.sec2tick(5))
-        elif event == PickUpItemsAction.Event.CLICK_TIMEOUT:
+        elif pickup_status == PickUpItemsAction.Event.CLICK_TIMEOUT:
             print("Find item failed - excessive click count")
             return Action.Status.COMPLETE
-        elif event == PickUpItemsAction.Event.RETRY_TIMEOUT:
+        elif pickup_status == PickUpItemsAction.Event.RETRY_TIMEOUT:
             print("Find item stopped - retry timeout")
             return Action.Status.COMPLETE
 
