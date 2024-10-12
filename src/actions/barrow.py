@@ -27,15 +27,12 @@ class BarrowAction(Action):
         self.available_img = Images.Barrows.AVAILABLE_LABELS[barrow]
         self.unavailable_img = Images.Barrows.UNAVAILABLE_LABELS[barrow]
 
-        self.skip = False
-
     def first_tick(self):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
 
     def tick(self, timing):
-        # todo: example of execute that should return a value
-        timing.execute(self.navigate_to_barrow)
-        if self.skip:
+        is_previously_completed = not timing.execute(self.navigate_to_barrow, capture_result=True)
+        if is_previously_completed:
             return timing.complete_after(Timer.sec2tick(8))
 
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))  # open inventory
@@ -70,7 +67,8 @@ class BarrowAction(Action):
     def navigate_to_barrow(self):
         if not robot.click_image(self.available_img, region=Regions.MINIMAP):
             robot.click_image(self.unavailable_img, region=Regions.MINIMAP)
-            self.skip = True
+            return False
+        return True
 
     def last_tick(self):
-        self.skip = False
+        pass

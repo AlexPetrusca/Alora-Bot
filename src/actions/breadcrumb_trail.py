@@ -22,9 +22,8 @@ class BreadcrumbTrailAction(Action):
     def tick(self, timing):
         timing.interval(Timer.sec2tick(1), self.click_next_breadcrumb)
         if self.retry_count >= 4:
-            return Action.Status.COMPLETE  # reached destination
-        else:
-            return Action.Status.IN_PROGRESS
+            return timing.complete()  # reached destination
+        return Action.Status.IN_PROGRESS
 
     def click_next_breadcrumb(self):
         screenshot = vision.grab_screen(hide_ui=True)

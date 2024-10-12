@@ -10,8 +10,6 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 class PickUpItemsAction(Action):
     def __init__(self):
         super().__init__()
-
-        self.item_found = False
         self.click_count = 0
         self.retry_count = 0
 
@@ -19,10 +17,9 @@ class PickUpItemsAction(Action):
         self.set_progress_message('Picking Up Ground Items...')
 
     def tick(self, timing):
-        # todo: example of execute that should return a value
-        timing.execute(self.pickup_first_item)
-        if not self.item_found:
-            return Action.Status.COMPLETE
+        first_item_found = timing.execute(self.pickup_first_item, capture_result=True)
+        if not first_item_found:
+            return timing.complete()
 
         timing.wait(Timer.sec2tick(3))
         pickup_status = timing.poll(Timer.sec2tick(0.2), self.pickup_subsequent_items)
@@ -32,18 +29,19 @@ class PickUpItemsAction(Action):
             return timing.abort_after(Timer.sec2tick(5))
         elif pickup_status == PickUpItemsAction.Event.CLICK_TIMEOUT:
             print("Find item failed - excessive click count")
-            return Action.Status.COMPLETE
+            return timing.complete()
         elif pickup_status == PickUpItemsAction.Event.RETRY_TIMEOUT:
             print("Find item stopped - retry timeout")
-            return Action.Status.COMPLETE
+            return timing.complete()
 
         return Action.Status.IN_PROGRESS
 
     def pickup_first_item(self):
         click_xy = vision.locate_ground_item(vision.grab_screen())
         if click_xy is not None:
-            self.item_found = True
             robot.click(click_xy[0] / 2, click_xy[1] / 2)
+            return True
+        return False
 
     def pickup_subsequent_items(self):
         click_xy = vision.locate_ground_item(vision.grab_screen())
@@ -60,7 +58,6 @@ class PickUpItemsAction(Action):
                 return PickUpItemsAction.Event.RETRY_TIMEOUT
 
     def last_tick(self):
-        self.item_found = False
         self.click_count = 0
         self.retry_count = 0
 

@@ -34,14 +34,25 @@ class ActionTiming:
         self.tick_offset += tick_duration
         return self.tick_counter == self.tick_offset
 
-    # todo: should this also latch and return the result of the function?
-    def execute(self, fn):
+    # todo: [important] execute, poll, and observe don't capture lambda return values... fn needs to be a fixed address
+    def execute(self, fn, capture_result=False):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
         if self.tick_counter == self.tick_offset:
-            fn()
-        return self.tick_counter == self.tick_offset
+            status = fn()
+            self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+
+        if capture_result:
+            execute_record = self.timing_records.get(fn)
+            if execute_record is None:
+                self.tick_offset = math.inf
+                return None
+            else:
+                self.tick_offset = execute_record.tick
+                return execute_record.status
+        else:
+            return self.tick_counter == self.tick_offset
 
     def complete(self):
         if self.tick_counter >= self.tick_offset:
@@ -56,9 +67,6 @@ class ActionTiming:
             return Action.Status.IN_PROGRESS
 
     def execute_after(self, tick_duration, fn):
-        if not callable(fn):
-            raise AssertionError(f"{fn} is not callable")
-
         self.wait(tick_duration)
         return self.execute(fn)
 
