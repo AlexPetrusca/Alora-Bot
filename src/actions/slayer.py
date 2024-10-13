@@ -1,5 +1,6 @@
 from enum import Enum
 
+from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
@@ -21,12 +22,12 @@ class SlayerAction(Action):
         super().__init__()
         self.task = task
         self.health_threshold = health_threshold
-        self.prayer = SlayerAction.determine_prayer(task)
 
         self.combat_loop_action = OrchestratorAction([
             CombatAction(health_threshold=self.health_threshold),
             PickUpItemsAction()
         ])
+        self.prayer_action = PrayerAction(SlayerAction.determine_prayer(task), switch_inventory=True)
 
     @staticmethod
     def determine_prayer(task):
@@ -46,9 +47,7 @@ class SlayerAction(Action):
         self.set_progress_message(f'Slaying {self.task.value}s...')
 
     def tick(self, timing):
-        timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))
-        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))
-        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(ControlPanel.INVENTORY_TAB))
+        timing.action(self.prayer_action)
         return timing.action(self.combat_loop_action)
 
     def last_tick(self):
