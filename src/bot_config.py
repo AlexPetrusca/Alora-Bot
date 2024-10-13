@@ -61,7 +61,7 @@ class BotConfig:
             CalibrateAction().play_once(),
 
             HomeTeleportAction(),
-            TeleportWizardAction("barrows"),
+            TeleportWizardAction("Barrows"),
 
             BarrowAction(BarrowBrother.AHRIM, prayer=Prayer.PROTECT_FROM_MAGIC),
             BarrowAction(BarrowBrother.KARIL, prayer=Prayer.PROTECT_FROM_MISSILES),
@@ -81,7 +81,7 @@ class BotConfig:
             CalibrateAction().play_once(),
 
             HomeTeleportAction(),
-            TeleportWizardAction("cerberus"),
+            TeleportWizardAction("Cerberus"),
 
             CerberusAction(),
 

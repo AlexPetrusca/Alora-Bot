@@ -26,8 +26,8 @@ class Bot:
         # config = BotConfig.experiment()
         # config = BotConfig.combat()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
-        config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
-        # config = BotConfig.cerberus()
+        # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
+        config = BotConfig.cerberus()
         # config = BotConfig.barrows()
         self.apply_config(config)
 
