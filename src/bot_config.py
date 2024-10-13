@@ -22,7 +22,9 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            ZulrahAction(),
+            # ZulrahAction(),
+
+            CombatAction(dodge_hazards=True),
 
             # WaitAction(5),
             # PrayerAction(Prayer.PROTECT_FROM_MELEE, Prayer.PIETY),

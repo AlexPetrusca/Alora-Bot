@@ -43,6 +43,9 @@ class Color(Enum):
 
 
 def get_color_limits(color, ht=0.99, st=0.9, vt=0.8):
+    if hasattr(color, 'value'):
+        color = color.value
+
     def clip(value, lower=0, upper=255):
         return lower if value < lower else upper if value > upper else value
 

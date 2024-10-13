@@ -1,9 +1,9 @@
 from src.actions.combat import CombatAction
 from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
+from src.actions.types.action_status import ActionStatus
 from src.robot import robot
 from src.robot.timing.timer import Timer
-from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, Prayer, Minimap, ArceuusSpellbook, CerberusActionCoord
 
@@ -11,10 +11,7 @@ from src.vision.coordinates import ControlPanel, Prayer, Minimap, ArceuusSpellbo
 class CerberusAction(Action):
     def __init__(self):
         super().__init__()
-        self.tile_color = Color.MAGENTA
-        self.last_chat = None
-        self.retry_count = 0
-
+        self.combat_action = CombatAction(health_threshold=50, dodge_hazards=True, flee=False)
         self.prayer_on_action = PrayerAction(Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY)
         self.prayer_off_action = PrayerAction(Prayer.PIETY, Prayer.PROTECT_FROM_MAGIC)
 
@@ -36,7 +33,7 @@ class CerberusAction(Action):
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Minimap.SPECIAL))
 
         # 5. click magenta contour + wait to start fight
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click_contour(self.tile_color))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click_contour(Color.YELLOW))
 
         # 6. summon thrall
         timing.execute_after(Timer.sec2tick(3), lambda: (
@@ -46,43 +43,16 @@ class CerberusAction(Action):
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ArceuusSpellbook.RESURRECT_GREATER_SKELETON))
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))
 
-        # todo: can we replace this with a CombatAction?
         # 7. Wait for fight end + on "Grrrr", click yellow contour + on low health, eat
         timing.wait(Timer.sec2tick(3))
-        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat)
-        if combat_status is not CombatAction.Event.FIGHT_OVER:
-            timing.interval(Timer.sec2tick(0.5), self.poll_cerberus_special, ignore_scheduling=True)
+        combat_status = timing.action(self.combat_action)
 
-        # 8. Disable prayers
-        timing.action(self.prayer_off_action)
+        if combat_status == ActionStatus.COMPLETE:
+            # 8. Disable prayers
+            timing.action(self.prayer_off_action)
 
         # 9. End fight
         return timing.complete_after(Timer.sec2tick(5))
 
-    def poll_combat(self):
-        damage_ui = vision.read_damage_ui()
-        if damage_ui.startswith('0/'):
-            return CombatAction.Event.FIGHT_OVER
-        elif damage_ui.find("/") == -1:  # "/" not found
-            print("DAMAGE_UI not found:", damage_ui)
-            self.retry_count += 1
-            if self.retry_count >= 3:
-                return CombatAction.Event.FIGHT_OVER
-        else:
-            self.retry_count = 0
-
-        if vision.read_hitpoints() <= 30:
-            robot.click_food()
-
-    def poll_cerberus_special(self):
-        chat = vision.read_latest_chat()
-        if chat.find("Cerberus: Gr") != -1 and chat != self.last_chat:
-            self.tile_color = Color.YELLOW if self.tile_color == Color.MAGENTA else Color.MAGENTA
-            robot.click_contour(self.tile_color)
-            robot.press(['Enter', 'h', 'a', 'h', 'a', 'Enter'])
-        self.last_chat = chat
-
     def last_tick(self):
-        self.tile_color = Color.MAGENTA
-        self.last_chat = None
-        self.retry_count = 0
+        pass

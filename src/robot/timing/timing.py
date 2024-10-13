@@ -1,3 +1,4 @@
+import inspect
 import math
 
 from src.actions.types.action_status import ActionStatus
@@ -86,6 +87,31 @@ class Timing:
         else:
             return None  # interval not called yet
 
+    def observe(self, tick_interval, fn, cb, starting_status=None):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
+        def run_cb(timing, from_status, to_status, triggered_tick):
+            tick_offset_restore = self.tick_offset
+            self.tick_offset = triggered_tick
+            cb(timing, from_status, to_status)
+            self.tick_offset = tick_offset_restore
+
+        prev_record = self.timing_records.get(fn)
+        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+            status = fn()
+            prev_status = prev_record.status if (prev_record is not None) else starting_status
+            if status != prev_status:  # change observed?
+                self.timing_records[fn] = TimingRecord(self.tick_counter, status, prev_status)
+                run_cb(self, prev_status, status, self.tick_counter)
+                return prev_status, status
+
+        if prev_record is not None:  # no change observed?
+            run_cb(self, prev_record.prev_status, prev_record.status, prev_record.tick)
+            return prev_record.prev_status, prev_record.status
+        else:  # no value observed?
+            return starting_status, starting_status
+
     # todo: [important] poll doesn't work with lambdas... fn needs to be a fixed address
     def poll(self, tick_interval, fn):
         if not callable(fn):
@@ -112,31 +138,6 @@ class Timing:
 
         self.tick_offset = poll_record.tick
         return poll_record.status  # event previously found
-
-    def observe(self, tick_interval, fn, cb, starting_status=None):
-        if not callable(fn):
-            raise AssertionError(f"{fn} is not callable")
-
-        def run_cb(timing, from_status, to_status, triggered_tick):
-            tick_offset_restore = self.tick_offset
-            self.tick_offset = triggered_tick
-            cb(timing, from_status, to_status)
-            self.tick_offset = tick_offset_restore
-
-        prev_record = self.timing_records.get(fn)
-        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
-            status = fn()
-            prev_status = prev_record.status if (prev_record is not None) else starting_status
-            if status != prev_status:  # change observed?
-                self.timing_records[fn] = TimingRecord(self.tick_counter, status, prev_status)
-                run_cb(self, prev_status, status, self.tick_counter)
-                return prev_status, status
-
-        if prev_record is not None:  # no change observed?
-            run_cb(self, prev_record.prev_status, prev_record.status, prev_record.tick)
-            return prev_record.prev_status, prev_record.status
-        else:  # no value observed?
-            return starting_status, starting_status
 
     def action(self, action):
         # reset latch on first tick

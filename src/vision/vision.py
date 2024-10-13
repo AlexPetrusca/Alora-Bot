@@ -220,5 +220,5 @@ def read_int(haystack):
         print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
-        print("ERROR: read_int failed with:", text)
+        print("ERROR: read_int failed with:", old_text, "-->", text)
         return 30  # don't assume we've died if we cant read hitpoints
