@@ -49,3 +49,15 @@ class Potions:
         cv.imread(f"../resources/item/potion/antifire/3.png", cv.IMREAD_UNCHANGED),
         cv.imread(f"../resources/item/potion/antifire/4.png", cv.IMREAD_UNCHANGED),
     ]
+
+
+class Status:
+    cv.imread(f"../resources/status/attack.png", cv.IMREAD_UNCHANGED),
+    cv.imread(f"../resources/status/strength.png", cv.IMREAD_UNCHANGED),
+    cv.imread(f"../resources/status/defense.png", cv.IMREAD_UNCHANGED),
+    cv.imread(f"../resources/status/ranged.png", cv.IMREAD_UNCHANGED),
+
+    cv.imread(f"../resources/status/anti_venom.png", cv.IMREAD_UNCHANGED),
+    cv.imread(f"../resources/status/antifire.png", cv.IMREAD_UNCHANGED),
+
+    cv.imread(f"../resources/status/antifire.png", cv.IMREAD_UNCHANGED),
