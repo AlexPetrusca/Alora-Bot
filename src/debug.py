@@ -166,7 +166,7 @@ class DebugDisplay:
             latest_chat = vision.read_text(screenshot[Regions.LATEST_CHAT.as_slice()], config='--psm 6')
             hitpoints_text = vision.read_text(screenshot[Regions.HITPOINTS.as_slice()], config='--psm 6')
             hitpoints_int = vision.read_int(screenshot[Regions.HITPOINTS.as_slice()])
-            damage_ui = vision.read_text(screenshot[Regions.DAMAGE_UI.as_slice()], config='--psm 6')
+            damage_ui = vision.read_text(screenshot[Regions.COMBAT_INFO.as_slice()], config='--psm 6')
 
             hitpoints = f'[Hitpoints]: {hitpoints_text} -> {hitpoints_int}'
             damage_ui = f'[Damage Ui]: {damage_ui}'

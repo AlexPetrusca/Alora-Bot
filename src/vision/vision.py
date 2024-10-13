@@ -18,30 +18,13 @@ class ContourDetection(Enum):
     AREA_SMALLEST = 3
 
 
-def mask_region(img, region, color=(0, 0, 0)):
-    p1 = (2 * region.x, 2 * region.y)
-    p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
-    return cv.rectangle(img, p1, p2, color, thickness=-1)
-
-
-def mask_ui(img):
-    mask_region(img, Regions.EXP_BAR)  # hide exp bar
-    mask_region(img, Regions.CONTROL_PANEL)  # hide control panel
-    mask_region(img, Regions.CHAT)  # hide chat
-    mask_region(img, Regions.MINIMAP)  # hide minimap
-    mask_region(img, Regions.STATUS)  # hide status ui
-    mask_region(img, Regions.HOVER_ACTION)  # hide hover text
-    mask_region(img, Regions.RUNELITE_SIDEBAR)  # hide runelite sidebar
-    return img
-
-
 def grab_screen(hide_ui=False):
     screenshot = Screen.grab()
     return mask_ui(screenshot) if hide_ui else screenshot
 
 
-def grab_damage_ui():
-    return grab_screen()[Regions.DAMAGE_UI.as_slice()]
+def grab_combat_info():
+    return grab_screen()[Regions.COMBAT_INFO.as_slice()]
 
 
 def grab_minimap():
@@ -60,8 +43,8 @@ def read_latest_chat():
     return read_text(grab_screen()[Regions.LATEST_CHAT.as_slice()])
 
 
-def read_damage_ui():
-    return read_text(grab_damage_ui(), config='--psm 6')
+def read_combat_info():
+    return read_text(grab_combat_info(), config='--psm 6')
 
 
 def read_hitpoints():
@@ -78,6 +61,11 @@ def read_run_energy():
 
 def read_spec_energy():
     return read_int(grab_screen()[Regions.SPEC_ENERGY.as_slice()])
+
+
+def is_status_active(status):
+    status_bar = grab_screen()[Regions.STATUS_BAR.as_slice()]
+    return locate_image(status_bar, status, 0.85) is not None
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
@@ -222,3 +210,23 @@ def read_int(haystack):
     except ValueError:
         print("ERROR: read_int failed with:", old_text, "-->", text)
         return 30  # don't assume we've died if we cant read hitpoints
+
+
+def mask_region(img, region, color=Color.BLACK):
+    if hasattr(color, 'value'):
+        color = color.value
+
+    p1 = (2 * region.x, 2 * region.y)
+    p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
+    return cv.rectangle(img, p1, p2, color, thickness=-1)
+
+
+def mask_ui(img):
+    mask_region(img, Regions.EXP_BAR)  # hide exp bar
+    mask_region(img, Regions.CONTROL_PANEL)  # hide control panel
+    mask_region(img, Regions.CHAT)  # hide chat
+    mask_region(img, Regions.MINIMAP)  # hide minimap
+    mask_region(img, Regions.STATUS_BAR)  # hide status ui
+    mask_region(img, Regions.HOVER_ACTION)  # hide hover text
+    mask_region(img, Regions.RUNELITE_SIDEBAR)  # hide runelite sidebar
+    return img

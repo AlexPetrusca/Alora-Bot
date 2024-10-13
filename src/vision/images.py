@@ -42,13 +42,18 @@ class Food:
 
 
 class Potions:
-    ANTIFIRE = [
-        None,
-        cv.imread(f"../resources/item/potion/antifire/1.png", cv.IMREAD_UNCHANGED),
-        cv.imread(f"../resources/item/potion/antifire/2.png", cv.IMREAD_UNCHANGED),
-        cv.imread(f"../resources/item/potion/antifire/3.png", cv.IMREAD_UNCHANGED),
-        cv.imread(f"../resources/item/potion/antifire/4.png", cv.IMREAD_UNCHANGED),
-    ]
+    class Potion:
+        def __init__(self, potion):
+            self.doses = [
+                None,
+                cv.imread(f"../resources/item/potion/{potion}/1.png", cv.IMREAD_UNCHANGED),
+                cv.imread(f"../resources/item/potion/{potion}/2.png", cv.IMREAD_UNCHANGED),
+                cv.imread(f"../resources/item/potion/{potion}/3.png", cv.IMREAD_UNCHANGED),
+                cv.imread(f"../resources/item/potion/{potion}/4.png", cv.IMREAD_UNCHANGED),
+            ]
+            self.status = cv.imread(f"../resources/status/{potion}.png", cv.IMREAD_UNCHANGED)
+
+    ANTIFIRE = Potion("antifire", )
 
 
 class Status:

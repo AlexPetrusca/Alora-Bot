@@ -28,9 +28,9 @@ class Regions:
     GAME = Region(SCREEN.x, SCREEN.y + Screen.TOP_GAP, SCREEN.w - 30, SCREEN.h - Screen.TOP_GAP)
     RUNELITE_SIDEBAR = Region(GAME.x + GAME.w, GAME.y, 30, GAME.h)
 
-    STATUS = Region(GAME.x, GAME.y, 221, 173)
-    DAMAGE_UI = Region(STATUS.x + 8, STATUS.y + 40, 124, 16)
-    HOVER_ACTION = Region(STATUS.x, STATUS.y, 400, 20)
+    STATUS_BAR = Region(GAME.x, GAME.y, 221, 173)
+    COMBAT_INFO = Region(STATUS_BAR.x + 8, STATUS_BAR.y + 40, 124, 16)
+    HOVER_ACTION = Region(STATUS_BAR.x, STATUS_BAR.y, 400, 20)
 
     MINIMAP = Region(GAME.x + GAME.w - 215, GAME.y, 215, 172)
     HITPOINTS = Region(MINIMAP.x + 6, MINIMAP.y + 57, 20, 12)

@@ -39,6 +39,17 @@ def click_food():
     return ate_food
 
 
+def click_potion(potion):
+    drank_potion = click_image(potion.doses[1], 0.9, region=Regions.CONTROL_PANEL)
+    if not drank_potion:
+        drank_potion = click_image(potion.doses[2], 0.9, region=Regions.CONTROL_PANEL)
+    if not drank_potion:
+        drank_potion = click_image(potion.doses[3], 0.9, region=Regions.CONTROL_PANEL)
+    # if not drank_potion:
+    #     drank_potion = click_image(potion.doses[4], 0.9, region=Regions.CONTROL_PANEL)
+    return drank_potion
+
+
 def click_image(image, threshold=0.7, region=Regions.SCREEN):
     loc = vision.locate_image(vision.grab_screen()[region.as_slice()], image, threshold)
     if loc is None:

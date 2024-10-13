@@ -7,7 +7,7 @@ from src.vision.regions import Regions
 
 haystack_img = cv.imread('../screenshots/damage_ui/present_68.png', cv.IMREAD_UNCHANGED)
 # haystack_img = cv.imread('../screenshots/alt_macbook/cerb_fight_2.png', cv.IMREAD_UNCHANGED)
-damage_ui_image = np.ndarray.copy(haystack_img[Regions.DAMAGE_UI.as_slice()])
+damage_ui_image = np.ndarray.copy(haystack_img[Regions.COMBAT_INFO.as_slice()])
 
 ocr1 = pytesseract.image_to_string(damage_ui_image, config='--psm 6').strip()
 print(" - basic ocr:", ocr1)

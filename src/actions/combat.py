@@ -47,7 +47,7 @@ class CombatAction(Action):
 
     def poll_combat(self):
         # check fight end
-        ocr = vision.read_damage_ui()
+        ocr = vision.read_combat_info()
         # print('"', ocr, '"', len(ocr))
         if ocr.startswith("0/"):
             return CombatAction.Event.FIGHT_OVER
