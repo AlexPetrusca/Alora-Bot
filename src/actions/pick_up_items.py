@@ -1,8 +1,9 @@
 from enum import Enum
 
 from src.actions.primitives.action import Action
+from src.actions.types.action_status import ActionStatus
 from src.robot import robot
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 from src.vision import vision
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 
@@ -34,7 +35,7 @@ class PickUpItemsAction(Action):
             print("Find item stopped - retry timeout")
             return timing.complete()
 
-        return Action.Status.IN_PROGRESS
+        return ActionStatus.IN_PROGRESS
 
     def pickup_first_item(self):
         click_xy = vision.locate_ground_item(vision.grab_screen())

@@ -1,4 +1,5 @@
 from src.actions.primitives.action import Action
+from src.actions.types.action_status import ActionStatus
 
 
 class NullAction(Action):
@@ -6,7 +7,7 @@ class NullAction(Action):
         pass
 
     def tick(self, timing):
-        return Action.Status.COMPLETE
+        return ActionStatus.COMPLETE
 
     def last_tick(self):
         pass

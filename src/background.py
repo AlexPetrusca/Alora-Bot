@@ -1,7 +1,7 @@
 import requests
 from requests import request
 
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 
 KEYLOGGER_HOST = "http://localhost:8080"
 

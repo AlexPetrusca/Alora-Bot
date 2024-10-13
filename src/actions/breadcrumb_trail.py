@@ -1,6 +1,7 @@
 from src.actions.primitives.action import Action
+from src.actions.types.action_status import ActionStatus
 from src.robot import robot
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.images import Images
@@ -23,7 +24,7 @@ class BreadcrumbTrailAction(Action):
         timing.interval(Timer.sec2tick(1), self.click_next_breadcrumb)
         if self.retry_count >= 4:
             return timing.complete()  # reached destination
-        return Action.Status.IN_PROGRESS
+        return ActionStatus.IN_PROGRESS
 
     def click_next_breadcrumb(self):
         screenshot = vision.grab_screen(hide_ui=True)

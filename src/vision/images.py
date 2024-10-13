@@ -36,9 +36,9 @@ class Images:
 
 
 class Food:
-    MONKFISH = cv.imread('../resources/item/monkfish.png', cv.IMREAD_UNCHANGED)
-    SHARK = cv.imread('../resources/item/shark.png', cv.IMREAD_UNCHANGED)
-    MANTA_RAY = cv.imread('../resources/item/manta_ray.png', cv.IMREAD_UNCHANGED)
+    MONKFISH = cv.imread('../resources/item/food/monkfish.png', cv.IMREAD_UNCHANGED)
+    SHARK = cv.imread('../resources/item/food/shark.png', cv.IMREAD_UNCHANGED)
+    MANTA_RAY = cv.imread('../resources/item/food/manta_ray.png', cv.IMREAD_UNCHANGED)
 
 
 class Potions:

@@ -1,6 +1,6 @@
 from src.actions.primitives.action import Action
 from src.robot import robot
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 

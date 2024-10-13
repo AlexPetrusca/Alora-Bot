@@ -1,6 +1,6 @@
 from src.actions.primitives.action import Action
 from src.robot import robot
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 from src.vision.coordinates import ControlPanel
 
 
@@ -13,7 +13,7 @@ class PrayerAction(Action):
         self.switch_inventory = switch_inventory
 
     def first_tick(self):
-        self.set_progress_message(f'Toggling prayers...')
+        pass
 
     def tick(self, timing):
         if self.fast_switch:

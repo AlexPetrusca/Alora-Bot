@@ -1,8 +1,7 @@
-from copy import copy
-
 from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
-from src.robot.timer import Timer
+from src.actions.types.action_status import ActionStatus
+from src.robot.timing.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import Prayer
@@ -21,13 +20,13 @@ class ZulrahAction(Action):
         self.set_progress_message(f'Fighting Zulrah...')
 
     def tick(self, timing):
-        # todo: this is somewhat convoluted. (Maybe add an Observer class with an on_change method on it)
-        timing.observe(Timer.sec2tick(1), self.detect_color_change)
+        timing.observe(Timer.sec2tick(1), self.track_color, self.respond_to_color_change)
+        return ActionStatus.IN_PROGRESS
+
+    def respond_to_color_change(self, timing, from_status, to_status):
         timing.action(self.prayer_action)
 
-        return Action.Status.IN_PROGRESS
-
-    def detect_color_change(self):
+    def track_color(self):
         screenshot = vision.grab_screen(hide_ui=True)
         red_contour, red_area = vision.get_contour(screenshot, Color.RED, mode=ContourDetection.AREA_LARGEST)
         green_contour, green_area = vision.get_contour(screenshot, Color.GREEN, mode=ContourDetection.AREA_LARGEST)
@@ -42,7 +41,7 @@ class ZulrahAction(Action):
         if self.zulrah_color is None and max_color is not None and max_color != self.last_zulrah_color:
             self.zulrah_color = max_color
             self.prayer_action.set_prayer(self.protect_against_color())
-            print(max_color, '-->', max_area)
+            1 
         elif self.zulrah_color is not None and max_color is None:
             self.last_zulrah_color = self.zulrah_color
             self.zulrah_color = None

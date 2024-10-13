@@ -3,12 +3,11 @@ from copy import deepcopy
 from enum import Enum
 
 from src.actions.primitives.null import NullAction
-from src.actions.slayer import SlayerTask
 from src.background import BackgroundScript
 from src.bot_config import BotConfig
 from src.debug import DebugDisplay
 from src.keylogger.keys import Key
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 
 
 class Bot:
@@ -23,11 +22,11 @@ class Bot:
         self.current_config = None
         self.current_action = None
 
-        # config = BotConfig.experiment()
+        config = BotConfig.experiment()
         # config = BotConfig.combat()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
         # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
-        config = BotConfig.cerberus()
+        # config = BotConfig.cerberus()
         # config = BotConfig.barrows()
         self.apply_config(config)
 

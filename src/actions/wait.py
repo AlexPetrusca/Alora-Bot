@@ -1,5 +1,5 @@
 from src.actions.primitives.action import Action
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 
 
 class WaitAction(Action):

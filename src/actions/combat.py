@@ -1,8 +1,9 @@
 from enum import Enum
 
 from src.actions.primitives.action import Action
+from src.actions.types.action_status import ActionStatus
 from src.robot import robot
-from src.robot.timer import Timer
+from src.robot.timing.timer import Timer
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, StandardSpellbook
@@ -36,7 +37,7 @@ class CombatAction(Action):
         elif combat_status == CombatAction.Event.FIGHT_OVER:
             return timing.complete_after(Timer.sec2tick(5))
 
-        return Action.Status.IN_PROGRESS
+        return ActionStatus.IN_PROGRESS
 
     def poll_combat(self):
         # check fight end

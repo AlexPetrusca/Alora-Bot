@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from src.actions.primitives.action import Action
 from src.actions.primitives.null import NullAction
+from src.actions.types.action_status import ActionStatus
 
 
 class OrchestratorAction(Action):
@@ -21,13 +22,13 @@ class OrchestratorAction(Action):
     # todo: this code is very similar to Bot.run(). Can we consolidate the two?
     def tick(self, timing):
         if len(self.action_queue) == 1:
-            return Action.Status.COMPLETE
+            return ActionStatus.COMPLETE
 
         current_action = self.action_queue[0]
         status = current_action.run(timing.tick_counter)
 
-        if self.quit_on_abort and status == Action.Status.ABORTED:
-            return Action.Status.COMPLETE
+        if self.quit_on_abort and status == ActionStatus.ABORTED:
+            return ActionStatus.COMPLETE
 
         if status.is_terminal():  # current action is done?
             self.action_queue.pop(0)
@@ -44,9 +45,9 @@ class OrchestratorAction(Action):
                 self.action_queue.append(null_action)
 
             if self.play_count == 0:
-                return Action.Status.COMPLETE
+                return ActionStatus.COMPLETE
 
-        return Action.Status.IN_PROGRESS
+        return ActionStatus.IN_PROGRESS
 
     def last_tick(self):
         # when an action completes, its play_count is decremented, so we need to account for this
