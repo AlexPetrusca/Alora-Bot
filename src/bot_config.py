@@ -4,6 +4,7 @@ from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
+from src.actions.prayer import PrayerAction
 from src.actions.primitives.orchestrator import OrchestratorAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
@@ -21,7 +22,12 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            ZulrahAction()
+            ZulrahAction(),
+
+            # WaitAction(5),
+            # PrayerAction(Prayer.PROTECT_FROM_MELEE, Prayer.PIETY),
+            # WaitAction(1),
+            # PrayerAction(Prayer.PIETY, Prayer.PROTECT_FROM_MELEE)
         ]
 
     @staticmethod

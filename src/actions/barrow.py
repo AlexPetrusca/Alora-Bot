@@ -1,4 +1,5 @@
 from src.actions.combat import CombatAction
+from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -27,6 +28,8 @@ class BarrowAction(Action):
         self.unavailable_img = Images.Barrows.UNAVAILABLE_LABELS[barrow]
 
         self.combat_action = CombatAction(target=None)
+        self.prayer_on_action = PrayerAction(self.prayer, Prayer.PIETY)
+        self.prayer_off_action = PrayerAction(Prayer.PIETY, self.prayer)
 
     def first_tick(self):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
@@ -44,16 +47,13 @@ class BarrowAction(Action):
             robot.click_contour(Color.YELLOW)  # click sarcophagus + fight
         ))
 
-        timing.execute_after(Timer.sec2tick(3), lambda: robot.click(ControlPanel.PRAYER_TAB))  # open prayer
-        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # enable custom prayer
-        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # enable piety
+        timing.wait(Timer.sec2tick(3))
+        timing.action(self.prayer_on_action)
 
         timing.wait(Timer.sec2tick(3))
         timing.action(self.combat_action)
 
-        timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))  # open prayer
-        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PIETY))  # disable piety
-        timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.prayer))  # disable custom prayer
+        timing.action(self.prayer_off_action)
 
         if self.last:
             timing.execute_after(Timer.sec2tick(4), lambda: robot.click(RewardMenu.CLOSE))  # collect rewards
