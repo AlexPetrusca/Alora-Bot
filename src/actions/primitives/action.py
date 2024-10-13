@@ -165,9 +165,9 @@ class ActionTiming:
             self.tick_offset = math.inf
             return Action.Status.NOT_STARTED
 
-    def actions(self, *actions):
-        for action in actions:
-            self.action(action)
+    def action_after(self, tick_duration, action):
+        self.wait(tick_duration)
+        return self.action(action)
 
 
 class Action:

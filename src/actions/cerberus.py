@@ -1,4 +1,5 @@
 from src.actions.combat import CombatAction
+from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
 from src.robot import robot
 from src.robot.timer import Timer
@@ -14,6 +15,9 @@ class CerberusAction(Action):
         self.last_chat = None
         self.retry_count = 0
 
+        self.prayer_on_action = PrayerAction(Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY)
+        self.prayer_off_action = PrayerAction(Prayer.PIETY, Prayer.PROTECT_FROM_MAGIC)
+
     def first_tick(self):
         self.set_progress_message('Routing to Cerberus...')
 
@@ -28,10 +32,7 @@ class CerberusAction(Action):
         timing.execute_after(Timer.sec2tick(14), lambda: robot.click(CerberusActionCoord.WALK3))
 
         # 4. Enable prayers + spec
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.PRAYER_TAB))
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MAGIC))
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PIETY))
-
+        timing.action_after(Timer.sec2tick(2), self.prayer_on_action)
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Minimap.SPECIAL))
 
         # 5. click magenta contour + wait to start fight
@@ -53,9 +54,7 @@ class CerberusAction(Action):
             timing.interval(Timer.sec2tick(0.5), self.poll_cerberus_special, ignore_scheduling=True)
 
         # 8. Disable prayers
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.PRAYER_TAB))
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MAGIC))
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PIETY))
+        timing.action(self.prayer_off_action)
 
         # 9. End fight
         return timing.complete_after(Timer.sec2tick(5))
