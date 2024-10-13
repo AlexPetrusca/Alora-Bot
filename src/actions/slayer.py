@@ -5,9 +5,8 @@ from src.actions.primitives.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.primitives.orchestrator import OrchestratorAction
-from src.robot import robot
-from src.robot.timer import Timer
-from src.vision.coordinates import Prayer, ControlPanel
+from src.vision.coordinates import Prayer
+from src.vision.images import Potions
 
 
 class SlayerTask(Enum):
@@ -18,30 +17,16 @@ class SlayerTask(Enum):
 
 # todo: [bug] sometimes heal action is messed up and fails after tp back
 class SlayerAction(Action):
-    def __init__(self, task, health_threshold=30):
+    def __init__(self, task):
         super().__init__()
         self.task = task
-        self.health_threshold = health_threshold
 
+        config = SlayerAction.get_task_config(self.task)
         self.combat_loop_action = OrchestratorAction([
-            CombatAction(health_threshold=self.health_threshold),
+            CombatAction(health_threshold=config.health_threshold),
             PickUpItemsAction()
         ])
-        self.prayer_action = PrayerAction(SlayerAction.determine_prayer(task), switch_inventory=True)
-
-    @staticmethod
-    def determine_prayer(task):
-        magic_tasks = {SlayerTask.CAVE_KRAKEN, SlayerTask.RUNE_DRAGON, SlayerTask.BASILISK_KNIGHT}
-        melee_tasks = {}
-        ranged_tasks = {}
-        if task in magic_tasks:
-            return Prayer.PROTECT_FROM_MAGIC
-        elif task in ranged_tasks:
-            return Prayer.PROTECT_FROM_MISSILES
-        elif task in melee_tasks:
-            return Prayer.PROTECT_FROM_MELEE
-        else:
-            raise AssertionError(f"No prayer mapped to slayer task: {task}")
+        self.prayer_action = PrayerAction(*config.prayers, switch_inventory=True)
 
     def first_tick(self):
         self.set_progress_message(f'Slaying {self.task.value}s...')
@@ -52,3 +37,18 @@ class SlayerAction(Action):
 
     def last_tick(self):
         pass
+
+    @staticmethod
+    def get_task_config(task):
+        task_configs = {
+            SlayerTask.CAVE_KRAKEN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]),
+            SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(70, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY]),
+            SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY], [Potions.ANTIFIRE]),
+        }
+        return task_configs[task]
+
+    class Config:
+        def __init__(self, health_threshold=50, prayers=None, potions=None):
+            self.health_threshold = health_threshold
+            self.prayers = prayers if (prayers is not None) else []
+            self.potions = potions if (potions is not None) else []

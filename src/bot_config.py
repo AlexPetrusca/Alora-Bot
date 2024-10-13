@@ -49,7 +49,7 @@ class BotConfig:
             TeleportWizardAction(task),
 
             BreadcrumbTrailAction(color),
-            SlayerAction(task, health_threshold),
+            SlayerAction(task),
 
             HealAction(bank=True)
         ]

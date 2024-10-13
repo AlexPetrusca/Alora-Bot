@@ -2,7 +2,7 @@ import cv2 as cv
 from src.vision import vision
 
 haystack = cv.imread('../screenshots/slayer/abyssal.png', cv.IMREAD_UNCHANGED)
-needle = cv.imread('../../resources/item/shark.png', cv.IMREAD_UNCHANGED)
+needle = cv.imread('../../resources/item/food/shark.png', cv.IMREAD_UNCHANGED)
 loc = vision.locate_image(haystack, needle, 0.9)
 
 if loc is not None:

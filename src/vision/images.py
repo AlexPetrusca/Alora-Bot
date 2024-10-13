@@ -2,10 +2,6 @@ import cv2 as cv
 
 
 class Images:
-    MONKFISH = cv.imread('../resources/item/monkfish.png', cv.IMREAD_UNCHANGED)
-    SHARK = cv.imread('../resources/item/shark.png', cv.IMREAD_UNCHANGED)
-    MANTA_RAY = cv.imread('../resources/item/manta_ray.png', cv.IMREAD_UNCHANGED)
-
     HEAL_OPTION = cv.imread('../resources/menu/heal_option.png', cv.IMREAD_UNCHANGED)
     YELLOW_MARKERS = [
         cv.imread('../resources/label/marker/yellow/0.png', cv.IMREAD_UNCHANGED),
@@ -37,3 +33,19 @@ class Images:
             T=cv.imread(f"../resources/label/barrows/unavailable/T.png", cv.IMREAD_UNCHANGED),
             V=cv.imread(f"../resources/label/barrows/unavailable/V.png", cv.IMREAD_UNCHANGED)
         )
+
+
+class Food:
+    MONKFISH = cv.imread('../resources/item/monkfish.png', cv.IMREAD_UNCHANGED)
+    SHARK = cv.imread('../resources/item/shark.png', cv.IMREAD_UNCHANGED)
+    MANTA_RAY = cv.imread('../resources/item/manta_ray.png', cv.IMREAD_UNCHANGED)
+
+
+class Potions:
+    ANTIFIRE = [
+        None,
+        cv.imread(f"../resources/item/potion/antifire/1.png", cv.IMREAD_UNCHANGED),
+        cv.imread(f"../resources/item/potion/antifire/2.png", cv.IMREAD_UNCHANGED),
+        cv.imread(f"../resources/item/potion/antifire/3.png", cv.IMREAD_UNCHANGED),
+        cv.imread(f"../resources/item/potion/antifire/4.png", cv.IMREAD_UNCHANGED),
+    ]
