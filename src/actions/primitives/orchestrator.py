@@ -50,6 +50,9 @@ class OrchestratorAction(Action):
         return ActionStatus.IN_PROGRESS
 
     def last_tick(self):
-        # when an action completes, its play_count is decremented, so we need to account for this
-        self.play_count = self.original_play_count + 1
+        if self.original_play_count > 0:
+            # when an action completes, its play_count is decremented, so we need to account for this
+            self.play_count = self.original_play_count + 1
+        else:
+            self.play_count = self.original_play_count
         self.action_queue = deepcopy(self.original_action_queue)

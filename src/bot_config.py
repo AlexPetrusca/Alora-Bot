@@ -22,9 +22,14 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            # ZulrahAction(),
+            ZulrahAction(),
 
-            CombatAction(dodge_hazards=True),
+            # CombatAction(dodge_hazards=True),
+
+            # OrchestratorAction([
+            #     WaitAction(0.1),
+            #     WaitAction(0.2),
+            # ], 3)
 
             # WaitAction(5),
             # PrayerAction(Prayer.PROTECT_FROM_MELEE, Prayer.PIETY),
@@ -42,7 +47,7 @@ class BotConfig:
         ]
 
     @staticmethod
-    def slayer(task, color=Color.YELLOW, health_threshold=30):
+    def slayer(task, trail_color=Color.YELLOW):
         return [
             WaitAction(5).play_once(),
             CalibrateAction().play_once(),
@@ -50,7 +55,7 @@ class BotConfig:
             HomeTeleportAction(),
             TeleportWizardAction(task),
 
-            BreadcrumbTrailAction(color),
+            BreadcrumbTrailAction(trail_color),
             SlayerAction(task),
 
             HealAction(bank=True)
