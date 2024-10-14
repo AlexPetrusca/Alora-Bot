@@ -5,8 +5,10 @@ from src.actions.primitives.action import Action
 from src.actions.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.primitives.orchestrator import OrchestratorAction
-from src.vision.coordinates import Prayer
-from src.vision.images import Potions
+from src.robot import robot
+from src.robot.timing.timer import Timer
+from src.vision.coordinates import Prayer, ControlPanel
+from src.vision.images import Potion
 
 
 class SlayerTask(Enum):
@@ -22,6 +24,7 @@ class SlayerAction(Action):
         self.task = task
 
         config = SlayerAction.get_task_config(self.task)
+        self.potions = config.potions
         self.combat_loop_action = OrchestratorAction([
             CombatAction(health_threshold=config.health_threshold),
             PickUpItemsAction()
@@ -33,6 +36,9 @@ class SlayerAction(Action):
 
     def tick(self, timing):
         timing.action(self.prayer_action)
+        timing.execute(lambda: robot.click(ControlPanel.INVENTORY_TAB))
+        for potion in self.potions:
+            timing.execute_after(Timer.sec2tick(1), lambda: robot.click_potion(potion))
         return timing.action(self.combat_loop_action)
 
     def last_tick(self):
@@ -43,7 +49,7 @@ class SlayerAction(Action):
         task_configs = {
             SlayerTask.CAVE_KRAKEN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]),
             SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(70, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY]),
-            SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY], [Potions.ANTIFIRE]),
+            SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY], [Potion.ANTIFIRE]),
         }
         return task_configs[task]
 

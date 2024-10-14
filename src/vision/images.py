@@ -41,8 +41,8 @@ class Food:
     MANTA_RAY = cv.imread('../resources/item/food/manta_ray.png', cv.IMREAD_UNCHANGED)
 
 
-class Potions:
-    class Potion:
+class Potion:
+    class PotionDescriptor:
         def __init__(self, potion):
             self.doses = [
                 None,
@@ -53,7 +53,7 @@ class Potions:
             ]
             self.status = cv.imread(f"../resources/status/{potion}.png", cv.IMREAD_UNCHANGED)
 
-    ANTIFIRE = Potion("antifire", )
+    ANTIFIRE = PotionDescriptor("antifire")
 
 
 class Status:
