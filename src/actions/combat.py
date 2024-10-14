@@ -50,11 +50,14 @@ class CombatAction(Action):
         ocr = vision.read_combat_info()
         # print('"', ocr, '"', len(ocr))
         if ocr.startswith("0/"):
+            print("COMBAT - FIGHT OVER")
             return CombatAction.Event.FIGHT_OVER
         elif ocr.find("/") == -1:  # '/' not found
             self.retry_count += 1
             if self.retry_count >= 3:
-                return CombatAction.Event.DEAD
+                # return CombatAction.Event.DEAD  # todo: this should be returned instead
+                print("COMBAT - DIED IN COMBAT")
+                return CombatAction.Event.FIGHT_OVER
         else:
             self.retry_count = 0  # '/' found
 
@@ -62,6 +65,7 @@ class CombatAction(Action):
         if vision.read_hitpoints() < self.health_threshold:
             ate_food = robot.click_food()
             if self.flee and not ate_food:
+                print("COMBAT - OUT OF FOOD")
                 return CombatAction.Event.FLEE
 
     def last_tick(self):

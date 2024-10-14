@@ -29,17 +29,25 @@ class SlayerAction(Action):
             CombatAction(health_threshold=config.health_threshold),
             PickUpItemsAction()
         ])
-        self.prayer_action = PrayerAction(*config.prayers, switch_inventory=True)
+        self.prayer_on_action = PrayerAction(*config.prayers, switch_inventory=True)
+        self.prayer_off_action = PrayerAction(*config.prayers, switch_inventory=True)
 
     def first_tick(self):
         self.set_progress_message(f'Slaying {self.task.value}s...')
 
     def tick(self, timing):
-        timing.action(self.prayer_action)
-        timing.execute(lambda: robot.click(ControlPanel.INVENTORY_TAB))
+        timing.action(self.prayer_on_action)
+        # todo: create potion action and replace this
+        timing.execute(lambda: robot.press("Space"))
         for potion in self.potions:
+            timing.execute(lambda: print("Clicking Potion"))
             timing.execute_after(Timer.sec2tick(1), lambda: robot.click_potion(potion))
-        return timing.action(self.combat_loop_action)
+            timing.execute(lambda: print("Finished Clicking Potion"))
+
+        timing.action(self.combat_loop_action)
+
+        timing.action(self.prayer_off_action)
+        return timing.complete()
 
     def last_tick(self):
         pass
@@ -49,7 +57,7 @@ class SlayerAction(Action):
         task_configs = {
             SlayerTask.CAVE_KRAKEN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]),
             SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(70, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY]),
-            SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY], [Potion.ANTIFIRE]),
+            SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC], [Potion.ANTIFIRE]),
         }
         return task_configs[task]
 
