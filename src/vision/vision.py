@@ -6,7 +6,8 @@ import cv2 as cv
 from pytesseract import pytesseract
 
 from src.vision.color import Color, get_color_limits
-from src.vision.coordinates import Player
+from src.vision.coordinates import Player, Prayer
+from src.vision.images import PrayerProtect
 from src.vision.regions import Regions
 from src.vision.screen import Screen
 
@@ -23,55 +24,70 @@ def grab_screen(hide_ui=False):
     return mask_ui(screenshot) if hide_ui else screenshot
 
 
-def grab_combat_info():
-    return grab_screen()[Regions.COMBAT_INFO.as_slice()]
-
-
-def grab_minimap():
-    return grab_screen()[Regions.MINIMAP.as_slice()]
-
-
-def grab_control_panel():
-    return grab_screen()[Regions.CONTROL_PANEL.as_slice()]
-
-
-def grab_hover_action():
-    return grab_screen()[Regions.HOVER_ACTION.as_slice()]
+def grab_region(region):
+    return grab_screen()[region.as_slice()]
 
 
 def read_latest_chat():
-    return read_text(grab_screen()[Regions.LATEST_CHAT.as_slice()])
+    return read_text(grab_region(Regions.LATEST_CHAT))
 
 
 def read_combat_info():
-    return read_text(grab_combat_info(), config='--psm 6')
+    return read_text(grab_region(Regions.COMBAT_INFO), config='--psm 6')
 
 
 def read_hitpoints():
-    return read_int(grab_screen()[Regions.HITPOINTS.as_slice()])
+    return read_int(grab_region(Regions.HITPOINTS))
 
 
 def read_prayer_energy():
-    return read_int(grab_screen()[Regions.PRAYER.as_slice()])
+    return read_int(grab_region(Regions.PRAYER))
 
 
 def read_run_energy():
-    return read_int(grab_screen()[Regions.RUN_ENERGY.as_slice()])
+    return read_int(grab_region(Regions.RUN_ENERGY))
 
 
 def read_spec_energy():
-    return read_int(grab_screen()[Regions.SPEC_ENERGY.as_slice()])
+    return read_int(grab_region(Regions.SPEC_ENERGY))
 
 
 def is_status_active(status):
-    status_bar = grab_screen()[Regions.STATUS_BAR.as_slice()]
-    return locate_image(status_bar, status, 0.85) is not None
+    return locate_image(grab_region(Regions.STATUS_BAR), status, 0.85) is not None
+
+
+def get_my_prayer_protect():
+    return get_prayer_protect(grab_region(Regions.PLAYER))
+
+
+def get_opponent_prayer_protect(opponent_color=Color.RED):
+    contour, _ = get_contour(grab_screen(), opponent_color)
+    if contour is not None:
+        x, y, w, h = cv.boundingRect(contour)
+        return get_prayer_protect(grab_screen()[(y - 75):(y + h), x:(x + w)])
+    else:
+        print("get_opponent_prayer_protect: no opponent found")
+        return None, None
+
+
+def get_prayer_protect(haystack):
+    protect_loc = locate_image(haystack, PrayerProtect.MAGIC, 0.9)
+    if protect_loc is not None:
+        return Prayer.PROTECT_FROM_MAGIC, protect_loc
+    protect_loc = locate_image(haystack, PrayerProtect.MELEE, 0.9)
+    if protect_loc is not None:
+        return Prayer.PROTECT_FROM_MELEE, protect_loc
+    protect_loc = locate_image(haystack, PrayerProtect.RANGED, 0.9)
+    if protect_loc is not None:
+        return Prayer.PROTECT_FROM_MISSILES, protect_loc
+    return None, None
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
     if hasattr(color, 'value'):
         color = color.value
 
+    # todo: use of mask_ui implies that the haystack should be a full screen capture
     hsv = mask_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
     lower_limit, upper_limit = get_color_limits(color)
     mask = cv.inRange(hsv, lower_limit, upper_limit)
@@ -120,6 +136,7 @@ def locate_contour(haystack, color, area_threshold=750, mode=ContourDetection.DI
 
 
 def locate_ground_item(haystack, area_threshold=250):
+    # todo: use of mask_ui implies that the haystack should be a full screen capture
     haystack = mask_ui(np.ndarray.copy(haystack))
 
     def locate_item_by_color(screenshot, color):
@@ -219,6 +236,11 @@ def mask_region(img, region, color=Color.BLACK):
     p1 = (2 * region.x, 2 * region.y)
     p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
     return cv.rectangle(img, p1, p2, color, thickness=-1)
+
+
+def mask_player(img):
+    mask_region(img, Regions.PLAYER)  # hide player
+    return img
 
 
 def mask_ui(img):

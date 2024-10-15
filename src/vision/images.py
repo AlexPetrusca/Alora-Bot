@@ -1,44 +1,55 @@
+import os
 import cv2 as cv
 
 
+# todo: turn this into a ResourceLoader + move this somewhere else
+class ImageLoader:
+    VISION_DIR = os.path.dirname(os.path.abspath(__file__))
+    RESOURCES_DIR = VISION_DIR[0:VISION_DIR.find('/src/')] + '/resources'
+    
+    @staticmethod
+    def read(path):
+        return cv.imread(f'{ImageLoader.RESOURCES_DIR}/{path}', cv.IMREAD_UNCHANGED)
+
+
 class Images:
-    HEAL_OPTION = cv.imread('../resources/menu/heal_option.png', cv.IMREAD_UNCHANGED)
+    HEAL_OPTION = ImageLoader.read('menu/heal_option.png')
     YELLOW_MARKERS = [
-        cv.imread('../resources/label/marker/yellow/0.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/1.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/2.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/3.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/4.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/5.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/6.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/7.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/8.png', cv.IMREAD_UNCHANGED),
-        cv.imread('../resources/label/marker/yellow/9.png', cv.IMREAD_UNCHANGED),
+        ImageLoader.read('label/marker/yellow/0.png'),
+        ImageLoader.read('label/marker/yellow/1.png'),
+        ImageLoader.read('label/marker/yellow/2.png'),
+        ImageLoader.read('label/marker/yellow/3.png'),
+        ImageLoader.read('label/marker/yellow/4.png'),
+        ImageLoader.read('label/marker/yellow/5.png'),
+        ImageLoader.read('label/marker/yellow/6.png'),
+        ImageLoader.read('label/marker/yellow/7.png'),
+        ImageLoader.read('label/marker/yellow/8.png'),
+        ImageLoader.read('label/marker/yellow/9.png'),
     ]
 
     class Barrows:
         AVAILABLE_LABELS = dict(
-            A=cv.imread(f"../resources/label/barrows/available/A.png", cv.IMREAD_UNCHANGED),
-            D=cv.imread(f"../resources/label/barrows/available/D.png", cv.IMREAD_UNCHANGED),
-            G=cv.imread(f"../resources/label/barrows/available/G.png", cv.IMREAD_UNCHANGED),
-            K=cv.imread(f"../resources/label/barrows/available/K.png", cv.IMREAD_UNCHANGED),
-            T=cv.imread(f"../resources/label/barrows/available/T.png", cv.IMREAD_UNCHANGED),
-            V=cv.imread(f"../resources/label/barrows/available/V.png", cv.IMREAD_UNCHANGED)
+            A=ImageLoader.read('label/barrows/available/A.png'),
+            D=ImageLoader.read('label/barrows/available/D.png'),
+            G=ImageLoader.read('label/barrows/available/G.png'),
+            K=ImageLoader.read('label/barrows/available/K.png'),
+            T=ImageLoader.read('label/barrows/available/T.png'),
+            V=ImageLoader.read('label/barrows/available/V.png'),
         )
         UNAVAILABLE_LABELS = dict(
-            A=cv.imread(f"../resources/label/barrows/unavailable/A.png", cv.IMREAD_UNCHANGED),
-            D=cv.imread(f"../resources/label/barrows/unavailable/D.png", cv.IMREAD_UNCHANGED),
-            G=cv.imread(f"../resources/label/barrows/unavailable/G.png", cv.IMREAD_UNCHANGED),
-            K=cv.imread(f"../resources/label/barrows/unavailable/K.png", cv.IMREAD_UNCHANGED),
-            T=cv.imread(f"../resources/label/barrows/unavailable/T.png", cv.IMREAD_UNCHANGED),
-            V=cv.imread(f"../resources/label/barrows/unavailable/V.png", cv.IMREAD_UNCHANGED)
+            A=ImageLoader.read('label/barrows/unavailable/A.png'),
+            D=ImageLoader.read('label/barrows/unavailable/D.png'),
+            G=ImageLoader.read('label/barrows/unavailable/G.png'),
+            K=ImageLoader.read('label/barrows/unavailable/K.png'),
+            T=ImageLoader.read('label/barrows/unavailable/T.png'),
+            V=ImageLoader.read('label/barrows/unavailable/V.png'),
         )
 
 
 class Food:
-    MONKFISH = cv.imread('../resources/item/food/monkfish.png', cv.IMREAD_UNCHANGED)
-    SHARK = cv.imread('../resources/item/food/shark.png', cv.IMREAD_UNCHANGED)
-    MANTA_RAY = cv.imread('../resources/item/food/manta_ray.png', cv.IMREAD_UNCHANGED)
+    MONKFISH = ImageLoader.read('item/food/monkfish.png')
+    SHARK = ImageLoader.read('item/food/shark.png')
+    MANTA_RAY = ImageLoader.read('item/food/manta_ray.png')
 
 
 class Potion:
@@ -46,23 +57,29 @@ class Potion:
         def __init__(self, potion):
             self.doses = [
                 None,
-                cv.imread(f"../resources/item/potion/{potion}/1.png", cv.IMREAD_UNCHANGED),
-                cv.imread(f"../resources/item/potion/{potion}/2.png", cv.IMREAD_UNCHANGED),
-                cv.imread(f"../resources/item/potion/{potion}/3.png", cv.IMREAD_UNCHANGED),
-                cv.imread(f"../resources/item/potion/{potion}/4.png", cv.IMREAD_UNCHANGED),
+                ImageLoader.read(f'item/potion/{potion}/1.png'),
+                ImageLoader.read(f'item/potion/{potion}/2.png'),
+                ImageLoader.read(f'item/potion/{potion}/3.png'),
+                ImageLoader.read(f'item/potion/{potion}/4.png'),
             ]
-            self.status = cv.imread(f"../resources/status/{potion}.png", cv.IMREAD_UNCHANGED)
+            self.status = ImageLoader.read(f'status/{potion}.png')
 
-    ANTIFIRE = PotionDescriptor("antifire")
+    ANTIFIRE = PotionDescriptor('antifire')
 
 
 class Status:
-    cv.imread(f"../resources/status/attack.png", cv.IMREAD_UNCHANGED),
-    cv.imread(f"../resources/status/strength.png", cv.IMREAD_UNCHANGED),
-    cv.imread(f"../resources/status/defense.png", cv.IMREAD_UNCHANGED),
-    cv.imread(f"../resources/status/ranged.png", cv.IMREAD_UNCHANGED),
+    ATTACK = ImageLoader.read('status/attack.png')
+    STRENGTH = ImageLoader.read('status/strength.png')
+    DEFENSE = ImageLoader.read('status/defense.png')
+    RANGED = ImageLoader.read('status/ranged.png')
 
-    cv.imread(f"../resources/status/anti_venom.png", cv.IMREAD_UNCHANGED),
-    cv.imread(f"../resources/status/antifire.png", cv.IMREAD_UNCHANGED),
+    ANTI_VENOM = ImageLoader.read('status/anti_venom.png')
+    ANTIFIRE = ImageLoader.read('status/antifire.png')
 
-    cv.imread(f"../resources/status/antifire.png", cv.IMREAD_UNCHANGED),
+    GREATER_SKELETON = ImageLoader.read('status/greater_skeleton.png')
+
+
+class PrayerProtect:
+    MELEE = ImageLoader.read('prayer/melee.png')
+    MAGIC = ImageLoader.read('prayer/magic.png')
+    RANGED = ImageLoader.read('prayer/ranged.png')
