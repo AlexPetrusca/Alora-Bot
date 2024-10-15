@@ -28,6 +28,9 @@ class Regions:
     GAME = Region(SCREEN.x, SCREEN.y + Screen.TOP_GAP, SCREEN.w - 30, SCREEN.h - Screen.TOP_GAP)
     RUNELITE_SIDEBAR = Region(GAME.x + GAME.w, GAME.y, 30, GAME.h)
 
+    # todo: this region doesn't match exactly and the match is worse when the player is moving
+    PLAYER = Region(GAME.w // 2 - 10 - 35, GAME.y + GAME.h // 2 - 20 - 50, 70, 100)
+
     STATUS_BAR = Region(GAME.x, GAME.y, 221, 173)
     COMBAT_INFO = Region(STATUS_BAR.x + 8, STATUS_BAR.y + 40, 124, 16)
     HOVER_ACTION = Region(STATUS_BAR.x, STATUS_BAR.y, 400, 20)
