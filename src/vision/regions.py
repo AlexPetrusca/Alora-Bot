@@ -13,6 +13,9 @@ class Region:
         p1 = (self.x + self.w, self.y + self.h)
         return slice(2 * p0[1], 2 * p1[1]), slice(2 * p0[0], 2 * p1[0])
 
+    def center(self):
+        return self.x + self.w // 2, self.y + self.h // 2
+
     def offset(self, x, y):
         return self.x + x, self.y + y
 
@@ -28,8 +31,8 @@ class Regions:
     GAME = Region(SCREEN.x, SCREEN.y + Screen.TOP_GAP, SCREEN.w - 30, SCREEN.h - Screen.TOP_GAP)
     RUNELITE_SIDEBAR = Region(GAME.x + GAME.w, GAME.y, 30, GAME.h)
 
-    # todo: this region doesn't match exactly and the match is worse when the player is moving
-    PLAYER = Region(GAME.w // 2 - 10 - 35, GAME.y + GAME.h // 2 - 20 - 50, 70, 100)
+    PLAYER = Region(GAME.w // 2 - 10 - 35, GAME.y + GAME.h // 2 - 20 - 50, 70, 100)  # todo: this region doesn't match exactly and the match is worse when the player is moving
+    PLAYER_MOVE_BOX = Region(GAME.w // 2 - 10 - 100, GAME.y + GAME.h // 2 - 20 - 100, 200, 200)
 
     STATUS_BAR = Region(GAME.x, GAME.y, 221, 173)
     COMBAT_INFO = Region(STATUS_BAR.x + 8, STATUS_BAR.y + 40, 124, 16)
@@ -43,6 +46,7 @@ class Regions:
     EXP_BAR = Region(MINIMAP.x - 153, MINIMAP.y + 2, 122, 30)
 
     CONTROL_PANEL = Region(GAME.x + GAME.w - 246, GAME.y + GAME.h - 334, 246, 334)
+    INVENTORY = Region(CONTROL_PANEL.x + 37, CONTROL_PANEL.y + 79, 168, 252)
 
     CHAT = Region(GAME.x, GAME.y + GAME.h - 200, 520, 200)
     LATEST_CHAT = Region(CHAT.x + 7, CHAT.y + 136, 490, 18)
@@ -50,3 +54,7 @@ class Regions:
     BANK = Region(GAME.x + (GAME.w - 490) // 2, GAME.y + (GAME.h - 970) // 2, 488, 800)
     REWARD = Region(GAME.x + (GAME.w - 290) // 2, GAME.y + (GAME.h - 356) // 2, 234, 194)
     TELEPORT_MENU = Region(GAME.x + (GAME.w - 528) // 2, GAME.y + (GAME.h - 460) // 2, 488, 306)
+
+    @classmethod
+    def INVENTORY_ITEM(cls, x, y):
+        return Region(cls.INVENTORY.x + 42 * x, cls.INVENTORY.y + 36 * y, 42, 36)

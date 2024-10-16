@@ -2,6 +2,8 @@ from src.actions.barrow import BarrowAction, BarrowBrother
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
 from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
+from src.actions.experiment import ExperimentAction
+from src.actions.gear_switch import GearSwitchAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
 from src.actions.prayer import PrayerAction
@@ -22,7 +24,12 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            ZulrahAction(),
+            # ExperimentAction(),
+
+            WaitAction(5),
+            GearSwitchAction((0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1)),
+
+            # ZulrahAction(),
 
             # CombatAction(dodge_hazards=True),
 

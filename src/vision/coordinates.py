@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, nonmember
 
 from src.vision.regions import Regions
 
@@ -33,6 +33,47 @@ class ControlPanel(Enum):
     OPTIONS_TAB = Regions.CONTROL_PANEL.offset(156, 316)
     EMOTE_TAB = Regions.CONTROL_PANEL.offset(189, 316)
     MUSIC_TAB = Regions.CONTROL_PANEL.offset(222, 316)
+
+
+class Inventory(Enum):
+    ITEM_0_0 = Regions.CONTROL_PANEL.offset(58, 61)
+    ITEM_0_1 = Regions.CONTROL_PANEL.offset(100, 61)
+    ITEM_0_2 = Regions.CONTROL_PANEL.offset(142, 61)
+    ITEM_0_3 = Regions.CONTROL_PANEL.offset(184, 61)
+
+    ITEM_1_0 = Regions.CONTROL_PANEL.offset(58, 97)
+    ITEM_1_1 = Regions.CONTROL_PANEL.offset(100, 97)
+    ITEM_1_2 = Regions.CONTROL_PANEL.offset(142, 97)
+    ITEM_1_3 = Regions.CONTROL_PANEL.offset(184, 97)
+
+    ITEM_2_0 = Regions.CONTROL_PANEL.offset(58, 133)
+    ITEM_2_1 = Regions.CONTROL_PANEL.offset(100, 133)
+    ITEM_2_2 = Regions.CONTROL_PANEL.offset(142, 133)
+    ITEM_2_3 = Regions.CONTROL_PANEL.offset(184, 133)
+
+    ITEM_3_0 = Regions.CONTROL_PANEL.offset(58, 169)
+    ITEM_3_1 = Regions.CONTROL_PANEL.offset(100, 169)
+    ITEM_3_2 = Regions.CONTROL_PANEL.offset(142, 169)
+    ITEM_3_3 = Regions.CONTROL_PANEL.offset(184, 169)
+
+    ITEM_4_0 = Regions.CONTROL_PANEL.offset(58, 205)
+    ITEM_4_1 = Regions.CONTROL_PANEL.offset(100, 205)
+    ITEM_4_2 = Regions.CONTROL_PANEL.offset(142, 205)
+    ITEM_4_3 = Regions.CONTROL_PANEL.offset(184, 205)
+
+    ITEM_5_0 = Regions.CONTROL_PANEL.offset(58, 241)
+    ITEM_5_1 = Regions.CONTROL_PANEL.offset(100, 241)
+    ITEM_5_2 = Regions.CONTROL_PANEL.offset(142, 241)
+    ITEM_5_3 = Regions.CONTROL_PANEL.offset(184, 241)
+
+    ITEM_6_0 = Regions.CONTROL_PANEL.offset(58, 277)
+    ITEM_6_1 = Regions.CONTROL_PANEL.offset(100, 277)
+    ITEM_6_2 = Regions.CONTROL_PANEL.offset(142, 277)
+    ITEM_6_3 = Regions.CONTROL_PANEL.offset(184, 277)
+
+    @classmethod
+    def item(cls, y, x):
+        return cls[f'ITEM_{y}_{x}']
 
 
 class Minimap(Enum):
