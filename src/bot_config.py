@@ -12,6 +12,7 @@ from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
 from src.actions.slayer import SlayerAction
 from src.actions.teleport_wizard import TeleportWizardAction
+from src.actions.tormented_demon import TormentedDemonAction
 from src.actions.wait import WaitAction
 from src.actions.zulrah import ZulrahAction
 from src.vision.color import Color
@@ -27,8 +28,8 @@ class BotConfig:
 
             # ExperimentAction(),
 
-            GearSwitchAction(GearSwitch.TWO_BY_THREE, condition_item=Gear.Melee.ARCLIGHT),
-            WaitAction(5),
+            TormentedDemonAction(),
+            PickUpItemsAction(),
 
             # ZulrahAction(),
 

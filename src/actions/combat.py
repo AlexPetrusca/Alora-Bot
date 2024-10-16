@@ -33,7 +33,7 @@ class CombatAction(Action):
 
         timing.wait(Timer.sec2tick(3))
         if self.dodge_hazards:
-            timing.observe(Timer.sec2tick(0.5), CombatAction.track_hazards, CombatAction.respond_to_hazards)
+            timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_hazards)
         combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat)
 
         if combat_status == CombatAction.Event.FLEE or combat_status == CombatAction.Event.DEAD:
@@ -71,13 +71,11 @@ class CombatAction(Action):
     def last_tick(self):
         self.retry_count = 0
 
-    @staticmethod
-    def track_hazards():
+    def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)
         return hazard is not None
 
-    @staticmethod
-    def respond_to_hazards(timing, prev_hazard, curr_hazard):
+    def respond_to_hazards(self, timing, prev_hazard, curr_hazard):
         if not prev_hazard and curr_hazard:
             timing.execute(lambda: robot.click_contour(Color.YELLOW))
 

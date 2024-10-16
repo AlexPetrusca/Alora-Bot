@@ -28,7 +28,7 @@ class GearSwitchAction(Action):
         return timing.complete()
 
     def is_condition_item_present(self):
-        loc = vision.locate_image(vision.grab_region(Regions.INVENTORY), self.condition_item, 0.9)
+        loc = vision.locate_image(vision.grab_region(Regions.INVENTORY), self.condition_item, 0.9, silent=True)
         return loc is not None
 
     def last_tick(self):

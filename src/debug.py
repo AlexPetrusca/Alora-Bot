@@ -6,6 +6,7 @@ import numpy as np
 
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
+from src.actions.tormented_demon import TormentedDemonAction
 from src.actions.zulrah import ZulrahAction
 from src.vision import vision
 from src.vision.color import Color, get_color_limits
@@ -33,6 +34,8 @@ class DebugDisplay:
             screenshot = self.tick_slayer(screenshot)
         elif isinstance(self.bot.current_action, ZulrahAction):
             screenshot = self.tick_zulrah(screenshot)
+        elif isinstance(self.bot.current_action, TormentedDemonAction):
+            screenshot = self.tick_tormented_demon(screenshot)
         else:
             screenshot = self.tick_default(screenshot)
 
@@ -159,6 +162,20 @@ class DebugDisplay:
 
         return screenshot
 
+    def tick_tormented_demon(self, screenshot):
+        self.tab_name = "Tormented Demon Detection"
+
+        screenshot = vision.mask_region(screenshot, Regions.PLAYER_MOVE_BOX)
+
+        contour, _ = vision.get_contour(screenshot, Color.RED)
+        if contour is not None:
+            x, y, w, h = cv.boundingRect(contour)
+            if w > 50 and h > 50:
+                y = y - 75 if (y - 75 >= 0) else 0
+                cv.rectangle(screenshot, (x, y), (x + w, y + h + 150), color=(0, 255, 0), thickness=2)
+
+        return screenshot
+
     def tick_default(self, screenshot):
         self.tab_name = "Default Display"
 
@@ -173,7 +190,7 @@ class DebugDisplay:
             latest_chat = f'[Latest Chat]: {latest_chat}'
             self.debug_text = f'{hitpoints}\n{damage_ui}\n{latest_chat}'
 
-        if self.bot.tick_counter % 10 == 0:  # every second
+        if self.bot.timer.tick_counter % 10 == 0:  # every second
             executor.submit(update_debug_info)
 
         DebugDisplay.draw_text(screenshot, self.debug_text, 10, 500, (0, 255, 0))

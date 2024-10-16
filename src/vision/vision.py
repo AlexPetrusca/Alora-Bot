@@ -57,17 +57,21 @@ def is_status_active(status):
 
 
 def get_my_prayer_protect():
-    return get_prayer_protect(grab_region(Regions.PLAYER))
+    return get_prayer_protect(grab_region(Regions.PLAYER))[0]
 
 
 def get_opponent_prayer_protect(opponent_color=Color.RED):
-    contour, _ = get_contour(grab_screen(), opponent_color)
+    screenshot = grab_screen()
+    contour, _ = get_contour(screenshot, opponent_color)
     if contour is not None:
         x, y, w, h = cv.boundingRect(contour)
-        return get_prayer_protect(grab_screen()[(y - 75):(y + h), x:(x + w)])
-    else:
-        print("get_opponent_prayer_protect: no opponent found")
-        return None, None
+        if w > 50 and h > 50:
+            y = y - 75 if (y - 75 >= 0) else 0
+            mask_region(screenshot, Regions.PLAYER_MOVE_BOX)
+            return get_prayer_protect(screenshot[y:(y + h + 150), x:(x + w)])[0]
+
+    # print("get_opponent_prayer_protect: no opponent found")
+    return None
 
 
 def get_prayer_protect(haystack):
@@ -115,14 +119,16 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
     return opt_contour, opt_value
 
 
-def locate_image(haystack, needle, threshold=0.7):
+def locate_image(haystack, needle, threshold=0.7, silent=False):
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv.minMaxLoc(result)
     if max_val >= threshold:
-        print(max_val)
+        if not silent:
+            print(max_val)
         return max_loc[0] + needle.shape[1] / 2, max_loc[1] + needle.shape[0] / 2
     else:
-        print("ERROR: locate_image failed with:", max_val)
+        if not silent:
+            print("ERROR: locate_image failed with:", max_val)
         return None
 
 
@@ -236,11 +242,6 @@ def mask_region(img, region, color=Color.BLACK):
     p1 = (2 * region.x, 2 * region.y)
     p2 = (2 * (region.x + region.w), 2 * (region.y + region.h))
     return cv.rectangle(img, p1, p2, color, thickness=-1)
-
-
-def mask_player(img):
-    mask_region(img, Regions.PLAYER)  # hide player
-    return img
 
 
 def mask_ui(img):

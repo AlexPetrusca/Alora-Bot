@@ -31,11 +31,11 @@ def shift_click(x=None, y=None):
 
 
 def click_food():
-    ate_food = click_image(Food.MONKFISH, 0.9, region=Regions.CONTROL_PANEL)
+    ate_food = click_image(Food.MONKFISH, 0.9, region=Regions.CONTROL_PANEL, silent=True)
     if not ate_food:
-        ate_food = click_image(Food.SHARK, 0.9, region=Regions.CONTROL_PANEL)
+        ate_food = click_image(Food.SHARK, 0.9, region=Regions.CONTROL_PANEL, silent=True)
     if not ate_food:
-        ate_food = click_image(Food.MANTA_RAY, 0.9, region=Regions.CONTROL_PANEL)
+        ate_food = click_image(Food.MANTA_RAY, 0.9, region=Regions.CONTROL_PANEL, silent=True)
     return ate_food
 
 
@@ -50,12 +50,12 @@ def click_potion(potion):
     return drank_potion
 
 
-def click_image(image, threshold=0.7, region=Regions.SCREEN):
+def click_image(image, threshold=0.7, region=Regions.SCREEN, silent=False):
     screen = vision.grab_screen()
     if region == Regions.SCREEN:
-        loc = vision.locate_image(screen, image, threshold)
+        loc = vision.locate_image(screen, image, threshold, silent=silent)
     else:
-        loc = vision.locate_image(screen[region.as_slice()], image, threshold)
+        loc = vision.locate_image(screen[region.as_slice()], image, threshold, silent=silent)
 
     if loc is None:
         return False

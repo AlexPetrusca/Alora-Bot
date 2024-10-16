@@ -17,7 +17,7 @@ class ZulrahAction(Action):
         self.prayer_action = PrayerAction(switch_inventory=True)
 
     def first_tick(self):
-        self.set_progress_message(f'Fighting Zulrah...')
+        self.set_progress_message('Fighting Zulrah...')
 
     def tick(self, timing):
         timing.observe(Timer.sec2tick(1), self.track_color, self.respond_to_color_change)
