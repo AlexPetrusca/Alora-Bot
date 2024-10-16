@@ -15,8 +15,8 @@ class TormentedDemonAction(CombatAction):
         super().__init__(health_threshold=70, dodge_hazards=True, flee=False)
         self.last_opp_prayer = None
 
-        self.melee_switch_action = GearSwitchAction(GearSwitch.TWO_BY_THREE, condition_item=Gear.Magic.TRIDENT_OF_THE_SWAMP)
-        self.magic_switch_action = GearSwitchAction(GearSwitch.TWO_BY_THREE, condition_item=Gear.Melee.ARCLIGHT)
+        self.melee_switch_action = GearSwitchAction(GearSwitch.TWO_BY_THREE, condition_item=Gear.Melee.ARCLIGHT)
+        self.magic_switch_action = GearSwitchAction(GearSwitch.TWO_BY_THREE, condition_item=Gear.Magic.TRIDENT_OF_THE_SWAMP)
 
     def first_tick(self):
         self.set_progress_message('Fighting Tormented Demons...')

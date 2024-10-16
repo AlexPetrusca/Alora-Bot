@@ -2,6 +2,7 @@ from src.actions.barrow import BarrowAction, BarrowBrother
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
 from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
+from src.actions.demonic_gorillas import DemonicGorillaAction
 from src.actions.experiment import ExperimentAction
 from src.actions.gear_switch import GearSwitchAction, GearSwitch
 from src.actions.heal import HealAction
@@ -28,7 +29,8 @@ class BotConfig:
 
             # ExperimentAction(),
 
-            TormentedDemonAction(),
+            # TormentedDemonAction(),
+            DemonicGorillaAction(),
             PickUpItemsAction(),
 
             # ZulrahAction(),
