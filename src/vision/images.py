@@ -83,3 +83,21 @@ class PrayerProtect:
     MELEE = ImageLoader.read('prayer/melee.png')
     MAGIC = ImageLoader.read('prayer/magic.png')
     RANGED = ImageLoader.read('prayer/ranged.png')
+
+
+class Gear:
+    class Magic:
+        TRIDENT_OF_THE_SWAMP = ImageLoader.read('item/gear/magic/trident_of_the_swamp.png')
+        MAGES_BOOK = ImageLoader.read('item/gear/magic/mages_book.png')
+        IMBUED_ZAMORAK_CAPE = ImageLoader.read('item/gear/magic/imbued_zamorak_cape.png')
+        AHRIMS_ROBETOP = ImageLoader.read('item/gear/magic/ahrims_robetop.png')
+        AHRIMS_ROBESKIRT = ImageLoader.read('item/gear/magic/ahrims_robeskirt.png')
+        ETERNAL_BOOTS = ImageLoader.read('item/gear/magic/eternal_boots.png')
+
+    class Melee:
+        ARCLIGHT = ImageLoader.read('item/gear/melee/arclight.png')
+        DRAGON_DEFENDER = ImageLoader.read('item/gear/melee/dragon_defender.png')
+        FIRE_CAPE = ImageLoader.read('item/gear/melee/fire_cape.png')
+        FIGHTER_TORSO = ImageLoader.read('item/gear/melee/fighter_torso.png')
+        VERACS_PLATESKIRT = ImageLoader.read('item/gear/melee/veracs_plateskirt.png')
+        PRIMORDIAL_BOOTS = ImageLoader.read('item/gear/melee/primordial_boots.png')
