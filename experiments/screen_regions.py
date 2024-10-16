@@ -3,10 +3,10 @@ import numpy as np
 
 from src.vision.regions import Regions
 
-haystack_img = cv.imread('screenshots/bank/bank1.png', cv.IMREAD_UNCHANGED)
+haystack_img = cv.imread('screenshots/full_switch.png', cv.IMREAD_UNCHANGED)
 # haystack_img = cv.imread('../resources/resources/screenshots/alt_macbook/edgeville.png', cv.IMREAD_UNCHANGED)
 minimap_image = np.ndarray.copy(haystack_img[Regions.MINIMAP.as_slice()])
-inventory_image = np.ndarray.copy(haystack_img[Regions.CONTROL_PANEL.as_slice()])
+inventory_image = np.ndarray.copy(haystack_img[Regions.INVENTORY.as_slice()])
 hover_action_image = np.ndarray.copy(haystack_img[Regions.HOVER_ACTION.as_slice()])
 bank_image = np.ndarray.copy(haystack_img[Regions.BANK.as_slice()])
 chat_image = np.ndarray.copy(haystack_img[Regions.CHAT.as_slice()])

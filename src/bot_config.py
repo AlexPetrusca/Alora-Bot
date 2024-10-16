@@ -3,7 +3,7 @@ from src.actions.breadcrumb_trail import BreadcrumbTrailAction
 from src.actions.calibrate import CalibrateAction
 from src.actions.cerberus import CerberusAction
 from src.actions.experiment import ExperimentAction
-from src.actions.gear_switch import GearSwitchAction
+from src.actions.gear_switch import GearSwitchAction, GearSwitch
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
 from src.actions.prayer import PrayerAction
@@ -16,6 +16,7 @@ from src.actions.wait import WaitAction
 from src.actions.zulrah import ZulrahAction
 from src.vision.color import Color
 from src.vision.coordinates import Prayer
+from src.vision.images import Gear
 
 
 class BotConfig:
@@ -26,8 +27,8 @@ class BotConfig:
 
             # ExperimentAction(),
 
+            GearSwitchAction(GearSwitch.TWO_BY_THREE, condition_item=Gear.Melee.ARCLIGHT),
             WaitAction(5),
-            GearSwitchAction((0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1)),
 
             # ZulrahAction(),
 

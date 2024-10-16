@@ -26,6 +26,9 @@ class Timing:
         self.timing_records.clear()
 
     def wait(self, tick_duration):
+        if not tick_duration.is_integer():
+            raise AssertionError(f"{tick_duration} is not an integer")
+
         self.tick_offset += tick_duration
         return self.tick_counter == self.tick_offset
 
@@ -36,7 +39,8 @@ class Timing:
 
         if self.tick_counter == self.tick_offset:
             status = fn()
-            self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+            if capture_result:
+                self.timing_records[fn] = TimingRecord(self.tick_counter, status)
 
         if capture_result:
             execute_record = self.timing_records.get(fn)
@@ -61,9 +65,9 @@ class Timing:
         else:
             return ActionStatus.IN_PROGRESS
 
-    def execute_after(self, tick_duration, fn):
+    def execute_after(self, tick_duration, fn, capture_result=False):
         self.wait(tick_duration)
-        return self.execute(fn)
+        return self.execute(fn, capture_result)
 
     def complete_after(self, tick_duration):
         self.wait(tick_duration)

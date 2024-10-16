@@ -46,7 +46,7 @@ class Regions:
     EXP_BAR = Region(MINIMAP.x - 153, MINIMAP.y + 2, 122, 30)
 
     CONTROL_PANEL = Region(GAME.x + GAME.w - 246, GAME.y + GAME.h - 334, 246, 334)
-    INVENTORY = Region(CONTROL_PANEL.x + 37, CONTROL_PANEL.y + 79, 168, 252)
+    INVENTORY = Region(CONTROL_PANEL.x + 39, CONTROL_PANEL.y + 43, 168, 253)
 
     CHAT = Region(GAME.x, GAME.y + GAME.h - 200, 520, 200)
     LATEST_CHAT = Region(CHAT.x + 7, CHAT.y + 136, 490, 18)
