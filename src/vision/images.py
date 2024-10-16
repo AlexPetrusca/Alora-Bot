@@ -86,6 +86,14 @@ class PrayerProtect:
 
 
 class Gear:
+    class Melee:
+        ARCLIGHT = ImageLoader.read('item/gear/melee/arclight.png')
+        DRAGON_DEFENDER = ImageLoader.read('item/gear/melee/dragon_defender.png')
+        FIRE_CAPE = ImageLoader.read('item/gear/melee/fire_cape.png')
+        FIGHTER_TORSO = ImageLoader.read('item/gear/melee/fighter_torso.png')
+        VERACS_PLATESKIRT = ImageLoader.read('item/gear/melee/veracs_plateskirt.png')
+        PRIMORDIAL_BOOTS = ImageLoader.read('item/gear/melee/primordial_boots.png')
+
     class Magic:
         TRIDENT_OF_THE_SWAMP = ImageLoader.read('item/gear/magic/trident_of_the_swamp.png')
         MAGES_BOOK = ImageLoader.read('item/gear/magic/mages_book.png')
@@ -94,10 +102,10 @@ class Gear:
         AHRIMS_ROBESKIRT = ImageLoader.read('item/gear/magic/ahrims_robeskirt.png')
         ETERNAL_BOOTS = ImageLoader.read('item/gear/magic/eternal_boots.png')
 
-    class Melee:
-        ARCLIGHT = ImageLoader.read('item/gear/melee/arclight.png')
-        DRAGON_DEFENDER = ImageLoader.read('item/gear/melee/dragon_defender.png')
-        FIRE_CAPE = ImageLoader.read('item/gear/melee/fire_cape.png')
-        FIGHTER_TORSO = ImageLoader.read('item/gear/melee/fighter_torso.png')
-        VERACS_PLATESKIRT = ImageLoader.read('item/gear/melee/veracs_plateskirt.png')
-        PRIMORDIAL_BOOTS = ImageLoader.read('item/gear/melee/primordial_boots.png')
+    class Ranged:
+        RUNE_CROSSBOW = ImageLoader.read('item/gear/ranged/rune_crossbow.png')
+        BOOK_OF_LAW = ImageLoader.read('item/gear/ranged/book_of_law.png')
+        AVAS_ASSEMBLER = ImageLoader.read('item/gear/ranged/avas_assembler.png')
+        KARILS_LEATHERTOP = ImageLoader.read('item/gear/ranged/karils_leathertop.png')
+        KARILS_LEATHERSKIRT = ImageLoader.read('item/gear/ranged/karils_leatherskirt.png')
+        PEGASIAN_BOOTS = ImageLoader.read('item/gear/ranged/pegasian_boots.png')
