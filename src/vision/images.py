@@ -57,10 +57,10 @@ class Potion:
         def __init__(self, potion):
             self.doses = [
                 None,
-                ImageLoader.read(f'item/potion/{potion}/1.png'),
-                ImageLoader.read(f'item/potion/{potion}/2.png'),
-                ImageLoader.read(f'item/potion/{potion}/3.png'),
-                ImageLoader.read(f'item/potion/{potion}/4.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/1.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/2.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/3.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/4.png'),
             ]
             self.status = ImageLoader.read(f'status/{potion}.png')
 
