@@ -8,6 +8,8 @@ from src.vision.coordinates import Prayer
 from src.vision.vision import ContourDetection
 
 
+# Requirements
+#   - Turn on "Entity Hider" > "Hide NPCs 2D"
 class ZulrahAction(Action):
     def __init__(self):
         super().__init__()

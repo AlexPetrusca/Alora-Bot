@@ -30,12 +30,12 @@ class BotConfig:
             # ExperimentAction(),
 
             # TormentedDemonAction(),
-            DemonicGorillaAction(),
-            PickUpItemsAction(),
+            # DemonicGorillaAction(),
+            # PickUpItemsAction(),
 
             # ZulrahAction(),
 
-            # CombatAction(dodge_hazards=True),
+            CombatAction(),
 
             # OrchestratorAction([
             #     WaitAction(0.1),

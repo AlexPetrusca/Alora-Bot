@@ -23,9 +23,9 @@ class Bot:
         self.current_config = None
         self.current_action = None
 
-        config = BotConfig.experiment()
+        # config = BotConfig.experiment()
         # config = BotConfig.combat()
-        # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT, health_threshold=70)
+        config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT)
         # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
         # config = BotConfig.slayer(SlayerTask.RUNE_DRAGON)
         # config = BotConfig.cerberus()

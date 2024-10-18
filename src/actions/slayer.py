@@ -26,7 +26,7 @@ class SlayerAction(Action):
         config = SlayerAction.get_task_config(self.task)
         self.potions = config.potions
         self.combat_loop_action = OrchestratorAction([
-            CombatAction(health_threshold=config.health_threshold),
+            CombatAction(health_threshold=config.health_threshold, dodge_hazards=config.dodge_hazards),
             PickUpItemsAction()
         ])
         self.prayer_on_action = PrayerAction(*config.prayers, switch_inventory=True)
@@ -56,13 +56,14 @@ class SlayerAction(Action):
     def get_task_config(task):
         task_configs = {
             SlayerTask.CAVE_KRAKEN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]),
-            SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(70, [Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY]),
+            SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(80, [Prayer.PROTECT_FROM_MAGIC]),
             SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC], [Potion.ANTIFIRE]),
         }
         return task_configs[task]
 
     class Config:
-        def __init__(self, health_threshold=50, prayers=None, potions=None):
+        def __init__(self, health_threshold=50, prayers=None, potions=None, dodge_hazards=False):
             self.health_threshold = health_threshold
             self.prayers = prayers if (prayers is not None) else []
             self.potions = potions if (potions is not None) else []
+            self.dodge_hazards = dodge_hazards
