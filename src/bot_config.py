@@ -25,13 +25,13 @@ class BotConfig:
     @staticmethod
     def experiment():
         return [
-            WaitAction(1).play_once(),
+            # WaitAction(1).play_once(),
 
             # ExperimentAction(),
 
             # TormentedDemonAction(),
-            # DemonicGorillaAction(),
-            # PickUpItemsAction(),
+            DemonicGorillaAction(),
+            PickUpItemsAction(),
 
             # ZulrahAction(),
 
@@ -68,6 +68,24 @@ class BotConfig:
 
             BreadcrumbTrailAction(trail_color),
             SlayerAction(task),
+
+            HealAction(bank=True)
+        ]
+
+    @staticmethod
+    def demonic_gorillas():
+        return [
+            WaitAction(5).play_once(),
+            CalibrateAction().play_once(),
+
+            HomeTeleportAction(),
+            TeleportWizardAction("Gorillas"),
+
+            BreadcrumbTrailAction(Color.YELLOW),
+            OrchestratorAction([
+                DemonicGorillaAction(),
+                PickUpItemsAction(),
+            ]),
 
             HealAction(bank=True)
         ]

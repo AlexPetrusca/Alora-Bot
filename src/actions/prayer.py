@@ -5,12 +5,12 @@ from src.vision.coordinates import ControlPanel
 
 
 class PrayerAction(Action):
-    def __init__(self, *prayers, fast_switch=True, switch_inventory=False):
+    def __init__(self, *prayers, fast_switch=True, switch_to_inventory=False):
         super().__init__()
         self.prayers = set(prayers)  # ground truth
         self.active_prayers = set()  # in-game truth
         self.fast_switch = fast_switch
-        self.switch_inventory = switch_inventory
+        self.switch_inventory = switch_to_inventory
 
     def first_tick(self):
         pass

@@ -53,25 +53,29 @@ class Timing:
         else:
             return self.tick_counter == self.tick_offset
 
-    def complete(self):
-        if self.tick_counter >= self.tick_offset:
-            return ActionStatus.COMPLETE
-        else:
-            return ActionStatus.IN_PROGRESS
-
-    def abort(self):
-        if self.tick_counter >= self.tick_offset:
-            return ActionStatus.ABORTED
-        else:
-            return ActionStatus.IN_PROGRESS
-
     def execute_after(self, tick_duration, fn, capture_result=False):
         self.wait(tick_duration)
         return self.execute(fn, capture_result)
 
+    def exit_status(self, action_status):
+        if self.tick_counter >= self.tick_offset:
+            return action_status
+        else:
+            return ActionStatus.IN_PROGRESS
+
+    def exit_status_after(self, tick_duration, action_status):
+        self.wait(tick_duration)
+        return self.exit_status(action_status)
+
+    def complete(self):
+        return self.exit_status(ActionStatus.COMPLETE)
+
     def complete_after(self, tick_duration):
         self.wait(tick_duration)
         return self.complete()
+
+    def abort(self):
+        return self.exit_status(ActionStatus.ABORTED)
 
     def abort_after(self, tick_duration):
         self.wait(tick_duration)
@@ -123,6 +127,7 @@ class Timing:
 
         # reset latch on first tick
         if self.tick_counter == self.tick_offset:
+            print("RESET POLL")
             action_record = self.timing_records.get(fn)
             if action_record is not None:
                 self.timing_records.pop(fn)

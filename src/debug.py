@@ -4,6 +4,7 @@ from time import perf_counter
 import cv2 as cv
 import numpy as np
 
+from src.actions.demonic_gorillas import DemonicGorillaAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
 from src.actions.tormented_demon import TormentedDemonAction
@@ -30,6 +31,8 @@ class DebugDisplay:
         screenshot = vision.grab_screen()
         if isinstance(self.bot.current_action, PickUpItemsAction):
             screenshot = self.tick_pick_up_items(screenshot)
+        elif isinstance(self.bot.current_action, DemonicGorillaAction):
+            screenshot = self.tick_demonic_gorilla(screenshot)
         elif isinstance(self.bot.current_action, CombatAction):
             screenshot = self.tick_slayer(screenshot)
         elif isinstance(self.bot.current_action, ZulrahAction):
@@ -173,6 +176,26 @@ class DebugDisplay:
             if w > 50 and h > 50:
                 y = y - 75 if (y - 75 >= 0) else 0
                 cv.rectangle(screenshot, (x, y), (x + w, y + h + 150), color=(0, 255, 0), thickness=2)
+
+        return screenshot
+
+    def tick_demonic_gorilla(self, screenshot):
+        self.tab_name = "Demonic Gorilla Detection"
+
+        red_contour, _ = vision.get_contour(screenshot, Color.RED)
+        if red_contour is not None:
+            x, y, w, h = cv.boundingRect(red_contour)
+            cv.rectangle(screenshot, (x, y), (x + w, y + h), color=Color.MAGENTA.value, thickness=4)
+
+        blue_contour, _ = vision.get_contour(screenshot, Color.BLUE)
+        if blue_contour is not None:
+            x, y, w, h = cv.boundingRect(blue_contour)
+            cv.rectangle(screenshot, (x, y), (x + w, y + h), color=Color.CYAN.value, thickness=4)
+
+        green_contour, _ = vision.get_contour(screenshot, Color.GREEN)
+        if green_contour is not None:
+            x, y, w, h = cv.boundingRect(green_contour)
+            cv.rectangle(screenshot, (x, y), (x + w, y + h), color=Color.YELLOW.value, thickness=4)
 
         return screenshot
 

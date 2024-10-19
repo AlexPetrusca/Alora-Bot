@@ -103,6 +103,7 @@ class Gear:
         ETERNAL_BOOTS = ImageLoader.read('item/gear/magic/eternal_boots.png')
 
     class Ranged:
+        ARMADYL_CROSSBOW = ImageLoader.read('item/gear/ranged/armadyl_crossbow.png')
         RUNE_CROSSBOW = ImageLoader.read('item/gear/ranged/rune_crossbow.png')
         BOOK_OF_LAW = ImageLoader.read('item/gear/ranged/book_of_law.png')
         AVAS_ASSEMBLER = ImageLoader.read('item/gear/ranged/avas_assembler.png')

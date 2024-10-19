@@ -29,8 +29,8 @@ class SlayerAction(Action):
             CombatAction(health_threshold=config.health_threshold, dodge_hazards=config.dodge_hazards),
             PickUpItemsAction()
         ])
-        self.prayer_on_action = PrayerAction(*config.prayers, switch_inventory=True)
-        self.prayer_off_action = PrayerAction(*config.prayers, switch_inventory=True)
+        self.prayer_on_action = PrayerAction(*config.prayers, switch_to_inventory=True)
+        self.prayer_off_action = PrayerAction(*config.prayers, switch_to_inventory=True)
 
     def first_tick(self):
         self.set_progress_message(f'Slaying {self.task.value}s...')

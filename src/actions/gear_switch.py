@@ -13,7 +13,7 @@ class GearSwitchAction(Action):
         self.condition_item = condition_item
 
     def first_tick(self):
-        self.set_progress_message("Switching gear...")
+        pass
 
     def tick(self, timing):
         timing.execute(lambda: robot.press('Space'))  # inventory
@@ -23,6 +23,7 @@ class GearSwitchAction(Action):
             if found is False:
                 return timing.abort()
 
+        timing.execute(lambda: self.set_progress_message("Switching gear..."))
         for x, y in self.item_coords:
             timing.execute_after(Timer.sec2tick(0.1), lambda: robot.click(Inventory.item(x, y)))
         return timing.complete()
