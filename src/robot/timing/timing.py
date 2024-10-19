@@ -1,5 +1,6 @@
 import math
 import traceback as tb
+from enum import Enum
 
 from src.actions.types.action_status import ActionStatus
 from src.robot.timing.timing_record import TimingRecord
@@ -45,7 +46,7 @@ class Timing:
         if capture_result:
             execute_record = self.timing_records.get(key)
             if execute_record is None:
-                self.tick_offset = math.inf
+                self.block()
                 return None
             else:
                 self.tick_offset = execute_record.tick
@@ -81,16 +82,27 @@ class Timing:
         self.wait(tick_duration)
         return self.abort()
 
-    def interval(self, tick_interval, fn, ignore_scheduling=False):
+    def interval(self, tick_interval, fn, ignore_scheduling=False, play_count=-1):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
         key = Timing.get_caller_identifier()
 
+        # reset latch on first tick
+        if self.tick_counter == self.tick_offset:
+            action_record = self.timing_records.get(key)
+            if action_record is not None:
+                self.timing_records.pop(key)
+
+        # process interval on subsequent ticks
         interval_record = self.timing_records.get(key)
-        if (ignore_scheduling or self.tick_counter >= self.tick_offset) and self.tick_counter % tick_interval == 0:
+        is_scheduled = ignore_scheduling or self.tick_counter >= self.tick_offset
+        is_playable = play_count == -1 or interval_record is None or interval_record.play_count > 0
+        if is_playable and is_scheduled and self.tick_counter % tick_interval == 0:
             status = fn()
-            self.timing_records[key] = TimingRecord(self.tick_counter, status)
+            play_count = interval_record.play_count if (interval_record is not None) else play_count
+            new_play_count = play_count - 1 if (play_count != -1) else -1
+            self.timing_records[key] = TimingRecord(self.tick_counter, status, play_count=new_play_count)
             return status  # current interval value
         elif interval_record is not None:
             return interval_record.status  # last interval value
@@ -124,7 +136,7 @@ class Timing:
         else:  # no value observed?
             return starting_status, starting_status
 
-    def poll(self, tick_interval, fn, default_status=None):
+    def poll(self, tick_interval, fn, default_status=None, play_count=-1):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
@@ -138,15 +150,22 @@ class Timing:
 
         # process poll on subsequent ticks
         poll_record = self.timing_records.get(key)
-        if poll_record is None:
+        if poll_record is None or poll_record.status is default_status:
+            is_playable = play_count == -1 or poll_record is None or poll_record.play_count > 0
+            if not is_playable:
+                return Timing.PollStatus.ABORTED
+
             if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
                 status = fn()
+                play_count = poll_record.play_count if (poll_record is not None) else play_count
+                new_play_count = play_count - 1 if (play_count != -1) else -1
+                self.timing_records[key] = TimingRecord(self.tick_counter, status, play_count=new_play_count)
                 if status is not default_status:
                     self.timing_records[key] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                     return status  # event found
 
-            self.tick_offset = math.inf
+            self.block()
             return None  # event not found
 
         self.tick_offset = poll_record.tick
@@ -170,21 +189,28 @@ class Timing:
                     self.timing_records[key] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                 else:
-                    self.tick_offset = math.inf
+                    self.block()
                 return status
             else:  # completed?
                 self.tick_offset = action_record.tick
                 return action_record.status
         else:  # not started?
-            self.tick_offset = math.inf
+            self.block()
             return ActionStatus.NOT_STARTED
 
     def action_after(self, tick_duration, action):
         self.wait(tick_duration)
         return self.action(action)
 
+    def block(self):
+        self.tick_offset = math.inf
+
     @classmethod
     def get_caller_identifier(cls):
         stack = tb.extract_stack()
         caller_frame = stack[len(stack) - 3]
         return f"{caller_frame.filename}_{caller_frame.name}_{caller_frame.lineno}"
+
+    class PollStatus(Enum):
+        ABORTED = 0
+

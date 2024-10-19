@@ -11,6 +11,7 @@ from src.actions.prayer import PrayerAction
 from src.actions.primitives.orchestrator import OrchestratorAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.combat import CombatAction
+from src.actions.sarachnis import SarachnisAction
 from src.actions.slayer import SlayerAction
 from src.actions.teleport_wizard import TeleportWizardAction
 from src.actions.tormented_demon import TormentedDemonAction
@@ -25,12 +26,13 @@ class BotConfig:
     @staticmethod
     def experiment():
         return [
-            # WaitAction(1).play_once(),
+            WaitAction(1).play_once(),
 
-            ExperimentAction(),
+            # ExperimentAction(),
 
             # TormentedDemonAction(),
             # DemonicGorillaAction(),
+            SarachnisAction(),
             # PickUpItemsAction(),
 
             # ZulrahAction(),
