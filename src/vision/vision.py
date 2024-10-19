@@ -202,8 +202,9 @@ def locate_ground_item(haystack, area_threshold=250):
 def read_text(haystack, config=""):
     grayscale = cv.cvtColor(haystack, cv.COLOR_BGR2GRAY)
     threshold = cv.threshold(grayscale, 120, 255, cv.THRESH_BINARY)[1]
-    blur = cv.blur(threshold, (3, 3))
-    return pytesseract.image_to_string(blur, config=config).strip()
+    blur = cv.blur(threshold, (2, 2))
+    morph = cv.morphologyEx(blur, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+    return pytesseract.image_to_string(morph, config=config).strip()
 
 
 # todo: this needs to be better >.<
@@ -212,27 +213,23 @@ def read_int(haystack):
     old_text = text
 
     # replace alphabetic characters with closest numerals
-    text = text.replace('.', '').replace('"', '')
+    text = text.replace('.', '').replace('"', '').replace('%', '')
     text = text.replace('o', '0').replace('O', '0').replace('Q', '0')
-    text = text.replace('i', '1').replace('l', '1').replace('I', '1')
+    text = text.replace('i', '1').replace('l', '1').replace('L', '1').replace('I', '1')
     text = text.replace('z', '2').replace('Z', '2')
-    text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('L', '4')
+    text = text.replace('y', '4').replace('k', '4').replace('h', '4').replace('u', '4').replace('&', '4')
     text = text.replace('S', '5').replace('s', '5')
     text = text.replace('G', '6').replace('E', '6')
-    text = text.replace('?', '7')
-    text = text.replace('B', '8').replace('&', '8')
+    text = text.replace('7?', '7').replace('?', '7')
+    text = text.replace('B', '8')
     text = text.replace('a', '9').replace('g', '9').replace('q', '9')
 
-    # trim 3 characters down to 2
-    if len(text) > 2:
-        text = text[0:2]
-
     try:
-        print("HP:", old_text, "-->", text)
+        # print("HP:", old_text, "-->", text)
         return int(text)
     except ValueError:
-        print("ERROR: read_int failed with:", old_text, "-->", text)
-        return 30  # don't assume we've died if we cant read hitpoints
+        # print("ERROR: read_int failed with:", old_text, "-->", text)
+        return -1  # don't assume we've died if we cant read hitpoints
 
 
 def mask_region(img, region, color=Color.BLACK):

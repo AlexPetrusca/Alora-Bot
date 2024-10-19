@@ -28,6 +28,7 @@ class Bot:
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT)
         # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
         # config = BotConfig.slayer(SlayerTask.RUNE_DRAGON)
+        # config = BotConfig.slayer(SlayerTask.SKELETAL_WYVERN)
         # config = BotConfig.demonic_gorillas()
         # config = BotConfig.cerberus()
         # config = BotConfig.barrows()

@@ -27,11 +27,11 @@ class BotConfig:
         return [
             # WaitAction(1).play_once(),
 
-            # ExperimentAction(),
+            ExperimentAction(),
 
             # TormentedDemonAction(),
-            DemonicGorillaAction(),
-            PickUpItemsAction(),
+            # DemonicGorillaAction(),
+            # PickUpItemsAction(),
 
             # ZulrahAction(),
 

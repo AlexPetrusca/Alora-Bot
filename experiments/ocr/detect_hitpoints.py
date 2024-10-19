@@ -5,8 +5,8 @@ from pytesseract import pytesseract
 from src.vision import vision
 from src.vision.regions import Regions
 
-# haystack = cv.imread('../screenshots/damage_ui/not_present.png', cv.IMREAD_UNCHANGED)
-haystack = cv.imread('../screenshots/alt_macbook/edgeville.png', cv.IMREAD_UNCHANGED)
+haystack = cv.imread('../screenshots/damage_ui/not_present.png', cv.IMREAD_UNCHANGED)
+# haystack = cv.imread('../screenshots/alt_macbook/edgeville.png', cv.IMREAD_UNCHANGED)
 
 health_img = haystack[Regions.HITPOINTS.as_slice()]  # w = 40, h = 24
 prayer_img = haystack[Regions.PRAYER.as_slice()]  # w = 40, h = 24

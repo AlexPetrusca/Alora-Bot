@@ -15,6 +15,7 @@ class SlayerTask(Enum):
     CAVE_KRAKEN = 'Cave Kraken'
     RUNE_DRAGON = 'Rune Dragon'
     BASILISK_KNIGHT = 'Basilisk Knight'
+    SKELETAL_WYVERN = 'Skeletal Wyvern'
 
 
 # todo: [bug] sometimes heal action is messed up and fails after tp back
@@ -58,6 +59,7 @@ class SlayerAction(Action):
             SlayerTask.CAVE_KRAKEN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]),
             SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(80, [Prayer.PROTECT_FROM_MAGIC]),
             SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC], [Potion.ANTIFIRE]),
+            SlayerTask.SKELETAL_WYVERN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MISSILES], [Potion.ANTIFIRE]),
         }
         return task_configs[task]
 

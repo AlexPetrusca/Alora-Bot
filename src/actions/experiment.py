@@ -1,7 +1,11 @@
 from src.actions.primitives.action import Action
+from src.actions.types.action_status import ActionStatus
 from src.robot import robot
 from src.robot.timing.timer import Timer
+from src.vision import vision
 from src.vision.coordinates import Inventory
+from src.vision.regions import Regions
+from src.vision.vision import grab_region, read_int, read_text
 
 
 class ExperimentAction(Action):
@@ -12,11 +16,12 @@ class ExperimentAction(Action):
         self.set_progress_message('Experimenting...')
 
     def tick(self, timing):
-        for y in range(0, 7):
-            for x in range(0, 4):
-                timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Inventory.item(y, x)))
+        timing.interval(Timer.sec2tick(1), self.print_prayer)
+        return ActionStatus.IN_PROGRESS
 
-        return timing.complete()
+    def print_prayer(self):
+        screenshot = grab_region(Regions.PRAYER)
+        print("Prayer:", read_text(screenshot, config='--psm 6'), "-->", read_int(screenshot))
 
     def last_tick(self):
         pass
