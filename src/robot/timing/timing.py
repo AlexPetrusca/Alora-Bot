@@ -1,4 +1,5 @@
 import math
+import inspect
 import traceback as tb
 from enum import Enum
 
@@ -116,7 +117,15 @@ class Timing:
         def run_cb(timing, from_status, to_status, triggered_tick):
             tick_offset_restore = self.tick_offset
             self.tick_offset = triggered_tick
-            cb(timing, from_status, to_status)
+
+            param_count = len(inspect.signature(cb).parameters)
+            if param_count == 3:
+                cb(timing, from_status, to_status)
+            elif param_count == 1:
+                cb(timing)
+            else:
+                cb()
+
             self.tick_offset = tick_offset_restore
 
         key = Timing.get_caller_identifier()
