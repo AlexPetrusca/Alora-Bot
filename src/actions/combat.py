@@ -60,7 +60,6 @@ class CombatAction(Action):
 
         return timing.exit_status_after(Timer.sec2tick(5), exit_status)
 
-    # todo: do we need a retry timeout here? Bot could get stuck
     def poll_target_visible(self):
         contour = vision.locate_contour(vision.grab_screen(), self.target)
         if contour is not None:

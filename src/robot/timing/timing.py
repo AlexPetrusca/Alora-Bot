@@ -222,4 +222,3 @@ class Timing:
 
     class PollStatus(Enum):
         ABORTED = 0
-
