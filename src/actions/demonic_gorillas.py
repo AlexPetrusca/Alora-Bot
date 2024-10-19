@@ -3,7 +3,6 @@ import logging
 from src.actions.combat import CombatAction
 from src.actions.gear_switch import GearSwitchAction, GearSwitch
 from src.actions.prayer import PrayerAction
-from src.actions.types.action_status import ActionStatus
 from src.robot.timing.timer import Timer
 from src.vision import vision
 from src.vision.color import Color

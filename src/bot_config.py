@@ -35,7 +35,7 @@ class BotConfig:
 
             # ZulrahAction(),
 
-            CombatAction(),
+            # CombatAction(),
 
             # OrchestratorAction([
             #     WaitAction(0.1),

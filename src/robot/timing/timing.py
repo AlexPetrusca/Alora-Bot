@@ -1,5 +1,5 @@
-import inspect
 import math
+import traceback as tb
 
 from src.actions.types.action_status import ActionStatus
 from src.robot.timing.timing_record import TimingRecord
@@ -10,7 +10,6 @@ class Timing:
         self.tick_counter = -1
         self.tick_offset = 0
         self.start_tick = -1
-        # todo: [important] don't store actions, one-time functions, and polling functions together
         self.timing_records = dict()
 
     def update(self, global_tick):
@@ -32,18 +31,19 @@ class Timing:
         self.tick_offset += tick_duration
         return self.tick_counter == self.tick_offset
 
-    # todo: [important] execute, poll, and observe don't capture lambda return values... fn needs to be a fixed address
     def execute(self, fn, capture_result=False):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
+        key = Timing.get_caller_identifier()
+
         if self.tick_counter == self.tick_offset:
             status = fn()
             if capture_result:
-                self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+                self.timing_records[key] = TimingRecord(self.tick_counter, status)
 
         if capture_result:
-            execute_record = self.timing_records.get(fn)
+            execute_record = self.timing_records.get(key)
             if execute_record is None:
                 self.tick_offset = math.inf
                 return None
@@ -85,10 +85,12 @@ class Timing:
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
-        interval_record = self.timing_records.get(fn)
+        key = Timing.get_caller_identifier()
+
+        interval_record = self.timing_records.get(key)
         if (ignore_scheduling or self.tick_counter >= self.tick_offset) and self.tick_counter % tick_interval == 0:
             status = fn()
-            self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+            self.timing_records[key] = TimingRecord(self.tick_counter, status)
             return status  # current interval value
         elif interval_record is not None:
             return interval_record.status  # last interval value
@@ -105,12 +107,14 @@ class Timing:
             cb(timing, from_status, to_status)
             self.tick_offset = tick_offset_restore
 
-        prev_record = self.timing_records.get(fn)
+        key = Timing.get_caller_identifier()
+
+        prev_record = self.timing_records.get(key)
         if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
             status = fn()
             prev_status = prev_record.status if (prev_record is not None) else starting_status
             if status != prev_status:  # change observed?
-                self.timing_records[fn] = TimingRecord(self.tick_counter, status, prev_status)
+                self.timing_records[key] = TimingRecord(self.tick_counter, status, prev_status)
                 run_cb(self, prev_status, status, self.tick_counter)
                 return prev_status, status
 
@@ -120,25 +124,25 @@ class Timing:
         else:  # no value observed?
             return starting_status, starting_status
 
-    # todo: [important] poll doesn't work with lambdas... fn needs to be a fixed address
     def poll(self, tick_interval, fn):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
+        key = Timing.get_caller_identifier()
+
         # reset latch on first tick
         if self.tick_counter == self.tick_offset:
-            print("RESET POLL")
-            action_record = self.timing_records.get(fn)
+            action_record = self.timing_records.get(key)
             if action_record is not None:
-                self.timing_records.pop(fn)
+                self.timing_records.pop(key)
 
         # process poll on subsequent ticks
-        poll_record = self.timing_records.get(fn)
+        poll_record = self.timing_records.get(key)
         if poll_record is None:
             if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
                 status = fn()
                 if status is not None:
-                    self.timing_records[fn] = TimingRecord(self.tick_counter, status)
+                    self.timing_records[key] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                     return status  # event found
 
@@ -149,19 +153,21 @@ class Timing:
         return poll_record.status  # event previously found
 
     def action(self, action):
+        key = Timing.get_caller_identifier()
+
         # reset latch on first tick
         if self.tick_counter == self.tick_offset:
-            action_record = self.timing_records.get(action)
+            action_record = self.timing_records.get(key)
             if action_record is not None:
-                self.timing_records.pop(action)
+                self.timing_records.pop(key)
 
         # process action on subsequent ticks
         if self.tick_counter >= self.tick_offset:
-            action_record = self.timing_records.get(action)
+            action_record = self.timing_records.get(key)
             if action_record is None:  # in progress?
                 status = action.run(self.tick_counter)
                 if status.is_terminal():
-                    self.timing_records[action] = TimingRecord(self.tick_counter, status)
+                    self.timing_records[key] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                 else:
                     self.tick_offset = math.inf
@@ -176,3 +182,9 @@ class Timing:
     def action_after(self, tick_duration, action):
         self.wait(tick_duration)
         return self.action(action)
+
+    @classmethod
+    def get_caller_identifier(cls):
+        stack = tb.extract_stack()
+        caller_frame = stack[len(stack) - 3]
+        return f"{caller_frame.filename}_{caller_frame.name}_{caller_frame.lineno}"
