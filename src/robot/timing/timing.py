@@ -124,7 +124,7 @@ class Timing:
         else:  # no value observed?
             return starting_status, starting_status
 
-    def poll(self, tick_interval, fn):
+    def poll(self, tick_interval, fn, default_status=None):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
@@ -141,7 +141,7 @@ class Timing:
         if poll_record is None:
             if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
                 status = fn()
-                if status is not None:
+                if status is not default_status:
                     self.timing_records[key] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                     return status  # event found

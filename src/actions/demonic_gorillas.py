@@ -32,7 +32,6 @@ class DemonicGorillaAction(CombatAction):
 
         timing.action(self.melee_switch_action)
         if self.last_protect_prayer_action is not None:
-            timing.execute(lambda: print("Prayers:", self.last_protect_prayer_action.prayers))
             timing.action(self.last_protect_prayer_action)
 
         return timing.exit_status(combat_status)
