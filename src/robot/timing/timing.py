@@ -4,10 +4,15 @@ import traceback as tb
 from enum import Enum
 
 from src.actions.types.action_status import ActionStatus
+from src.robot.timing.mutex import Mutex
 from src.robot.timing.timing_record import TimingRecord
 
 
 class Timing:
+    MOUSE_MUTEX = Mutex()
+    KEYBOARD_MUTEX = Mutex()
+    SCREEN_MUTEX = Mutex()
+
     def __init__(self):
         self.tick_counter = -1
         self.tick_offset = 0
@@ -37,7 +42,7 @@ class Timing:
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
-        key = Timing.get_caller_identifier()
+        key = Timing.get_request_identifier()
 
         if self.tick_counter == self.tick_offset:
             status = fn()
@@ -87,12 +92,12 @@ class Timing:
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
-        key = Timing.get_caller_identifier()
+        key = Timing.get_request_identifier()
 
         # reset latch on first tick
         if self.tick_counter == self.tick_offset:
-            action_record = self.timing_records.get(key)
-            if action_record is not None:
+            interval_record = self.timing_records.get(key)
+            if interval_record is not None:
                 self.timing_records.pop(key)
 
         # process interval on subsequent ticks
@@ -128,7 +133,7 @@ class Timing:
 
             self.tick_offset = tick_offset_restore
 
-        key = Timing.get_caller_identifier()
+        key = Timing.get_request_identifier()
 
         prev_record = self.timing_records.get(key)
         if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
@@ -149,12 +154,12 @@ class Timing:
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
-        key = Timing.get_caller_identifier()
+        key = Timing.get_request_identifier()
 
         # reset latch on first tick
         if self.tick_counter == self.tick_offset:
-            action_record = self.timing_records.get(key)
-            if action_record is not None:
+            poll_record = self.timing_records.get(key)
+            if poll_record is not None:
                 self.timing_records.pop(key)
 
         # process poll on subsequent ticks
@@ -181,7 +186,7 @@ class Timing:
         return poll_record.status  # event previously found
 
     def action(self, action):
-        key = Timing.get_caller_identifier()
+        key = Timing.get_request_identifier()
 
         # reset latch on first tick
         if self.tick_counter == self.tick_offset:
@@ -214,11 +219,96 @@ class Timing:
     def block(self):
         self.tick_offset = math.inf
 
+    def acquire_mutex(self, mutex, force=False):
+        if not isinstance(mutex, Mutex):
+            raise AssertionError(f"{mutex} is not of type Mutex")
+
+        key = Timing.get_request_identifier()
+
+        # reset latch on first tick
+        if self.tick_counter == self.tick_offset:
+            acquire_record = self.timing_records.get(key)
+            if acquire_record is not None:
+                self.timing_records.pop(key)
+
+        # process acquire on subsequent ticks
+        if self.tick_counter >= self.tick_offset:
+            acquire_record = self.timing_records.get(key)
+            if acquire_record is None:  # attempting to acquire?
+                if mutex.acquire(force):
+                    self.timing_records[key] = TimingRecord(self.tick_counter, True)
+                    self.tick_offset = self.tick_counter
+                    return True
+            else:  # already acquired?
+                self.tick_offset = acquire_record.tick
+                return True
+
+        self.block()
+        return False
+
+    def release_mutex(self, mutex, force=False):
+        if not isinstance(mutex, Mutex):
+            raise AssertionError(f"{mutex} is not of type Mutex")
+
+        key = Timing.get_request_identifier()
+
+        # reset latch on first tick
+        if self.tick_counter == self.tick_offset:
+            release_record = self.timing_records.get(key)
+            if release_record is not None:
+                self.timing_records.pop(key)
+
+        # process release on subsequent ticks
+        if self.tick_counter >= self.tick_offset:
+            release_record = self.timing_records.get(key)
+            if release_record is None:  # attempting to release?
+                if mutex.release(force):
+                    self.timing_records[key] = TimingRecord(self.tick_counter, True)
+                    return True
+            else:  # already released?
+                return True
+
+        return False
+
+    def acquire_mutexes(self, *mutexes, force=False):
+        status = True
+        for mutex in mutexes:
+            if not self.acquire_mutex(mutex, force):
+                status = False
+        return status
+
+    def release_mutexes(self, *mutexes, force=False):
+        status = True
+        for mutex in mutexes:
+            if not self.release_mutex(mutex, force):
+                status = False
+        return status
+
+    def acquire_mouse(self, force=False):
+        return self.acquire_mutex(Timing.MOUSE_MUTEX, force)
+
+    def release_mouse(self, force=False):
+        return self.release_mutex(Timing.MOUSE_MUTEX, force)
+
+    def acquire_keyboard(self, force=False):
+        return self.acquire_mutex(Timing.KEYBOARD_MUTEX, force)
+
+    def release_keyboard(self, force=False):
+        return self.release_mutex(Timing.KEYBOARD_MUTEX, force)
+
+    def acquire_screen(self, force=False):
+        return self.acquire_mutex(Timing.SCREEN_MUTEX, force)
+
+    def release_screen(self, force=False):
+        return self.release_mutex(Timing.SCREEN_MUTEX, force)
+
     @classmethod
-    def get_caller_identifier(cls):
+    def get_request_identifier(cls):
         stack = tb.extract_stack()
-        caller_frame = stack[len(stack) - 3]
-        return f"{caller_frame.filename}_{caller_frame.name}_{caller_frame.lineno}"
+        for frame in reversed(stack):
+            if not frame.filename.endswith("timing/timing.py"):
+                return f"{frame.filename}_{frame.name}_{frame.lineno}"
+        return None
 
     class PollStatus(Enum):
         ABORTED = 0

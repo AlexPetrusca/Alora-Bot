@@ -22,15 +22,19 @@ class ExperimentAction(Action):
 
         """ Parallel Clicks """
         def action1():
+            timing.acquire_mouse()
             timing.execute(lambda: robot.click(ControlPanel.INVENTORY_TAB))
             timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Prayer.PROTECT_FROM_MELEE))
+            timing.release_mouse()
 
         def action2():
+            timing.acquire_mouse()
             timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))
             timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(Prayer.PROTECT_FROM_MISSILES))
+            timing.release_mouse()
 
-        timing.observe(Timer.sec2tick(2), self.counter, action1)
-        timing.observe(Timer.sec2tick(2), self.counter, action2)
+        timing.observe(Timer.sec2tick(5), self.counter, action1)
+        timing.observe(Timer.sec2tick(5), self.counter, action2)
 
         return ActionStatus.IN_PROGRESS
 
