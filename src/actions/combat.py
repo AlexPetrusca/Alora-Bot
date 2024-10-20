@@ -23,7 +23,7 @@ class CombatAction(Action):
         self.flee = flee
         self.prayers = prayers if (prayers is not None) else []
 
-        self.prayer_action = PrayerAction(*prayers)
+        self.prayer_action = PrayerAction(*self.prayers)
         self.retry_count = 0
 
     def first_tick(self):
