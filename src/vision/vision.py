@@ -121,13 +121,21 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
     return opt_contour, opt_value
 
 
-def locate_image(haystack, needle, threshold=0.7, silent=False):
+def locate_image(haystack, needle, threshold=0.7, half_scale=False, silent=False):
+    if half_scale:
+        haystack = cv.resize(haystack, (0, 0), fx=0.5, fy=0.5, interpolation=cv.INTER_NEAREST_EXACT)
+        needle = cv.resize(needle, (0, 0), fx=0.5, fy=0.5, interpolation=cv.INTER_NEAREST_EXACT)
+
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv.minMaxLoc(result)
     if max_val >= threshold:
         # if not silent:
         #     print(max_val)
-        return max_loc[0] + needle.shape[1] / 2, max_loc[1] + needle.shape[0] / 2
+        center_loc = max_loc[0] + needle.shape[1] / 2, max_loc[1] + needle.shape[0] / 2
+        if half_scale:
+            return 2 * center_loc[0], 2 * center_loc[1]
+        else:
+            return center_loc
     else:
         if not silent:
             print("ERROR: locate_image failed with:", max_val)

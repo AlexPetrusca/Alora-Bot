@@ -1,8 +1,7 @@
 import logging
 import math
 from enum import Enum
-
-import cv2
+from time import perf_counter
 
 from src.actions.auto_retaliate import AutoRetaliateAction
 from src.actions.primitives.action import Action
@@ -17,7 +16,7 @@ from src.vision.regions import Regions
 
 
 class BreadcrumbTrailAction(Action):
-    CLICK_RETRY_THRESHOLD = 10
+    CLICK_RETRY_THRESHOLD = 20
     RETRY_THRESHOLD = 3
     EXACT_DISTANCE_THRESHOLD = 25
     CLOSE_DISTANCE_THRESHOLD = 100
@@ -119,12 +118,13 @@ class BreadcrumbTrailAction(Action):
         elif to_status == self.Event.MENU_BREADCRUMB:
             timing.execute_after(Timer.sec2tick(1), lambda: robot.press('1'))
 
-    # todo: this is taking 0.5 seconds - need to speed this up
+    # todo: this is taking 0.1 seconds - possibly speed up?
     def get_next_breadcrumb(self):
-        screenshot = vision.grab_screen(hide_ui=True)
-        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.75, silent=False)
+        haystack = vision.grab_screen(hide_ui=True)
+        needle = Images.YELLOW_MARKERS[self.next_label]
+        breadcrumb_loc = vision.locate_image(haystack, needle, half_scale=True)
         if breadcrumb_loc is not None:
-            modifiers = self.find_modifiers(screenshot, breadcrumb_loc)
+            modifiers = self.find_modifiers(haystack, breadcrumb_loc)
             breadcrumb_loc = breadcrumb_loc[0] // 2, breadcrumb_loc[1] // 2
             distance = math.dist(Player.POSITION.value, breadcrumb_loc)
             return breadcrumb_loc, modifiers, distance
@@ -141,10 +141,10 @@ class BreadcrumbTrailAction(Action):
         y1 = int(loc[1] + width // 2 if (loc[1] + width // 2 <= 2 * Regions.SCREEN.h) else 2 * Regions.SCREEN.h)
         region = screenshot[y0:y1, x0:x1]
 
-        menu_marker_loc = vision.locate_image(region, Images.YELLOW_M_MARKER, 0.75, silent=True)
+        menu_marker_loc = vision.locate_image(region, Images.YELLOW_M_MARKER, silent=True)
         if menu_marker_loc is not None:
             modifiers.append('M')
-        web_marker_loc = vision.locate_image(region, Images.YELLOW_W_MARKER, 0.75, silent=True)
+        web_marker_loc = vision.locate_image(region, Images.YELLOW_W_MARKER, silent=True)
         if web_marker_loc is not None:
             modifiers.append('W')
 

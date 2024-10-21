@@ -56,12 +56,12 @@ def click_potion(potion):
     return drank_potion
 
 
-def click_image(image, threshold=0.7, region=Regions.SCREEN, silent=False):
+def click_image(image, threshold=0.7, region=Regions.SCREEN, half_scale=False, silent=False):
     screen = vision.grab_screen()
     if region == Regions.SCREEN:
-        loc = vision.locate_image(screen, image, threshold, silent=silent)
+        loc = vision.locate_image(screen, image, threshold, half_scale=half_scale, silent=silent)
     else:
-        loc = vision.locate_image(screen[region.as_slice()], image, threshold, silent=silent)
+        loc = vision.locate_image(screen[region.as_slice()], image, threshold, half_scale=half_scale, silent=silent)
 
     if loc is None:
         return False
