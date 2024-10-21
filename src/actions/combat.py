@@ -10,9 +10,10 @@ from src.robot.timing.timing import Timing
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, StandardSpellbook
+from src.vision.images import Potion
+
 
 # To-do:
-#  - Prayer potion + prayer threshold
 #  - Counter venom/poison
 #  - Thrall
 #  - Status potion
@@ -21,10 +22,12 @@ from src.vision.coordinates import ControlPanel, StandardSpellbook
 # todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
 #   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
-    def __init__(self, target=Color.RED, health_threshold=50, prayers=None, dodge_hazards=False, flee=True):
+    def __init__(self, target=Color.RED, health_threshold=50, prayer_threshold=20,
+                 prayers=None, dodge_hazards=False, flee=True):
         super().__init__()
         self.target = target
         self.health_threshold = health_threshold
+        self.prayer_threshold = prayer_threshold
         self.dodge_hazards = dodge_hazards
         self.flee = flee
         self.prayers = prayers if (prayers is not None) else []
@@ -50,7 +53,7 @@ class CombatAction(Action):
         timing.wait(Timer.sec2tick(3))
         if self.dodge_hazards:
             timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_hazards)
-        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat)
+        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat_end)
 
         exit_status = ActionStatus.IN_PROGRESS
         if combat_status == CombatAction.Event.FLEE or combat_status == CombatAction.Event.DEAD:
@@ -72,8 +75,7 @@ class CombatAction(Action):
         if contour is not None:
             return True
 
-    def poll_combat(self):
-        # check fight end
+    def poll_combat_end(self):
         ocr = vision.read_combat_info()
         # print('"', ocr, '"', len(ocr))
         if ocr.startswith("0/"):
@@ -94,6 +96,14 @@ class CombatAction(Action):
             if self.flee and not ate_food:
                 print("COMBAT - OUT OF FOOD")
                 return CombatAction.Event.FLEE
+
+        # sip prayer potions or teleport home on no prayer
+        if vision.read_prayer_energy() < self.prayer_threshold:
+            robot.click_potion(Potion.PRAYER)
+            # todo: teleport home on no prayer - below doesn't work because we cant read_int below ~25
+            # if self.flee and vision.read_prayer_energy() == 0:
+            #     print("COMBAT - OUT OF PRAYER")
+            #     return CombatAction.Event.FLEE
 
     def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)

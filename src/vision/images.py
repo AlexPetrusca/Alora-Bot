@@ -77,6 +77,8 @@ class Potion:
             self.status = ImageLoader.read(f'status/{potion}.png')
 
     ANTIFIRE = PotionDescriptor('antifire')
+    PRAYER = PotionDescriptor('prayer')
+    SUPER_COMBAT = PotionDescriptor('super_combat')
 
 
 class Status:
