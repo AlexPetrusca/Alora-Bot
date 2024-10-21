@@ -11,6 +11,13 @@ from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 
+# To-do:
+#  - timing.action(super()) refactor
+#  - Prayer potion + prayer threshold
+#  - Counter venom/poison
+#  - Thrall
+#  - Status potion
+
 
 # todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
 #   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
