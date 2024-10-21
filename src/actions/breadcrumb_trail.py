@@ -2,6 +2,8 @@ import logging
 import math
 from enum import Enum
 
+import cv2
+
 from src.actions.auto_retaliate import AutoRetaliateAction
 from src.actions.primitives.action import Action
 from src.actions.types.action_status import ActionStatus
@@ -69,9 +71,7 @@ class BreadcrumbTrailAction(Action):
             print("Failed finding breadcrumb: ", self.next_label)
             self.retry_count += 1
 
-        if self.target_label > 0 and self.next_label == self.target_label + 1:
-            return self.Event.TARGET_REACHED
-        elif self.retry_count > self.RETRY_THRESHOLD:
+        if self.retry_count > self.RETRY_THRESHOLD:
             return self.Event.ABORT
 
     def process_breadcrumb(self, breadcrumb_loc, modifiers, distance):
@@ -79,12 +79,15 @@ class BreadcrumbTrailAction(Action):
             self.next_label += 1
             self.click_retry_count = 0
             self.retry_count = 0
-            return self.Event.SUBTARGET_REACHED
+            if self.target_label != -1 and self.next_label == self.target_label + 1:
+                return self.Event.TARGET_REACHED
+            else:
+                return self.Event.SUBTARGET_REACHED
         elif distance < self.CLOSE_DISTANCE_THRESHOLD:  # close
             if 'M' in modifiers:
                 return self.Event.MENU_BREADCRUMB
             elif 'W' in modifiers:
-                self.found_loc = breadcrumb_loc
+                # self.found_loc = breadcrumb_loc
                 return self.Event.WEB_BREADCRUMB
         elif distance >= self.CLOSE_DISTANCE_THRESHOLD:  # far
             self.click_retry_count += 1
@@ -109,10 +112,10 @@ class BreadcrumbTrailAction(Action):
         elif to_status == self.Event.SHIFT_CLICK_BREADCRUMB:
             timing.execute(lambda: robot.shift_click(self.found_loc))
         elif to_status == self.Event.WEB_BREADCRUMB or (from_status == self.Event.WEB_BREADCRUMB and to_status is None):
-            self.retry_count = 0
+            self.retry_count = 0  # player health bar will sometimes block out the breadcrumb
             for _ in range(0, 20):
-                timing.execute_after(Timer.sec2tick(1), lambda: robot.click(self.found_loc[0], self.found_loc[1] + 20))
-                # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click_contour(self.color, 100))
+                timing.execute_after(Timer.sec2tick(1), lambda: robot.click_contour(self.color, 100))
+                # timing.execute_after(Timer.sec2tick(1), lambda: robot.click(self.found_loc[0], self.found_loc[1] + 20))
         elif to_status == self.Event.MENU_BREADCRUMB:
             timing.execute_after(Timer.sec2tick(1), lambda: robot.press('1'))
 
