@@ -11,6 +11,10 @@ from src.vision.images import Images
 
 
 class BreadcrumbTrailAction(Action):
+    CLICK_RETRY_THRESHOLD = 5
+    RETRY_THRESHOLD = 3
+    DISTANCE_THRESHOLD = 50
+
     def __init__(self, color=Color.YELLOW, disable_auto_retaliate=False):
         super().__init__()
         self.color = color
@@ -26,24 +30,24 @@ class BreadcrumbTrailAction(Action):
 
     def tick(self, timing):
         timing.interval(Timer.sec2tick(1), self.click_next_breadcrumb)
-        if self.retry_count > 3:
+        if self.retry_count > BreadcrumbTrailAction.RETRY_THRESHOLD:
             return timing.complete()  # reached destination
         return ActionStatus.IN_PROGRESS
 
     def click_next_breadcrumb(self):
         breadcrumb_loc, distance = self.find_next_breadcrumb()
         if breadcrumb_loc is not None:
-            if self.click_retry_count > 5:
+            if self.click_retry_count > BreadcrumbTrailAction.CLICK_RETRY_THRESHOLD:
                 print(f"Retrying Click on Breadcrumb {self.found_label}...")
                 self.found_label -= 1
                 self.click_retry_count = 0
                 self.retry_count += 1
 
             if self.found_label != self.next_label:
-                if distance >= 50:
+                if distance >= BreadcrumbTrailAction.DISTANCE_THRESHOLD:
                     robot.shift_click(breadcrumb_loc)
                 self.found_label = self.next_label
-            elif distance < 50:
+            elif distance < BreadcrumbTrailAction.DISTANCE_THRESHOLD:
                 self.next_label += 1
                 self.click_retry_count = 0
                 self.retry_count = 0
