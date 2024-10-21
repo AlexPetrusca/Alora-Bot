@@ -17,7 +17,7 @@ class HealAction(Action):
         timing.execute(lambda: robot.shift_click(HealActionCoord.WALK1))  # move to teleport wizard
         timing.execute_after(Timer.sec2tick(4), lambda: robot.click(HealActionCoord.PRAYER_ALTAR))
         timing.execute_after(Timer.sec2tick(8), lambda: robot.right_click(HealActionCoord.HEALER))
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click_image(Images.HEAL_OPTION, 0.9))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click_image(Images.Menu.HEAL_OPTION, 0.9))
         if self.bank:
             timing.execute_after(Timer.sec2tick(3), lambda: robot.click(HealActionCoord.BANK_CHEST))
             timing.execute_after(Timer.sec2tick(4), lambda: robot.click(BankMenu.CLOSE))

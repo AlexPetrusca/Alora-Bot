@@ -1,8 +1,8 @@
 import math
 from enum import Enum
 
+from src.actions.auto_retaliate import AutoRetaliateAction
 from src.actions.primitives.action import Action
-from src.actions.types.action_status import ActionStatus
 from src.robot import robot
 from src.robot.timing.timer import Timer
 from src.vision import vision
@@ -16,24 +16,30 @@ class BreadcrumbTrailAction(Action):
     RETRY_THRESHOLD = 3
     DISTANCE_THRESHOLD = 50
 
-    def __init__(self, color=Color.YELLOW, target=-1, disable_auto_retaliate=False):
+    def __init__(self, color=Color.YELLOW, target=-1, dangerous=False):
         super().__init__()
         self.color = color
-        self.disable_auto_retaliate = disable_auto_retaliate
         self.target_label = target
+        self.dangerous = dangerous
 
         self.found_label = -1
         self.next_label = 0
         self.click_retry_count = 0
         self.retry_count = 0
 
+        self.auto_retaliate_on_action = AutoRetaliateAction(auto_retaliate=True)
+        self.auto_retaliate_off_action = AutoRetaliateAction(auto_retaliate=False)
+
     def first_tick(self):
         self.set_progress_message(f'Following {self.color.to_string()} breadcrumb trail...')
 
     def tick(self, timing):
-        # if self.disable_auto_retaliate:
-        #     timing
+        if self.dangerous:
+            timing.action(self.auto_retaliate_off_action)
         status = timing.poll(Timer.sec2tick(1), self.click_next_breadcrumb)
+        if self.dangerous:
+            timing.action(self.auto_retaliate_on_action)
+
         if status == BreadcrumbTrailAction.Event.TARGET_REACHED:
             return timing.complete()
         else:
@@ -70,7 +76,7 @@ class BreadcrumbTrailAction(Action):
     # todo: this is taking 0.5 seconds - need to speed this up
     def find_next_breadcrumb(self):
         screenshot = vision.grab_screen(hide_ui=True)
-        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.8)
+        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.8, silent=True)
         if breadcrumb_loc is not None:
             breadcrumb_loc = breadcrumb_loc[0] / 2, breadcrumb_loc[1] / 2
             distance = math.dist(Player.POSITION.value, breadcrumb_loc)

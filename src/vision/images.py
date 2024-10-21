@@ -13,7 +13,6 @@ class ImageLoader:
 
 
 class Images:
-    HEAL_OPTION = ImageLoader.read('menu/heal_option.png')
     YELLOW_MARKERS = [
         ImageLoader.read('label/marker/yellow/0.png'),
         ImageLoader.read('label/marker/yellow/1.png'),
@@ -44,6 +43,11 @@ class Images:
             T=ImageLoader.read('label/barrows/unavailable/T.png'),
             V=ImageLoader.read('label/barrows/unavailable/V.png'),
         )
+
+    class Menu:
+        HEAL_OPTION = ImageLoader.read('menu/heal_option.png')
+        AUTO_RETALIATE_ON = ImageLoader.read('menu/auto_retaliate_on.png')
+        AUTO_RETALIATE_OFF = ImageLoader.read('menu/auto_retaliate_off.png')
 
 
 class Food:
