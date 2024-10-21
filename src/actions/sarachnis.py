@@ -8,6 +8,8 @@ from src.vision.coordinates import Prayer
 
 
 class SarachnisAction(CombatAction):
+    DISTANCE_THRESHOLD = 500  # upper limit for melee range
+
     def __init__(self):
         super().__init__(target=Color.RED, health_threshold=70, prayers=[Prayer.PROTECT_FROM_MELEE])
 
@@ -16,18 +18,12 @@ class SarachnisAction(CombatAction):
 
     def tick(self, timing):
         timing.interval(Timer.sec2tick(1), self.reengage_combat)
-        combat_status = timing.poll(Timer.sec2tick(0.1), self.poll_combat_status)
-        return timing.exit_status(combat_status)
+        return super().tick(timing)
 
     def reengage_combat(self):
         _, distance = vision.get_contour(vision.grab_screen(), self.target)
-        if distance > 500:  # 500 is upper limit for melee range
+        if distance > self.DISTANCE_THRESHOLD:
             robot.click_contour(Color.RED)
-
-    def poll_combat_status(self):
-        status = super().tick(self.timing)
-        if status.is_terminal():
-            return status
 
     def last_tick(self):
         super().last_tick()

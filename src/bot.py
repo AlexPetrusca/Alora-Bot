@@ -23,13 +23,13 @@ class Bot:
         self.current_config = None
         self.current_action = None
 
-        config = BotConfig.experiment()
+        # config = BotConfig.experiment()
         # config = BotConfig.combat()
         # config = BotConfig.slayer(SlayerTask.BASILISK_KNIGHT)
         # config = BotConfig.slayer(SlayerTask.CAVE_KRAKEN)
         # config = BotConfig.slayer(SlayerTask.RUNE_DRAGON)
         # config = BotConfig.slayer(SlayerTask.SKELETAL_WYVERN)
-        # config = BotConfig.sarachnis()
+        config = BotConfig.sarachnis()
         # config = BotConfig.demonic_gorillas()
         # config = BotConfig.cerberus()
         # config = BotConfig.barrows()

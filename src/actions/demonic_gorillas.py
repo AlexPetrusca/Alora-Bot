@@ -28,18 +28,13 @@ class DemonicGorillaAction(CombatAction):
     def tick(self, timing):
         timing.observe(Timer.sec2tick(1), self.track_opp_prayer, self.respond_to_prayer_change)
 
-        combat_status = timing.poll(Timer.sec2tick(0.1), self.poll_combat_status)
+        combat_status = super().tick(timing)
 
         timing.action(self.melee_switch_action)
         if self.last_protect_prayer_action is not None:
             timing.action(self.last_protect_prayer_action)
 
         return timing.exit_status(combat_status)
-
-    def poll_combat_status(self):
-        status = super().tick(self.timing)
-        if status.is_terminal():
-            return status
 
     def respond_to_prayer_change(self, timing, from_status, to_status):
         timing.execute(lambda: logging.info(f"{from_status} --> {to_status}"))

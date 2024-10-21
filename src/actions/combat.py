@@ -12,7 +12,6 @@ from src.vision.color import Color
 from src.vision.coordinates import ControlPanel, StandardSpellbook
 
 # To-do:
-#  - timing.action(super()) refactor
 #  - Prayer potion + prayer threshold
 #  - Counter venom/poison
 #  - Thrall
@@ -46,7 +45,7 @@ class CombatAction(Action):
         if len(self.prayers) > 0:
             timing.action(self.prayer_action)
 
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(ControlPanel.INVENTORY_TAB))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.press('Space'))  # inventory tab
 
         timing.wait(Timer.sec2tick(3))
         if self.dodge_hazards:
@@ -56,8 +55,9 @@ class CombatAction(Action):
         exit_status = ActionStatus.IN_PROGRESS
         if combat_status == CombatAction.Event.FLEE or combat_status == CombatAction.Event.DEAD:
             exit_status = ActionStatus.ABORTED
-            timing.execute(lambda: robot.click(ControlPanel.MAGIC_TAB))
-            timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
+            # todo: replace with teleport home action
+            timing.execute(lambda: robot.press('2'))  # magic tab
+            timing.execute_after(Timer.sec2tick(0.1), lambda: robot.click(StandardSpellbook.HOME_TELEPORT))
         elif combat_status == CombatAction.Event.FIGHT_OVER:
             exit_status = ActionStatus.COMPLETE
 
@@ -95,9 +95,6 @@ class CombatAction(Action):
                 print("COMBAT - OUT OF FOOD")
                 return CombatAction.Event.FLEE
 
-    def last_tick(self):
-        self.retry_count = 0
-
     def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)
         return hazard is not None
@@ -105,6 +102,9 @@ class CombatAction(Action):
     def respond_to_hazards(self, timing, prev_hazard, curr_hazard):
         if not prev_hazard and curr_hazard:
             timing.execute(lambda: robot.click_contour(Color.YELLOW))
+
+    def last_tick(self):
+        self.retry_count = 0
 
     class Event(Enum):
         DEAD = 0
