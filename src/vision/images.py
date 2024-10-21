@@ -25,6 +25,8 @@ class Images:
         ImageLoader.read('label/marker/yellow/8.png'),
         ImageLoader.read('label/marker/yellow/9.png'),
     ]
+    YELLOW_M_MARKER = ImageLoader.read('label/marker/yellow/M.png')
+    YELLOW_W_MARKER = ImageLoader.read('label/marker/yellow/W.png')
 
     class Barrows:
         AVAILABLE_LABELS = dict(

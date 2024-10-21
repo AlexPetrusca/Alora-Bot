@@ -5,7 +5,10 @@ from src.vision.regions import Regions
 from src.vision.vision import ContourDetection
 
 
-def click(x=None, y=None):
+def click(x, y=None):
+    if x is None:
+        return
+
     if isinstance(x, tuple):
         pyautogui.moveTo(x)
     elif hasattr(x, 'value'):
@@ -15,7 +18,10 @@ def click(x=None, y=None):
     pyautogui.click()
 
 
-def right_click(x=None, y=None):
+def right_click(x, y=None):
+    if x is None:
+        return
+
     if isinstance(x, tuple):
         pyautogui.moveTo(x)
     elif hasattr(x, 'value'):
@@ -25,7 +31,7 @@ def right_click(x=None, y=None):
     pyautogui.rightClick()
 
 
-def shift_click(x=None, y=None):
+def shift_click(x, y=None):
     with pyautogui.hold('shift'):
         click(x, y)
 

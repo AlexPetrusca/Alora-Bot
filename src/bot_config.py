@@ -29,7 +29,7 @@ class BotConfig:
             WaitAction(1).play_once(),
 
             # ExperimentAction(),
-            BreadcrumbTrailAction(),
+            BreadcrumbTrailAction(dangerous=True),
 
             # TormentedDemonAction(),
             # DemonicGorillaAction(),
