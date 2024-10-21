@@ -14,7 +14,7 @@ def scale_coord(x, y):
 
 
 class Player(Enum):
-    POSITION = Regions.GAME.w // 2 - 10, Regions.GAME.y + Regions.GAME.h // 2 - 20
+    POSITION = Regions.GAME.w // 2 + 4, Regions.GAME.y + Regions.GAME.h // 2 + 4
 
 
 class ControlPanel(Enum):

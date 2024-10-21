@@ -29,25 +29,14 @@ class BotConfig:
             WaitAction(1).play_once(),
 
             # ExperimentAction(),
+            BreadcrumbTrailAction(),
 
             # TormentedDemonAction(),
             # DemonicGorillaAction(),
-            SarachnisAction(),
-            PickUpItemsAction(),
-
+            # SarachnisAction(),
             # ZulrahAction(),
-
             # CombatAction(),
-
-            # OrchestratorAction([
-            #     WaitAction(0.1),
-            #     WaitAction(0.2),
-            # ], 3)
-
-            # WaitAction(5),
-            # PrayerAction(Prayer.PROTECT_FROM_MELEE, Prayer.PIETY),
-            # WaitAction(1),
-            # PrayerAction(Prayer.PIETY, Prayer.PROTECT_FROM_MELEE)
+            # PickUpItemsAction(),
         ]
 
     @staticmethod
