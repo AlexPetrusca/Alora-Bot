@@ -1,4 +1,5 @@
 import math
+from enum import Enum
 
 from src.actions.primitives.action import Action
 from src.actions.types.action_status import ActionStatus
@@ -15,10 +16,11 @@ class BreadcrumbTrailAction(Action):
     RETRY_THRESHOLD = 3
     DISTANCE_THRESHOLD = 50
 
-    def __init__(self, color=Color.YELLOW, disable_auto_retaliate=False):
+    def __init__(self, color=Color.YELLOW, target=-1, disable_auto_retaliate=False):
         super().__init__()
         self.color = color
         self.disable_auto_retaliate = disable_auto_retaliate
+        self.target_label = target
 
         self.found_label = -1
         self.next_label = 0
@@ -29,10 +31,13 @@ class BreadcrumbTrailAction(Action):
         self.set_progress_message(f'Following {self.color.to_string()} breadcrumb trail...')
 
     def tick(self, timing):
-        timing.interval(Timer.sec2tick(1), self.click_next_breadcrumb)
-        if self.retry_count > BreadcrumbTrailAction.RETRY_THRESHOLD:
-            return timing.complete()  # reached destination
-        return ActionStatus.IN_PROGRESS
+        # if self.disable_auto_retaliate:
+        #     timing
+        status = timing.poll(Timer.sec2tick(1), self.click_next_breadcrumb)
+        if status == BreadcrumbTrailAction.Event.TARGET_REACHED:
+            return timing.complete()
+        else:
+            return timing.abort()
 
     def click_next_breadcrumb(self):
         breadcrumb_loc, distance = self.find_next_breadcrumb()
@@ -57,10 +62,15 @@ class BreadcrumbTrailAction(Action):
             print("Failed finding breadcrumb: ", self.next_label)
             self.retry_count += 1
 
+        if self.target_label > 0 and self.next_label == self.target_label + 1:
+            return BreadcrumbTrailAction.Event.TARGET_REACHED
+        elif self.retry_count > BreadcrumbTrailAction.RETRY_THRESHOLD:
+            return BreadcrumbTrailAction.Event.ABORT
+
     # todo: this is taking 0.5 seconds - need to speed this up
     def find_next_breadcrumb(self):
         screenshot = vision.grab_screen(hide_ui=True)
-        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.8, silent=True)
+        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.8)
         if breadcrumb_loc is not None:
             breadcrumb_loc = breadcrumb_loc[0] / 2, breadcrumb_loc[1] / 2
             distance = math.dist(Player.POSITION.value, breadcrumb_loc)
@@ -90,3 +100,7 @@ class BreadcrumbTrailAction(Action):
         self.next_label = 0
         self.click_retry_count = 0
         self.retry_count = 0
+
+    class Event(Enum):
+        ABORT = 0
+        TARGET_REACHED = 1
