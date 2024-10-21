@@ -84,10 +84,10 @@ class BreadcrumbTrailAction(Action):
                 return self.Event.SUBTARGET_REACHED
         elif distance < self.CLOSE_DISTANCE_THRESHOLD:  # close
             if 'M' in modifiers:
-                return self.Event.MENU_BREADCRUMB
+                return self.Event.INTERACT_MENU
             elif 'W' in modifiers:
                 # self.found_loc = breadcrumb_loc
-                return self.Event.WEB_BREADCRUMB
+                return self.Event.INTERACT_WEB
         elif distance >= self.CLOSE_DISTANCE_THRESHOLD:  # far
             self.click_retry_count += 1
             if self.click_retry_count > self.CLICK_RETRY_THRESHOLD:
@@ -110,12 +110,12 @@ class BreadcrumbTrailAction(Action):
             timing.execute(lambda: robot.click(self.found_loc))
         elif to_status == self.Event.SHIFT_CLICK_BREADCRUMB:
             timing.execute(lambda: robot.shift_click(self.found_loc))
-        elif to_status == self.Event.WEB_BREADCRUMB or (from_status == self.Event.WEB_BREADCRUMB and to_status is None):
+        elif to_status == self.Event.INTERACT_WEB or (from_status == self.Event.INTERACT_WEB and to_status is None):
             self.retry_count = 0  # player health bar will sometimes block out the breadcrumb
             for _ in range(0, 20):
                 timing.execute_after(Timer.sec2tick(1), lambda: robot.click_contour(self.color, 100))
                 # timing.execute_after(Timer.sec2tick(1), lambda: robot.click(self.found_loc[0], self.found_loc[1] + 20))
-        elif to_status == self.Event.MENU_BREADCRUMB:
+        elif to_status == self.Event.INTERACT_MENU:
             timing.execute_after(Timer.sec2tick(1), lambda: robot.press('1'))
 
     # todo: this is taking 0.1 seconds - possibly speed up?
@@ -160,9 +160,10 @@ class BreadcrumbTrailAction(Action):
     class Event(Enum):
         ABORT = 0
         TARGET_REACHED = 1
+        SUBTARGET_REACHED = 2
 
-        SUBTARGET_REACHED = 6
-        CLICK_BREADCRUMB = 2
-        SHIFT_CLICK_BREADCRUMB = 3
-        WEB_BREADCRUMB = 4
-        MENU_BREADCRUMB = 5
+        CLICK_BREADCRUMB = 3
+        SHIFT_CLICK_BREADCRUMB = 4
+
+        INTERACT_WEB = 5
+        INTERACT_MENU = 6
