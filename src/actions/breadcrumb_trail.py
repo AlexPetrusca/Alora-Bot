@@ -1,9 +1,6 @@
 import logging
 import math
 from enum import Enum
-from time import perf_counter
-
-import cv2
 
 from src.actions.auto_retaliate import AutoRetaliateAction
 from src.actions.primitives.action import Action
@@ -46,11 +43,11 @@ class BreadcrumbTrailAction(Action):
             timing.action(self.auto_retaliate_off_action)
         _, status = timing.observe(Timer.sec2tick(1), self.click_next_breadcrumb, self.respond)
 
-        if status == BreadcrumbTrailAction.Event.TARGET_REACHED:
+        if status == self.Event.TARGET_REACHED:
             if self.dangerous:
                 timing.action(self.auto_retaliate_on_action)
             return timing.complete()
-        elif status == BreadcrumbTrailAction.Event.ABORT:
+        elif status == self.Event.ABORT:
             if self.dangerous:
                 timing.action(self.auto_retaliate_on_action)
             return timing.abort()
@@ -58,13 +55,14 @@ class BreadcrumbTrailAction(Action):
         return ActionStatus.IN_PROGRESS
 
     def click_next_breadcrumb(self):
-        t0 = perf_counter()
+        # t0 = perf_counter()
         breadcrumb_loc, modifiers, distance = self.get_next_breadcrumb()
-        t1 = perf_counter()
-        print("TIMING:", t1 - t0)
-        # print('Breadcrumb', self.next_label, '-->', breadcrumb_loc, '|', modifiers, '|', distance)
+        # t1 = perf_counter()
+        # print("TIMING:", t1 - t0)
+
+        logging.info(f'Breadcrumb {self.next_label} --> {breadcrumb_loc} | {modifiers} | {distance}')
         if breadcrumb_loc is not None:
-            # if self.click_retry_count > BreadcrumbTrailAction.CLICK_RETRY_THRESHOLD:
+            # if self.click_retry_count > self.CLICK_RETRY_THRESHOLD:
             #     print(f"Retrying Click on Breadcrumb {self.found_label}...")
             #     self.found_label -= 1
             #     self.click_retry_count = 0
@@ -82,43 +80,42 @@ class BreadcrumbTrailAction(Action):
             #     self.click_retry_count += 1
 
             if 'W' in modifiers and self.EXACT_DISTANCE_THRESHOLD < distance < self.CLOSE_DISTANCE_THRESHOLD:
-                self.found_loc = breadcrumb_loc if (self.found_loc is None) else None  # first loc is imprecise
-                return BreadcrumbTrailAction.Event.WEB_BREADCRUMB
+                self.found_loc = breadcrumb_loc
+                return self.Event.WEB_BREADCRUMB
             elif 'M' in modifiers and distance < self.CLOSE_DISTANCE_THRESHOLD:
-                return BreadcrumbTrailAction.Event.MENU_BREADCRUMB
-            elif distance > BreadcrumbTrailAction.EXACT_DISTANCE_THRESHOLD:
+                return self.Event.MENU_BREADCRUMB
+            elif distance > self.EXACT_DISTANCE_THRESHOLD:
                 if not self.dangerous or len(modifiers) > 0:
-                    return BreadcrumbTrailAction.Event.CLICK_BREADCRUMB
+                    return self.Event.CLICK_BREADCRUMB
                 else:
-                    return BreadcrumbTrailAction.Event.SHIFT_CLICK_BREADCRUMB
+                    return self.Event.SHIFT_CLICK_BREADCRUMB
         else:
             print("Failed finding breadcrumb: ", self.next_label)
             self.retry_count += 1
 
         if self.target_label > 0 and self.next_label == self.target_label + 1:
-            return BreadcrumbTrailAction.Event.TARGET_REACHED
-        elif self.retry_count > BreadcrumbTrailAction.RETRY_THRESHOLD:
-            return BreadcrumbTrailAction.Event.ABORT
+            return self.Event.TARGET_REACHED
+        elif self.retry_count > self.RETRY_THRESHOLD:
+            return self.Event.ABORT
 
     def respond(self, timing, from_status, to_status):
         timing.execute(lambda: logging.info(f"TO_STATUS --> {to_status}"))
-        if to_status == BreadcrumbTrailAction.Event.CLICK_BREADCRUMB:
+        if to_status == self.Event.CLICK_BREADCRUMB:
             timing.execute(lambda: robot.click(self.found_loc))
-        elif to_status == BreadcrumbTrailAction.Event.SHIFT_CLICK_BREADCRUMB:
+        elif to_status == self.Event.SHIFT_CLICK_BREADCRUMB:
             timing.execute(lambda: robot.shift_click(self.found_loc))
-        elif to_status == BreadcrumbTrailAction.Event.WEB_BREADCRUMB:
-            for i in range(0, 20):
-                timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click(self.found_loc))
-                # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click_contour(self.color))
-                # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click_image(Images.YELLOW_W_MARKER))
-        elif to_status == BreadcrumbTrailAction.Event.MENU_BREADCRUMB:
-            timing.execute_after(Timer.sec2tick(0.5), lambda: robot.press('1'))
-
+        elif to_status == self.Event.WEB_BREADCRUMB or (from_status == self.Event.WEB_BREADCRUMB and to_status is None):
+            self.retry_count = 0
+            for _ in range(0, 20):
+                timing.execute_after(Timer.sec2tick(1), lambda: robot.click(self.found_loc[0], self.found_loc[1] + 20))
+                # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click_contour(self.color, 100))
+        elif to_status == self.Event.MENU_BREADCRUMB:
+            timing.execute_after(Timer.sec2tick(1), lambda: robot.press('1'))
 
     # todo: this is taking 0.5 seconds - need to speed this up
     def get_next_breadcrumb(self):
         screenshot = vision.grab_screen(hide_ui=True)
-        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.75, silent=True)
+        breadcrumb_loc = vision.locate_image(screenshot, Images.YELLOW_MARKERS[self.next_label], 0.75, silent=False)
         if breadcrumb_loc is not None:
             modifiers = self.find_modifiers(screenshot, breadcrumb_loc)
             breadcrumb_loc = breadcrumb_loc[0] // 2, breadcrumb_loc[1] // 2
@@ -145,23 +142,6 @@ class BreadcrumbTrailAction(Action):
             modifiers.append('W')
 
         return modifiers
-
-    # def find_next_breadcrumb(self):
-    #     screenshot = vision.grab_screen(hide_ui=True)
-    #     contour_loc = vision.locate_contour(screenshot, Color.YELLOW, 250)
-    #     if contour_loc is not None:
-    #         search_width = 100
-    #         x0 = contour_loc[0] - search_width // 2 if (contour_loc[0] - search_width // 2 >= 0) else 0
-    #         y0 = contour_loc[1] - search_width // 2 if (contour_loc[1] - search_width // 2 >= 0) else 0
-    #         x1 = contour_loc[0] + search_width // 2 if (contour_loc[0] + search_width // 2 <= 2 * Regions.SCREEN.w) else 2 * Regions.SCREEN.w
-    #         y1 = contour_loc[1] + search_width // 2 if (contour_loc[1] + search_width // 2 <= 2 * Regions.SCREEN.h) else 2 * Regions.SCREEN.h
-    #         target_loc = vision.locate_image(screenshot[y0:y1, x0:x1], Images.YELLOW_MARKERS[self.next_label], 0.8, silent=True)
-    #         if target_loc is not None:
-    #             breadcrumb_loc = (x0 + target_loc[0]) // 2, (y0 + target_loc[1]) // 2
-    #             breadcrumb_distance = math.dist(Player.POSITION.value, breadcrumb_loc)
-    #             return breadcrumb_loc, breadcrumb_distance
-    #
-    #     return None, -1
 
     def last_tick(self):
         self.found_label = -1

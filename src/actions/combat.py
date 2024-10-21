@@ -33,7 +33,7 @@ class CombatAction(Action):
         if self.target is not None:
             status = timing.poll(Timer.sec2tick(0.5), self.poll_target_visible, play_count=5)
             if status == Timing.PollStatus.ABORTED:
-                return timing.abort()
+                return timing.complete()
             timing.execute(lambda: robot.click_contour(self.target))
 
         if len(self.prayers) > 0:

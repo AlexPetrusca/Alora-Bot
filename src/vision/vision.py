@@ -123,12 +123,12 @@ def locate_image(haystack, needle, threshold=0.7, silent=False):
     result = cv.matchTemplate(haystack, needle, cv.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv.minMaxLoc(result)
     if max_val >= threshold:
-        if not silent:
-            print(max_val)
+        # if not silent:
+        #     print(max_val)
         return max_loc[0] + needle.shape[1] / 2, max_loc[1] + needle.shape[0] / 2
     else:
-        # if not silent:
-        print("ERROR: locate_image failed with:", max_val)
+        if not silent:
+            print("ERROR: locate_image failed with:", max_val)
         return None
 
 
