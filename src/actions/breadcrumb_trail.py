@@ -15,7 +15,7 @@ from src.vision.regions import Regions
 
 
 class BreadcrumbTrailAction(Action):
-    CLICK_RETRY_THRESHOLD = 5
+    CLICK_RETRY_THRESHOLD = 10
     RETRY_THRESHOLD = 3
     EXACT_DISTANCE_THRESHOLD = 25
     CLOSE_DISTANCE_THRESHOLD = 100
@@ -72,6 +72,10 @@ class BreadcrumbTrailAction(Action):
             if self.found_label != self.next_label:
                 self.found_label = self.next_label
                 self.found_loc = breadcrumb_loc
+                if not self.dangerous or len(modifiers) > 0:
+                    return self.Event.CLICK_BREADCRUMB
+                else:
+                    return self.Event.SHIFT_CLICK_BREADCRUMB
 
             if distance < self.EXACT_DISTANCE_THRESHOLD:
                 self.next_label += 1
@@ -85,11 +89,11 @@ class BreadcrumbTrailAction(Action):
                 return self.Event.WEB_BREADCRUMB
             elif 'M' in modifiers and distance < self.CLOSE_DISTANCE_THRESHOLD:
                 return self.Event.MENU_BREADCRUMB
-            elif distance > self.EXACT_DISTANCE_THRESHOLD:
-                if not self.dangerous or len(modifiers) > 0:
-                    return self.Event.CLICK_BREADCRUMB
-                else:
-                    return self.Event.SHIFT_CLICK_BREADCRUMB
+            # elif distance > self.EXACT_DISTANCE_THRESHOLD:
+            #     if not self.dangerous or len(modifiers) > 0:
+            #         return self.Event.CLICK_BREADCRUMB
+            #     else:
+            #         return self.Event.SHIFT_CLICK_BREADCRUMB
         else:
             print("Failed finding breadcrumb: ", self.next_label)
             self.retry_count += 1
@@ -107,6 +111,7 @@ class BreadcrumbTrailAction(Action):
             timing.execute(lambda: robot.shift_click(self.found_loc))
         elif to_status == self.Event.WEB_BREADCRUMB or (from_status == self.Event.WEB_BREADCRUMB and to_status is None):
             self.retry_count = 0
+            self.click_retry_count = 0
             for _ in range(0, 20):
                 timing.execute_after(Timer.sec2tick(1), lambda: robot.click(self.found_loc[0], self.found_loc[1] + 20))
                 # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click_contour(self.color, 100))
