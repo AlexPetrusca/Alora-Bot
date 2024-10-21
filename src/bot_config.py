@@ -1,6 +1,6 @@
 from src.actions.barrow import BarrowAction, BarrowBrother
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
-from src.actions.calibrate import CalibrateAction
+from src.actions.calibrate import CalibrateAction, Direction
 from src.actions.cerberus import CerberusAction
 from src.actions.demonic_gorillas import DemonicGorillaAction
 from src.actions.experiment import ExperimentAction
@@ -60,6 +60,26 @@ class BotConfig:
             BreadcrumbTrailAction(trail_color),
             SlayerAction(task),
 
+            HealAction(bank=True)
+        ]
+
+    @staticmethod
+    def sarachnis():
+        return [
+            WaitAction(5).play_once(),
+            CalibrateAction().play_once(),
+
+            HomeTeleportAction(),
+            TeleportWizardAction("Sarachnis"),
+
+            CalibrateAction(Direction.SOUTH),
+            BreadcrumbTrailAction(Color.YELLOW, target=4, dangerous=True),
+            OrchestratorAction([
+                SarachnisAction(),
+                PickUpItemsAction(),
+            ]),
+
+            CalibrateAction(Direction.NORTH),
             HealAction(bank=True)
         ]
 
