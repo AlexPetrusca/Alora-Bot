@@ -48,8 +48,14 @@ class Images:
 
     class Menu:
         HEAL_OPTION = ImageLoader.read('menu/heal_option.png')
-        AUTO_RETALIATE_ON = ImageLoader.read('menu/auto_retaliate_on.png')
-        AUTO_RETALIATE_OFF = ImageLoader.read('menu/auto_retaliate_off.png')
+        AUTO_RETALIATE_ON = ImageLoader.read('menu/auto_retaliate/on.png')
+        AUTO_RETALIATE_OFF = ImageLoader.read('menu/auto_retaliate/off.png')
+        COMPASS_DIRECTIONS = dict(
+            North=ImageLoader.read('menu/compass/north.png'),
+            South=ImageLoader.read('menu/compass/south.png'),
+            East=ImageLoader.read('menu/compass/east.png'),
+            West=ImageLoader.read('menu/compass/west.png'),
+        )
 
 
 class Food:
