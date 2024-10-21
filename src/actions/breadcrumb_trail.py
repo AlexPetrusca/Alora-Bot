@@ -41,7 +41,7 @@ class BreadcrumbTrailAction(Action):
     def tick(self, timing):
         if self.dangerous:
             timing.action(self.auto_retaliate_off_action)
-        _, status = timing.observe(Timer.sec2tick(1), self.click_next_breadcrumb, self.respond)
+        _, status = timing.observe(Timer.sec2tick(0.5), self.click_next_breadcrumb, self.respond)
 
         if status == self.Event.TARGET_REACHED:
             if self.dangerous:
@@ -62,11 +62,12 @@ class BreadcrumbTrailAction(Action):
 
         logging.info(f'Breadcrumb {self.next_label} --> {breadcrumb_loc} | {modifiers} | {distance}')
         if breadcrumb_loc is not None:
-            # if self.click_retry_count > self.CLICK_RETRY_THRESHOLD:
-            #     print(f"Retrying Click on Breadcrumb {self.found_label}...")
-            #     self.found_label -= 1
-            #     self.click_retry_count = 0
-            #     self.retry_count += 1
+            if self.click_retry_count > self.CLICK_RETRY_THRESHOLD:
+                print(f"Retrying Click on Breadcrumb {self.found_label}...")
+                self.found_label -= 1
+                self.click_retry_count = 0
+                self.retry_count += 1
+                return None
 
             if self.found_label != self.next_label:
                 self.found_label = self.next_label
@@ -74,10 +75,10 @@ class BreadcrumbTrailAction(Action):
 
             if distance < self.EXACT_DISTANCE_THRESHOLD:
                 self.next_label += 1
-                # self.click_retry_count = 0
+                self.click_retry_count = 0
                 self.retry_count = 0
-            # else:
-            #     self.click_retry_count += 1
+            else:
+                self.click_retry_count += 1
 
             if 'W' in modifiers and self.EXACT_DISTANCE_THRESHOLD < distance < self.CLOSE_DISTANCE_THRESHOLD:
                 self.found_loc = breadcrumb_loc
