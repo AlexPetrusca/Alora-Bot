@@ -62,38 +62,9 @@ class BreadcrumbTrailAction(Action):
 
         logging.info(f'Breadcrumb {self.next_label} --> {breadcrumb_loc} | {modifiers} | {distance}')
         if breadcrumb_loc is not None:
-            if self.click_retry_count > self.CLICK_RETRY_THRESHOLD:
-                print(f"Retrying Click on Breadcrumb {self.found_label}...")
-                self.found_label -= 1
-                self.click_retry_count = 0
-                self.retry_count += 1
-                return None
-
-            if self.found_label != self.next_label:
-                self.found_label = self.next_label
-                self.found_loc = breadcrumb_loc
-                if not self.dangerous or len(modifiers) > 0:
-                    return self.Event.CLICK_BREADCRUMB
-                else:
-                    return self.Event.SHIFT_CLICK_BREADCRUMB
-
-            if distance < self.EXACT_DISTANCE_THRESHOLD:
-                self.next_label += 1
-                self.click_retry_count = 0
-                self.retry_count = 0
-            else:
-                self.click_retry_count += 1
-
-            if 'W' in modifiers and self.EXACT_DISTANCE_THRESHOLD < distance < self.CLOSE_DISTANCE_THRESHOLD:
-                self.found_loc = breadcrumb_loc
-                return self.Event.WEB_BREADCRUMB
-            elif 'M' in modifiers and distance < self.CLOSE_DISTANCE_THRESHOLD:
-                return self.Event.MENU_BREADCRUMB
-            # elif distance > self.EXACT_DISTANCE_THRESHOLD:
-            #     if not self.dangerous or len(modifiers) > 0:
-            #         return self.Event.CLICK_BREADCRUMB
-            #     else:
-            #         return self.Event.SHIFT_CLICK_BREADCRUMB
+            status = self.process_breadcrumb(breadcrumb_loc, modifiers, distance)
+            if status is not None:
+                return status
         else:
             print("Failed finding breadcrumb: ", self.next_label)
             self.retry_count += 1
@@ -103,6 +74,34 @@ class BreadcrumbTrailAction(Action):
         elif self.retry_count > self.RETRY_THRESHOLD:
             return self.Event.ABORT
 
+    def process_breadcrumb(self, breadcrumb_loc, modifiers, distance):
+        if distance < self.EXACT_DISTANCE_THRESHOLD:  # exactly there
+            self.next_label += 1
+            self.click_retry_count = 0
+            self.retry_count = 0
+            return self.Event.SUBTARGET_REACHED
+        elif distance < self.CLOSE_DISTANCE_THRESHOLD:  # close
+            if 'M' in modifiers:
+                return self.Event.MENU_BREADCRUMB
+            elif 'W' in modifiers:
+                self.found_loc = breadcrumb_loc
+                return self.Event.WEB_BREADCRUMB
+        elif distance >= self.CLOSE_DISTANCE_THRESHOLD:  # far
+            self.click_retry_count += 1
+            if self.click_retry_count > self.CLICK_RETRY_THRESHOLD:
+                print(f"Retrying Click on Breadcrumb {self.found_label}...")
+                self.found_label -= 1
+                self.click_retry_count = 0
+                self.retry_count += 1
+                return None
+            elif self.found_label != self.next_label:
+                self.found_label = self.next_label
+                self.found_loc = breadcrumb_loc
+                if not self.dangerous or len(modifiers) > 0:
+                    return self.Event.CLICK_BREADCRUMB
+                else:
+                    return self.Event.SHIFT_CLICK_BREADCRUMB
+
     def respond(self, timing, from_status, to_status):
         timing.execute(lambda: logging.info(f"TO_STATUS --> {to_status}"))
         if to_status == self.Event.CLICK_BREADCRUMB:
@@ -111,7 +110,6 @@ class BreadcrumbTrailAction(Action):
             timing.execute(lambda: robot.shift_click(self.found_loc))
         elif to_status == self.Event.WEB_BREADCRUMB or (from_status == self.Event.WEB_BREADCRUMB and to_status is None):
             self.retry_count = 0
-            self.click_retry_count = 0
             for _ in range(0, 20):
                 timing.execute_after(Timer.sec2tick(1), lambda: robot.click(self.found_loc[0], self.found_loc[1] + 20))
                 # timing.execute_after(Timer.sec2tick(0.5), lambda: robot.click_contour(self.color, 100))
@@ -160,6 +158,7 @@ class BreadcrumbTrailAction(Action):
         ABORT = 0
         TARGET_REACHED = 1
 
+        SUBTARGET_REACHED = 6
         CLICK_BREADCRUMB = 2
         SHIFT_CLICK_BREADCRUMB = 3
         WEB_BREADCRUMB = 4
