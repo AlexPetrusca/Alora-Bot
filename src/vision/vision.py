@@ -58,6 +58,19 @@ def is_status_active(status):
     return locate_image(grab_region(Regions.STATUS_BAR), status, 0.85) is not None
 
 
+def is_poisoned():
+    hitpoints_bar = grab_region(Regions.CP_HITPOINTS_BAR)
+    x, y = Regions.CP_HITPOINTS_BAR.w // 2, Regions.CP_HITPOINTS_BAR.h - 5
+    target_pixel = hitpoints_bar[y][x]
+
+    healthy_score = Color.HEALTHY.distance(target_pixel)
+    poison_score = Color.POISON.distance(target_pixel)
+    venom_score = Color.VENOM.distance(target_pixel)
+    min_score = min(healthy_score, poison_score, venom_score)
+
+    return min_score != healthy_score
+
+
 def get_my_prayer_protect():
     return get_prayer_protect(grab_region(Regions.PLAYER))[0]
 

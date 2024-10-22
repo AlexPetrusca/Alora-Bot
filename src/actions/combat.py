@@ -9,12 +9,11 @@ from src.robot.timing.timer import Timer
 from src.robot.timing.timing import Timing
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import StandardSpellbook
+from src.vision.coordinates import StandardSpellbook, Minimap
 from src.vision.images import Potion
 
 
 # To-do:
-#  - Counter venom/poison
 #  - Thrall
 #  - Status potion
 
@@ -34,8 +33,10 @@ class CombatAction(Action):
         self.flee = flee
         self.prayers = prayers if (prayers is not None) else []
 
+        self.poison_retry = 0
+        self.combat_retry = 0
+
         self.prayer_action = PrayerAction(*self.prayers)
-        self.retry_count = 0
 
     def first_tick(self):
         self.set_progress_message('Fighting...')
@@ -85,28 +86,40 @@ class CombatAction(Action):
             print("COMBAT - FIGHT OVER")
             return CombatAction.Event.FIGHT_OVER
         elif ocr.find("/") == -1:  # '/' not found
-            self.retry_count += 1
-            if self.retry_count >= self.RETRY_THRESHOLD:
+            self.combat_retry += 1
+            if self.combat_retry >= self.RETRY_THRESHOLD:
                 # return CombatAction.Event.DEAD  # todo: this should be returned instead
                 print("COMBAT - DIED IN COMBAT")
                 return CombatAction.Event.FIGHT_OVER
         else:
-            self.retry_count = 0  # '/' found
+            self.combat_retry = 0  # '/' found
 
         # eat food or teleport home on low health
         if vision.read_hitpoints() < self.health_threshold:
             ate_food = robot.click_food()
             if self.flee and not ate_food:
-                print("COMBAT - OUT OF FOOD")
+                print("FLEEING - OUT OF FOOD")
                 return CombatAction.Event.FLEE
 
         # sip prayer potions or teleport home on no prayer
         if vision.read_prayer_energy() < self.prayer_threshold:
             robot.click_potion(Potion.PRAYER)
             # todo: teleport home on no prayer - below doesn't work because we cant read_int below ~25
-            # if self.flee and vision.read_prayer_energy() == 0:
-            #     print("COMBAT - OUT OF PRAYER")
-            #     return CombatAction.Event.FLEE
+            if self.flee and vision.read_prayer_energy() == 0:
+                print("FLEEING - OUT OF PRAYER")
+                return CombatAction.Event.FLEE
+
+        # cure poison or teleport home if unable to
+        if vision.is_poisoned():
+            if self.flee and self.poison_retry >= self.RETRY_THRESHOLD:
+                print("FLEEING - CAN'T CURE POISON")
+                return CombatAction.Event.FLEE
+            else:
+                robot.click(Minimap.HEALTH_ORB)
+                self.poison_retry += 1
+        else:
+            self.poison_retry = 0
+
 
     def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)
@@ -117,7 +130,8 @@ class CombatAction(Action):
             timing.execute(lambda: robot.click_contour(Color.YELLOW))
 
     def last_tick(self):
-        self.retry_count = 0
+        self.poison_retry = 0
+        self.combat_retry = 0
 
     class Event(Enum):
         DEAD = 0

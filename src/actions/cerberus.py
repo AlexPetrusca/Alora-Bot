@@ -30,7 +30,7 @@ class CerberusAction(Action):
 
         # 4. Enable prayers + spec
         timing.action_after(Timer.sec2tick(2), self.prayer_on_action)
-        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Minimap.SPECIAL))
+        timing.execute_after(Timer.sec2tick(1), lambda: robot.click(Minimap.SPECIAL_ORB))
 
         # 5. click magenta contour + wait to start fight
         timing.execute_after(Timer.sec2tick(1), lambda: robot.click_contour(Color.YELLOW))

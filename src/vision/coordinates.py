@@ -78,10 +78,10 @@ class Inventory(Enum):
 
 class Minimap(Enum):
     COMPASS = Regions.MINIMAP.offset(54, 20)
-    HEALTH = Regions.MINIMAP.offset(39, 58)
-    PRAYER = Regions.MINIMAP.offset(39, 93)
-    RUN = Regions.MINIMAP.offset(50, 126)
-    SPECIAL = Regions.MINIMAP.offset(73, 151)
+    HEALTH_ORB = Regions.MINIMAP.offset(39, 58)
+    PRAYER_ORB = Regions.MINIMAP.offset(39, 93)
+    RUN_ORB = Regions.MINIMAP.offset(50, 126)
+    SPECIAL_ORB = Regions.MINIMAP.offset(73, 151)
 
 
 class BankMenu(Enum):

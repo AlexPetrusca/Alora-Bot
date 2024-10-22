@@ -55,3 +55,6 @@ class Color(Enum):
         sl, sh = clip(s - ds * (1 - st)), clip(s + ds * (1 - st))
         vl, vh = clip(v - dv * (1 - vt)), clip(v + dv * (1 - vt))
         return (hl, sl, vl), (hh, sh, vh)
+
+    def distance(self, color):
+        return cv.norm(np.array(self.value, dtype=np.int32) - color.astype(np.int32)[0:3])
