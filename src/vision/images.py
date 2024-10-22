@@ -66,7 +66,7 @@ class Food:
 
 class Potion:
     class PotionDescriptor:
-        def __init__(self, potion):
+        def __init__(self, potion, status):
             self.doses = [
                 None,
                 ImageLoader.read(f'item/herblore/potion/{potion}/1.png'),
@@ -74,11 +74,12 @@ class Potion:
                 ImageLoader.read(f'item/herblore/potion/{potion}/3.png'),
                 ImageLoader.read(f'item/herblore/potion/{potion}/4.png'),
             ]
-            self.status = ImageLoader.read(f'status/{potion}.png')
+            if status is not None:
+                self.status = ImageLoader.read(f'status/{status}.png')
 
-    ANTIFIRE = PotionDescriptor('antifire')
-    PRAYER = PotionDescriptor('prayer')
-    SUPER_COMBAT = PotionDescriptor('super_combat')
+    ANTIFIRE = PotionDescriptor('antifire', 'antifire')
+    PRAYER = PotionDescriptor('prayer', None)
+    SUPER_COMBAT = PotionDescriptor('super_combat', 'attack')
 
 
 class Status:
