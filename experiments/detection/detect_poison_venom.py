@@ -3,8 +3,8 @@ import numpy as np
 
 from src.vision.regions import Regions
 
-haystack_img = cv.imread('../screenshots/control_panel_bars/no_prayer.png', cv.IMREAD_UNCHANGED)
-healthy_img = cv.imread('../screenshots/control_panel_bars/no_prayer.png', cv.IMREAD_UNCHANGED)
+haystack_img = cv.imread('../screenshots/control_panel_bars/healthy.png', cv.IMREAD_UNCHANGED)
+healthy_img = cv.imread('../screenshots/control_panel_bars/healthy.png', cv.IMREAD_UNCHANGED)
 poison_img = cv.imread('../screenshots/control_panel_bars/poison.png', cv.IMREAD_UNCHANGED)
 venom_img = cv.imread('../screenshots/control_panel_bars/venom.png', cv.IMREAD_UNCHANGED)
 

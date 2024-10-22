@@ -3,7 +3,7 @@ import numpy as np
 
 from src.vision.regions import Regions
 
-haystack_img = cv.imread('screenshots/control_panel_bars/no_prayer.png', cv.IMREAD_UNCHANGED)
+haystack_img = cv.imread('screenshots/control_panel_bars/healthy.png', cv.IMREAD_UNCHANGED)
 # haystack_img = cv.imread('../resources/resources/screenshots/alt_macbook/edgeville.png', cv.IMREAD_UNCHANGED)
 
 minimap_image = np.ndarray.copy(haystack_img[Regions.MINIMAP.as_slice()])

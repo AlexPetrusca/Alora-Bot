@@ -71,6 +71,18 @@ def is_poisoned():
     return min_score != healthy_score
 
 
+def is_prayer_draining():
+    prayer_bar = grab_region(Regions.CP_PRAYER_BAR)
+    x, y = Regions.CP_PRAYER_BAR.w // 2, Regions.CP_PRAYER_BAR.h - 5
+    target_pixel = prayer_bar[y][x]
+
+    default_score = Color.PRAYER_DEFAULT.distance(target_pixel)
+    drain_score = Color.PRAYER_DRAIN.distance(target_pixel)
+    min_score = min(default_score, drain_score)
+
+    return min_score == drain_score
+
+
 def get_my_prayer_protect():
     return get_prayer_protect(grab_region(Regions.PLAYER))[0]
 

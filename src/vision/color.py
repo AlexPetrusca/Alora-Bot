@@ -23,6 +23,8 @@ class Color(Enum):
     HEALTHY = [18, 38, 133]
     POISON = [14, 102, 19]
     VENOM = [14, 55, 19]
+    PRAYER_DEFAULT = [145, 146, 45]
+    PRAYER_DRAIN = [166, 228, 54]
 
     def to_string(self):
         match self:
