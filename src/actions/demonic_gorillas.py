@@ -1,4 +1,5 @@
 import logging
+import math
 
 from src.actions.combat import CombatAction
 from src.actions.gear_switch import GearSwitchAction, GearSwitch
@@ -57,7 +58,7 @@ class DemonicGorillaAction(CombatAction):
         green_contour, green_dist = vision.get_contour(screenshot, Color.GREEN)
         blue_contour, blue_dist = vision.get_contour(screenshot, Color.BLUE)
 
-        closest_dist = 1e10
+        closest_dist = math.inf
         prayer = None
         self.target = None
         if red_contour is not None and red_dist < closest_dist:

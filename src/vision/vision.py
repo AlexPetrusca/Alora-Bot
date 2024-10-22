@@ -99,7 +99,7 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
     mask = cv.inRange(hsv, lower_limit, upper_limit)
 
     to_maximize = (mode == ContourDetection.DISTANCE_FARTHEST or mode == ContourDetection.AREA_LARGEST)
-    opt_value = 0 if to_maximize else 1e10
+    opt_value = 0 if to_maximize else math.inf
     opt_contour = None
     contours, _ = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
     for contour in contours:
