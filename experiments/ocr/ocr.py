@@ -5,7 +5,7 @@ import pytesseract
 from src.vision import vision
 from src.vision.regions import Regions
 
-img = cv.imread('../screenshots/breadcrumb_labels.png', cv.IMREAD_UNCHANGED)
+img = cv.imread('../screenshots/chat/full_inventory.png', cv.IMREAD_UNCHANGED)
 
 hover_action_image = np.ndarray.copy(img[Regions.HOVER_ACTION.as_slice()])
 print(pytesseract.image_to_string(hover_action_image).strip())

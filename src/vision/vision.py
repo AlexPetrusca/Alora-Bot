@@ -33,17 +33,17 @@ def read_latest_chat():
 
 
 def read_combat_info():
-    combat_info = read_text(grab_region(Regions.COMBAT_INFO), config='--psm 6')
+    combat_info = read_text(grab_region(Regions.COMBAT_INFO), Color.WHITE, config='--psm 6')
     combat_info.replace('@', '0').replace('o', '0').replace('O', '0')
     return combat_info
 
 
 def read_hitpoints():
-    return read_int(grab_region(Regions.HITPOINTS))
+    return read_int(grab_region(Regions.CP_HITPOINTS), Color.WHITE)
 
 
 def read_prayer_energy():
-    return read_int(grab_region(Regions.PRAYER))
+    return read_int(grab_region(Regions.CP_PRAYER), Color.WHITE)
 
 
 def read_run_energy():
@@ -209,17 +209,25 @@ def locate_ground_item(haystack, area_threshold=250):
     return None
 
 
-def read_text(haystack, config=""):
-    grayscale = cv.cvtColor(haystack, cv.COLOR_BGR2GRAY)
-    threshold = cv.threshold(grayscale, 120, 255, cv.THRESH_BINARY)[1]
-    blur = cv.blur(threshold, (2, 2))
-    morph = cv.morphologyEx(blur, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
-    return pytesseract.image_to_string(morph, config=config).strip()
+# todo: rewrite this for numbers
+def read_text(haystack, color=None, config=""):
+    if color is None:
+        grayscale = cv.cvtColor(haystack, cv.COLOR_BGR2GRAY)
+        threshold = cv.threshold(grayscale, 120, 255, cv.THRESH_BINARY)[1]
+        blur = cv.blur(threshold, (2, 2))
+        morph = cv.morphologyEx(blur, cv.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+        return pytesseract.image_to_string(morph, config=config).strip()
+    else:
+        hsv_haystack = cv.cvtColor(haystack, cv.COLOR_BGR2HSV)
+        lower_limit, upper_limit = get_color_limits(color, 0.1, 0.5, 0.5)
+        mask = cv.inRange(hsv_haystack, lower_limit, upper_limit)
+        blur = cv.blur(mask, (2, 2))
+        return pytesseract.image_to_string(blur, config=config).strip()
 
 
 # todo: this needs to be better >.<
-def read_int(haystack):
-    text = read_text(haystack, config='--psm 6')
+def read_int(haystack, color=None):
+    text = read_text(haystack, config='--psm 6', color=color)
     old_text = text
 
     # replace alphabetic characters with closest numerals

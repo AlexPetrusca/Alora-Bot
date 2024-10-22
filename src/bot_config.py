@@ -28,14 +28,14 @@ class BotConfig:
         return [
             WaitAction(1).play_once(),
 
-            # ExperimentAction(),
+            ExperimentAction(),
             # BreadcrumbTrailAction(dangerous=True),
 
             # TormentedDemonAction(),
             # DemonicGorillaAction(),
             # SarachnisAction(),
             # ZulrahAction(),
-            CombatAction(target=None),
+            # CombatAction(target=None),
             # PickUpItemsAction(),
         ]
 
