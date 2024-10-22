@@ -9,7 +9,7 @@ from src.robot.timing.timer import Timer
 from src.robot.timing.timing import Timing
 from src.vision import vision
 from src.vision.color import Color
-from src.vision.coordinates import ControlPanel, StandardSpellbook
+from src.vision.coordinates import StandardSpellbook
 from src.vision.images import Potion
 
 
@@ -22,6 +22,8 @@ from src.vision.images import Potion
 # todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
 #   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
+    RETRY_THRESHOLD = 3
+
     def __init__(self, target=Color.RED, health_threshold=50, prayer_threshold=20,
                  prayers=None, dodge_hazards=False, flee=True):
         super().__init__()
@@ -46,6 +48,7 @@ class CombatAction(Action):
             timing.execute(lambda: robot.click_contour(self.target))
 
         if len(self.prayers) > 0:
+            # todo: get rid of if statement; allow prayer action to pass through when prayers is empty or None
             timing.action(self.prayer_action)
 
         timing.execute_after(Timer.sec2tick(1), lambda: robot.press('Space'))  # inventory tab
@@ -83,7 +86,7 @@ class CombatAction(Action):
             return CombatAction.Event.FIGHT_OVER
         elif ocr.find("/") == -1:  # '/' not found
             self.retry_count += 1
-            if self.retry_count >= 3:
+            if self.retry_count >= self.RETRY_THRESHOLD:
                 # return CombatAction.Event.DEAD  # todo: this should be returned instead
                 print("COMBAT - DIED IN COMBAT")
                 return CombatAction.Event.FIGHT_OVER

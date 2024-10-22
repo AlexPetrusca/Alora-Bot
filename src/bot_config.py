@@ -29,13 +29,13 @@ class BotConfig:
             WaitAction(1).play_once(),
 
             # ExperimentAction(),
-            BreadcrumbTrailAction(dangerous=True),
+            # BreadcrumbTrailAction(dangerous=True),
 
             # TormentedDemonAction(),
             # DemonicGorillaAction(),
             # SarachnisAction(),
             # ZulrahAction(),
-            # CombatAction(),
+            CombatAction(target=None),
             # PickUpItemsAction(),
         ]
 
