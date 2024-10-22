@@ -4,6 +4,7 @@ from src.robot.timing.timer import Timer
 from src.vision.coordinates import ControlPanel
 
 
+# todo: needs to be reimplemented - check single pixel to determine whether a prayer is on or off
 class PrayerAction(Action):
     def __init__(self, *prayers, fast_switch=True, switch_to_inventory=False):
         super().__init__()
