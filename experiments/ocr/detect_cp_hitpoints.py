@@ -13,7 +13,7 @@ ocr1 = pytesseract.image_to_string(cp_hp_image, config='--psm 6').strip()
 print(" - basic ocr:", ocr1)
 
 hsv_damage_ui_image = cv.cvtColor(cp_hp_image, cv.COLOR_BGR2HSV)
-lower_limit, upper_limit = vision.get_color_limits(Color.WHITE, 0.1, 0.5, 0.5)
+lower_limit, upper_limit = Color.WHITE.get_limits(0.1, 0.5, 0.5)
 mask = cv.inRange(hsv_damage_ui_image, lower_limit, upper_limit)
 ocr2 = pytesseract.image_to_string(mask, config='--psm 6').strip()
 print(" - advanced ocr:", ocr2)

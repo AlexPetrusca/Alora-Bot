@@ -5,7 +5,7 @@ import numpy as np
 import cv2 as cv
 from pytesseract import pytesseract
 
-from src.vision.color import Color, get_color_limits
+from src.vision.color import Color
 from src.vision.coordinates import Player, Prayer
 from src.vision.images import PrayerProtect
 from src.vision.regions import Regions
@@ -95,7 +95,7 @@ def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTA
 
     # todo: use of mask_ui implies that the haystack should be a full screen capture
     hsv = mask_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
-    lower_limit, upper_limit = get_color_limits(color)
+    lower_limit, upper_limit = color.get_limits()
     mask = cv.inRange(hsv, lower_limit, upper_limit)
 
     to_maximize = (mode == ContourDetection.DISTANCE_FARTHEST or mode == ContourDetection.AREA_LARGEST)
@@ -157,7 +157,7 @@ def locate_ground_item(haystack, area_threshold=250):
 
     def locate_item_by_color(screenshot, color):
         hsv = cv.cvtColor(screenshot, cv.COLOR_BGR2HSV)
-        lower_limit, upper_limit = get_color_limits(color)
+        lower_limit, upper_limit = color.get_limits()
         mask = cv.inRange(hsv, lower_limit, upper_limit)
 
         # enhancements
@@ -219,7 +219,7 @@ def read_text(haystack, color=None, config=""):
         return pytesseract.image_to_string(morph, config=config).strip()
     else:
         hsv_haystack = cv.cvtColor(haystack, cv.COLOR_BGR2HSV)
-        lower_limit, upper_limit = get_color_limits(color, 0.1, 0.5, 0.5)
+        lower_limit, upper_limit = color.get_limits(0.1, 0.5, 0.5)
         mask = cv.inRange(hsv_haystack, lower_limit, upper_limit)
         blur = cv.blur(mask, (2, 2))
         return pytesseract.image_to_string(blur, config=config).strip()

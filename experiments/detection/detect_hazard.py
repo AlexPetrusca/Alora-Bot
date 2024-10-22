@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 from src.vision import vision
-from src.vision.color import Color, get_color_limits
+from src.vision.color import Color
 from src.vision.vision import ContourDetection
 
 
@@ -21,7 +21,7 @@ def simple_detection(img):
 def advanced_detection(img):
     img = np.copy(img)
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
-    lower_limit, upper_limit = get_color_limits(Color.MAGENTA)
+    lower_limit, upper_limit = Color.MAGENTA.get_limits()
     mask = cv.inRange(hsv, lower_limit, upper_limit)
     mask = cv.blur(mask, (5, 5))
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, np.ones((50, 5), np.uint8))

@@ -1,6 +1,6 @@
 import cv2 as cv
 
-from src.vision.color import Color, get_color_limits
+from src.vision.color import Color
 
 haystack_img = cv.imread('../screenshots/breadcrumb_labels.png', cv.IMREAD_UNCHANGED)
 needle_img = cv.imread('../../resources/label/marker/yellow/3.png', cv.IMREAD_UNCHANGED)
@@ -9,7 +9,7 @@ haystack_hsv = cv.cvtColor(haystack_img, cv.COLOR_BGR2HSV)
 result = cv.matchTemplate(haystack_img, needle_img, cv.TM_CCOEFF_NORMED)
 min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
 
-yellow_lower, yellow_upper = get_color_limits(Color.YELLOW.value)
+yellow_lower, yellow_upper = Color.YELLOW.get_limits()
 yellow_mask = cv.inRange(haystack_hsv, yellow_lower, yellow_upper)
 
 print('found', '-', max_val)

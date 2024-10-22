@@ -20,6 +20,10 @@ class Color(Enum):
     HIGH_VALUE = [0, 150, 255]
     INSANE_VALUE = [178, 102, 255]
 
+    HEALTHY = [18, 38, 133]
+    POISON = [14, 102, 19]
+    VENOM = [14, 55, 19]
+
     def to_string(self):
         match self:
             case Color.BLACK:
@@ -41,17 +45,13 @@ class Color(Enum):
             case _:
                 return ''
 
+    def get_limits(self, ht=0.99, st=0.9, vt=0.8):
+        def clip(value, lower=0, upper=255):
+            return lower if value < lower else upper if value > upper else value
 
-def get_color_limits(color, ht=0.99, st=0.9, vt=0.8):
-    if hasattr(color, 'value'):
-        color = color.value
-
-    def clip(value, lower=0, upper=255):
-        return lower if value < lower else upper if value > upper else value
-
-    h, s, v = cv.cvtColor(np.uint8([[color]]), cv.COLOR_BGR2HSV)[0][0]
-    dh, ds, dv = max(h, 255 - h), max(s, 255 - s), max(v, 255 - v)
-    hl, hh = clip(h - dh * (1 - ht)), clip(h + dh * (1 - ht))
-    sl, sh = clip(s - ds * (1 - st)), clip(s + ds * (1 - st))
-    vl, vh = clip(v - dv * (1 - vt)), clip(v + dv * (1 - vt))
-    return (hl, sl, vl), (hh, sh, vh)
+        h, s, v = cv.cvtColor(np.uint8([[self.value]]), cv.COLOR_BGR2HSV)[0][0]
+        dh, ds, dv = max(h, 255 - h), max(s, 255 - s), max(v, 255 - v)
+        hl, hh = clip(h - dh * (1 - ht)), clip(h + dh * (1 - ht))
+        sl, sh = clip(s - ds * (1 - st)), clip(s + ds * (1 - st))
+        vl, vh = clip(v - dv * (1 - vt)), clip(v + dv * (1 - vt))
+        return (hl, sl, vl), (hh, sh, vh)

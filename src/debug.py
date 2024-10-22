@@ -10,7 +10,7 @@ from src.actions.combat import CombatAction
 from src.actions.tormented_demon import TormentedDemonAction
 from src.actions.zulrah import ZulrahAction
 from src.vision import vision
-from src.vision.color import Color, get_color_limits
+from src.vision.color import Color
 from src.vision.regions import Regions
 from src.vision.vision import ContourDetection, mask_ui
 
@@ -64,7 +64,7 @@ class DebugDisplay:
         screenshot = cv.cvtColor(cv.cvtColor(screenshot, cv.COLOR_BGR2GRAY), cv.COLOR_GRAY2BGR)
 
         def identify_items(color, return_mask=True):
-            lower_limit, upper_limit = get_color_limits(color)
+            lower_limit, upper_limit = color.get_limits()
             mask = cv.inRange(copy, lower_limit, upper_limit)
 
             # enhancements
@@ -119,7 +119,7 @@ class DebugDisplay:
         slayer_color = self.bot.current_action.target
 
         screenshot = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
-        lower_limit, upper_limit = get_color_limits(slayer_color)
+        lower_limit, upper_limit = slayer_color.get_limits()
         mask = cv.inRange(screenshot, lower_limit, upper_limit)
         contours = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)[0]
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
@@ -222,7 +222,7 @@ class DebugDisplay:
     @staticmethod
     def get_color_mask(screenshot, color):
         screenshot = mask_ui(cv.cvtColor(screenshot, cv.COLOR_BGR2HSV))
-        lower_limit, upper_limit = get_color_limits(color)
+        lower_limit, upper_limit = color.get_limits()
         mask = cv.inRange(screenshot, lower_limit, upper_limit)
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
         return mask

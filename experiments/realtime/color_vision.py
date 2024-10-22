@@ -4,7 +4,7 @@ import cv2 as cv
 import numpy as np
 import mss
 
-from src.vision.color import get_color_limits
+from src.vision.color import Color
 
 
 class DisplayType(Enum):
@@ -15,9 +15,6 @@ class DisplayType(Enum):
     PURPLE_MASK = 5
 
 
-COLOR_RED = [0, 0, 255]
-COLOR_YELLOW = [0, 255, 255]
-COLOR_PURPLE = [255, 0, 255]
 display_type = DisplayType.DETECTION
 
 with mss.mss() as sct:
@@ -28,7 +25,7 @@ with mss.mss() as sct:
         _, threshold = cv.threshold(screenshot, 0, 255, cv.THRESH_BINARY)
         hsv_threshold = cv.cvtColor(threshold, cv.COLOR_BGR2HSV)
 
-        red_lower, red_upper = get_color_limits(COLOR_RED)
+        red_lower, red_upper = Color.RED.get_limits()
         red_mask = cv.inRange(hsv_threshold, red_lower, red_upper)
 
         contours, _ = cv.findContours(red_mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
@@ -38,7 +35,7 @@ with mss.mss() as sct:
                     x, y, w, h = cv.boundingRect(contour)
                     cv.rectangle(screenshot, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
 
-        yellow_lower, yellow_upper = get_color_limits(COLOR_YELLOW)
+        yellow_lower, yellow_upper = Color.YELLOW.get_limits()
         yellow_mask = cv.inRange(hsv_threshold, yellow_lower, yellow_upper)
 
         contours, _ = cv.findContours(yellow_mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
@@ -48,7 +45,7 @@ with mss.mss() as sct:
                     x, y, w, h = cv.boundingRect(contour)
                     cv.rectangle(screenshot, (x, y), (x + w, y + h), color=(0, 255, 0), thickness=2, lineType=cv.LINE_4)
 
-        purple_lower, purple_upper = get_color_limits(COLOR_PURPLE)
+        purple_lower, purple_upper = Color.MAGENTA.get_limits()
         purple_mask = cv.inRange(hsv_threshold, purple_lower, purple_upper)
 
         contours, _ = cv.findContours(purple_mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)

@@ -1,18 +1,18 @@
 import cv2 as cv
 from src.vision import vision
-from src.vision.color import Color, get_color_limits
+from src.vision.color import Color
 from src.vision.vision import mask_ui
 
-# COLOR = Color.DEFAULT_VALUE.value  # 0, 200
-# COLOR = Color.HIGHLIGHTED_VALUE.value
-COLOR = Color.LOW_VALUE.value
-# COLOR = Color.MEDIUM_VALUE.value
-# COLOR = Color.HIGH_VALUE.value  # 200, 200
-# COLOR = Color.INSANE_VALUE.value
+# COLOR = Color.DEFAULT_VALUE  # 0, 200
+# COLOR = Color.HIGHLIGHTED_VALUE
+COLOR = Color.LOW_VALUE
+# COLOR = Color.MEDIUM_VALUE
+# COLOR = Color.HIGH_VALUE  # 200, 200
+# COLOR = Color.INSANE_VALUE
 
 screenshot_image = mask_ui(cv.imread('../screenshots/ground_items/ground_items.png', cv.IMREAD_UNCHANGED))
 screenshot_threshold = cv.cvtColor(screenshot_image, cv.COLOR_BGR2HSV)
-lower_limit, upper_limit = get_color_limits(COLOR)
+lower_limit, upper_limit = COLOR.get_limits()
 mask = cv.inRange(screenshot_threshold, lower_limit, upper_limit)
 
 loc = vision.locate_ground_item(screenshot_image)
