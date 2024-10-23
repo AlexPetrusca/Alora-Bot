@@ -25,6 +25,8 @@ class Color(Enum):
     VENOM = [14, 55, 19]
     PRAYER_DEFAULT = [145, 146, 45]
     PRAYER_DRAIN = [166, 228, 54]
+    PRAYER_TOGGLE_OFF = [40, 52, 61]
+    PRAYER_TOGGLE_ON = [118, 184, 211]
 
     def to_string(self):
         match self:
@@ -45,7 +47,7 @@ class Color(Enum):
             case Color.WHITE:
                 return 'white'
             case _:
-                return ''
+                return str(self)
 
     def get_limits(self, ht=0.99, st=0.9, vt=0.8):
         def clip(value, lower=0, upper=255):

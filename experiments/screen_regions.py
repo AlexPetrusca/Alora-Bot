@@ -15,7 +15,7 @@ latest_chat_image = np.ndarray.copy(haystack_img[Regions.LATEST_CHAT.as_slice()]
 cp_hitpoints_bar_image = np.ndarray.copy(haystack_img[Regions.CP_HITPOINTS_BAR.as_slice()])
 cp_prayer_bar_image = np.ndarray.copy(haystack_img[Regions.CP_PRAYER_BAR.as_slice()])
 cp_hitpoints_image = np.ndarray.copy(haystack_img[Regions.CP_HITPOINTS.as_slice()])
-cp_prayer_image = np.ndarray.copy(haystack_img[Regions.CP_PRAYER.as_slice()])
+cp_prayer_image = np.ndarray.copy(haystack_img[Regions.CP_PRAYER_ENERGY.as_slice()])
 
 cv.imshow('Screenshot', haystack_img)
 cv.imshow('Minimap', minimap_image)

@@ -7,7 +7,7 @@ from src.vision.color import Color
 from src.vision.regions import Regions
 
 haystack_img = cv.imread('../screenshots/control_panel_bars/healthy.png', cv.IMREAD_UNCHANGED)
-cp_hp_image = np.ndarray.copy(haystack_img[Regions.CP_PRAYER.as_slice()])
+cp_hp_image = np.ndarray.copy(haystack_img[Regions.CP_PRAYER_ENERGY.as_slice()])
 
 ocr1 = pytesseract.image_to_string(cp_hp_image, config='--psm 6').strip()
 print(" - basic ocr:", ocr1)

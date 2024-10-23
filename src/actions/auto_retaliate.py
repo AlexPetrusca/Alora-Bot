@@ -12,7 +12,7 @@ class AutoRetaliateAction(Action):
         self.auto_retaliate = auto_retaliate
 
     def first_tick(self):
-        self.set_progress_message(f"Setting auto retaliate to {"ON" if self.auto_retaliate else "OFF"}...")
+        self.set_progress_message(f"Setting auto retaliate to {'ON' if self.auto_retaliate else 'OFF'}...")
 
     def tick(self, timing):
         timing.execute(lambda: robot.click(ControlPanel.COMBAT_TAB))

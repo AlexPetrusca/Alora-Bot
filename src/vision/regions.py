@@ -8,22 +8,26 @@ class Region:
         self.w = w
         self.h = h
 
-    def as_slice(self):
-        p0 = (self.x, self.y)
-        p1 = (self.x + self.w, self.y + self.h)
-        return slice(2 * p0[1], 2 * p1[1]), slice(2 * p0[0], 2 * p1[0])
-
     def center(self):
         return self.x + self.w // 2, self.y + self.h // 2
 
     def offset(self, x, y):
         return self.x + x, self.y + y
 
+    def as_slice(self):
+        p0 = (self.x, self.y)
+        p1 = (self.x + self.w, self.y + self.h)
+        return slice(2 * p0[1], 2 * p1[1]), slice(2 * p0[0], 2 * p1[0])
+
     def global_px(self, x, y):
         return 2 * self.x + x, 2 * self.y + y
 
     def local_px(self, x, y):
         return x - 2 * self.x, y - 2 * self.y
+
+    @staticmethod
+    def from_center_point(p, w, h):
+        return Region(p[0] - w//2, p[1] - h//2, w, h)
 
 
 class Regions:
@@ -40,7 +44,7 @@ class Regions:
 
     MINIMAP = Region(GAME.x + GAME.w - 215, GAME.y, 215, 172)
     HITPOINTS = Region(MINIMAP.x + 6, MINIMAP.y + 57, 20, 12)
-    PRAYER = Region(MINIMAP.x + 6, MINIMAP.y + 91, 20, 12)
+    PRAYER_ENERGY = Region(MINIMAP.x + 6, MINIMAP.y + 91, 20, 12)
     RUN_ENERGY = Region(MINIMAP.x + 15, MINIMAP.y + 123, 20, 12)
     SPEC_ENERGY = Region(MINIMAP.x + 39, MINIMAP.y + 149, 20, 12)
     EXP_BAR = Region(MINIMAP.x - 153, MINIMAP.y + 2, 122, 30)
@@ -50,7 +54,7 @@ class Regions:
     CP_HITPOINTS_BAR = Region(CONTROL_PANEL.x + 6, CONTROL_PANEL.y + 44, 20, 250)
     CP_PRAYER_BAR = Region(CONTROL_PANEL.x + 221, CONTROL_PANEL.y + 44, 20, 250)
     CP_HITPOINTS = Region(CP_HITPOINTS_BAR.x + 1, CP_HITPOINTS_BAR.y + 23, 18, 12)
-    CP_PRAYER = Region(CP_PRAYER_BAR.x + 1, CP_PRAYER_BAR.y + 23, 18, 12)
+    CP_PRAYER_ENERGY = Region(CP_PRAYER_BAR.x + 1, CP_PRAYER_BAR.y + 23, 18, 12)
 
     CHAT = Region(GAME.x, GAME.y + GAME.h - 200, 520, 200)
     LATEST_CHAT = Region(CHAT.x + 7, CHAT.y + 136, 490, 18)
@@ -62,3 +66,7 @@ class Regions:
     @classmethod
     def INVENTORY_ITEM(cls, x, y):
         return Region(cls.INVENTORY.x + 42 * x, cls.INVENTORY.y + 36 * y, 42, 36)
+
+    @classmethod
+    def PRAYER(cls, prayer):
+        return Region.from_center_point(prayer.value, 34, 34)

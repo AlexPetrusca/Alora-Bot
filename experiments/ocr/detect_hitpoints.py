@@ -9,7 +9,7 @@ haystack = cv.imread('../screenshots/damage_ui/not_present.png', cv.IMREAD_UNCHA
 # haystack = cv.imread('../screenshots/alt_macbook/edgeville.png', cv.IMREAD_UNCHANGED)
 
 health_img = haystack[Regions.HITPOINTS.as_slice()]  # w = 40, h = 24
-prayer_img = haystack[Regions.PRAYER.as_slice()]  # w = 40, h = 24
+prayer_img = haystack[Regions.PRAYER_ENERGY.as_slice()]  # w = 40, h = 24
 energy_img = haystack[Regions.RUN_ENERGY.as_slice()]  # w = 40, h = 24
 spec_img = haystack[Regions.SPEC_ENERGY.as_slice()]  # w = 40, h = 24
 

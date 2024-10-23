@@ -43,7 +43,7 @@ def read_hitpoints():
 
 
 def read_prayer_energy():
-    return read_int(grab_region(Regions.CP_PRAYER), Color.WHITE)
+    return read_int(grab_region(Regions.CP_PRAYER_ENERGY), Color.WHITE)
 
 
 def read_run_energy():
@@ -71,7 +71,7 @@ def is_poisoned():
     return min_score != healthy_score
 
 
-def is_prayer_draining():
+def is_prayer_points_draining():
     prayer_bar = grab_region(Regions.CP_PRAYER_BAR)
     x, y = Regions.CP_PRAYER_BAR.w // 2, Regions.CP_PRAYER_BAR.h - 5
     target_pixel = prayer_bar[y][x]
@@ -81,6 +81,31 @@ def is_prayer_draining():
     min_score = min(default_score, drain_score)
 
     return min_score == drain_score
+
+
+def is_prayer_active(prayer, screenshot=None):
+    if screenshot is None:
+        screenshot = grab_screen()
+
+    prayer_region = Regions.PRAYER(prayer)
+    prayer_img = screenshot[prayer_region.as_slice()]
+
+    target_pixel = prayer_img[1][prayer_region.w]
+    score_on = Color.PRAYER_TOGGLE_ON.distance(target_pixel)
+    score_off = Color.PRAYER_TOGGLE_OFF.distance(target_pixel)
+    min_score = min(score_on, score_off)
+    return min_score == score_on
+
+
+def get_active_prayers():
+    active_prayers = set()
+
+    screen = grab_screen()
+    for prayer in Prayer:
+        if is_prayer_active(prayer, screenshot=screen):
+            active_prayers.add(prayer)
+
+    return active_prayers
 
 
 def get_my_prayer_protect():

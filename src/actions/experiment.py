@@ -40,7 +40,7 @@ class ExperimentAction(Action):
         return ActionStatus.IN_PROGRESS
 
     def print_prayer(self):
-        screenshot = grab_region(Regions.CP_PRAYER)
+        screenshot = grab_region(Regions.CP_PRAYER_ENERGY)
         print("Prayer:", read_text(screenshot, Color.WHITE, config='--psm 6'), "-->", read_int(screenshot, Color.WHITE))
 
     @staticmethod
