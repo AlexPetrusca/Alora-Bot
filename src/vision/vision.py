@@ -34,7 +34,7 @@ def read_latest_chat():
 
 def read_combat_info():
     combat_info = read_text(grab_region(Regions.COMBAT_INFO), Color.WHITE, config='--psm 6')
-    combat_info.replace('@', '0').replace('o', '0').replace('O', '0')
+    combat_info.replace('@', '0').replace('a', '0').replace('o', '0').replace('O', '0')
     return combat_info
 
 
