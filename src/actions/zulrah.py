@@ -42,12 +42,11 @@ class ZulrahAction(Action):
             max_area, max_color = blue_area, Color.BLUE
         if self.zulrah_color is None and max_color is not None and max_color != self.last_zulrah_color:
             self.zulrah_color = max_color
-            self.prayer_action.set_prayer(self.protect_against_color())
-            1 
+            self.prayer_action.prayers = [self.protect_against_color()]
         elif self.zulrah_color is not None and max_color is None:
             self.last_zulrah_color = self.zulrah_color
             self.zulrah_color = None
-            self.prayer_action.disable_all_prayers()
+            self.prayer_action.prayers = []
         return self.zulrah_color
 
     def protect_against_color(self):

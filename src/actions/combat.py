@@ -36,7 +36,8 @@ class CombatAction(Action):
         self.poison_retry = 0
         self.combat_retry = 0
 
-        self.prayer_action = PrayerAction(*self.prayers)
+        self.prayer_on_action = PrayerAction(*self.prayers)
+        self.prayer_off_action = PrayerAction()
 
     def first_tick(self):
         self.set_progress_message('Fighting...')
@@ -48,9 +49,7 @@ class CombatAction(Action):
                 return timing.complete()
             timing.execute(lambda: robot.click_contour(self.target))
 
-        if len(self.prayers) > 0:
-            # todo: get rid of if statement; allow prayer action to pass through when prayers is empty or None
-            timing.action(self.prayer_action)
+        timing.action(self.prayer_on_action)
 
         timing.execute_after(Timer.sec2tick(1), lambda: robot.press('Space'))  # inventory tab
 
@@ -68,9 +67,7 @@ class CombatAction(Action):
         elif combat_status == CombatAction.Event.FIGHT_OVER:
             exit_status = ActionStatus.COMPLETE
 
-        if len(self.prayers) > 0:
-            # todo: get rid of if statement; allow prayer action to pass through when prayers is empty or None
-            timing.action(self.prayer_action)
+        timing.action(self.prayer_off_action)
 
         return timing.exit_status_after(Timer.sec2tick(5), exit_status)
 

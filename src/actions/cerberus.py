@@ -13,7 +13,7 @@ class CerberusAction(Action):
         super().__init__()
         self.combat_action = CombatAction(health_threshold=50, dodge_hazards=True, flee=False)
         self.prayer_on_action = PrayerAction(Prayer.PROTECT_FROM_MAGIC, Prayer.PIETY)
-        self.prayer_off_action = PrayerAction(Prayer.PIETY, Prayer.PROTECT_FROM_MAGIC)
+        self.prayer_off_action = PrayerAction()
 
     def first_tick(self):
         self.set_progress_message('Routing to Cerberus...')
@@ -27,6 +27,8 @@ class CerberusAction(Action):
 
         # 3. Click 850, 215 + wait to walk
         timing.execute_after(Timer.sec2tick(14), lambda: robot.click(CerberusActionCoord.WALK3))
+
+        # todo: let combat action handle prayers + thrall
 
         # 4. Enable prayers + spec
         timing.action_after(Timer.sec2tick(2), self.prayer_on_action)

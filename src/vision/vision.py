@@ -89,12 +89,8 @@ def is_prayer_active(prayer, screenshot=None):
 
     prayer_region = Regions.PRAYER(prayer)
     prayer_img = screenshot[prayer_region.as_slice()]
-
     target_pixel = prayer_img[1][prayer_region.w]
-    score_on = Color.PRAYER_TOGGLE_ON.distance(target_pixel)
-    score_off = Color.PRAYER_TOGGLE_OFF.distance(target_pixel)
-    min_score = min(score_on, score_off)
-    return min_score == score_on
+    return Color.PRAYER_TOGGLE_ON.distance(target_pixel) < 10
 
 
 def get_active_prayers():

@@ -29,7 +29,7 @@ class BarrowAction(Action):
 
         self.combat_action = CombatAction(target=None)
         self.prayer_on_action = PrayerAction(self.prayer, Prayer.PIETY)
-        self.prayer_off_action = PrayerAction(Prayer.PIETY, self.prayer)
+        self.prayer_off_action = PrayerAction()
 
     def first_tick(self):
         self.set_progress_message(f"Routing to Barrow {self.barrow} ...")
@@ -46,6 +46,8 @@ class BarrowAction(Action):
             self.set_progress_message("Fighting..."),
             robot.click_contour(Color.YELLOW)  # click sarcophagus + fight
         ))
+
+        # todo: let CombatAction handle prayer on/off
 
         timing.wait(Timer.sec2tick(3))
         timing.action(self.prayer_on_action)
