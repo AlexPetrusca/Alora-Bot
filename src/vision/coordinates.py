@@ -118,12 +118,40 @@ class ArceuusSpellbook(Enum):
 
 # dx = 37, dy = 37
 class Prayer(Enum):
+    THICK_SKIN = Regions.CONTROL_PANEL.offset(45, 63)
+    BURST_OF_STRENGTH = Regions.CONTROL_PANEL.offset(82, 63)
+    CLARITY_OF_THOUGHT = Regions.CONTROL_PANEL.offset(119, 63)
+    SHARP_EYE = Regions.CONTROL_PANEL.offset(156, 63)
+    MYSTIC_WILL = Regions.CONTROL_PANEL.offset(193, 63)
+
+    ROCK_SKIN = Regions.CONTROL_PANEL.offset(45, 100)
+    SUPERHUMAN_STRENGTH = Regions.CONTROL_PANEL.offset(82, 100)
+    IMPROVED_REFLEXES = Regions.CONTROL_PANEL.offset(119, 100)
+    RAPID_RESTORE = Regions.CONTROL_PANEL.offset(156, 100)
+    RAPID_HEAL = Regions.CONTROL_PANEL.offset(193, 100)
+
+    PROTECT_ITEM = Regions.CONTROL_PANEL.offset(45, 137)
+    HAWK_EYE = Regions.CONTROL_PANEL.offset(82, 137)
+    MYSTIC_LORE = Regions.CONTROL_PANEL.offset(119, 137)
+    STEEL_SKIN = Regions.CONTROL_PANEL.offset(156, 137)
+    ULTIMATE_STRENGTH = Regions.CONTROL_PANEL.offset(193, 137)
+
+    INCREDIBLE_REFLEXES = Regions.CONTROL_PANEL.offset(45, 174)
     PROTECT_FROM_MAGIC = Regions.CONTROL_PANEL.offset(82, 174)
     PROTECT_FROM_MISSILES = Regions.CONTROL_PANEL.offset(119, 174)
     PROTECT_FROM_MELEE = Regions.CONTROL_PANEL.offset(156, 174)
     EAGLE_EYE = Regions.CONTROL_PANEL.offset(193, 174)
+
     MYSTIC_MIGHT = Regions.CONTROL_PANEL.offset(45, 211)
+    RETRIBUTION = Regions.CONTROL_PANEL.offset(82, 211)
+    REDEMPTION = Regions.CONTROL_PANEL.offset(119, 211)
+    SMITE = Regions.CONTROL_PANEL.offset(156, 211)
+    PRESERVE = Regions.CONTROL_PANEL.offset(193, 211)
+
+    CHIVALRY = Regions.CONTROL_PANEL.offset(45, 248)
     PIETY = Regions.CONTROL_PANEL.offset(82, 248)
+    RIGOUR = Regions.CONTROL_PANEL.offset(119, 248)
+    AUGURY = Regions.CONTROL_PANEL.offset(156, 248)
 
 
 class BarrowsActionCoord(Enum):
