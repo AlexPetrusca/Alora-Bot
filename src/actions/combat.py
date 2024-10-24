@@ -24,15 +24,22 @@ class CombatAction(Action):
     RETRY_THRESHOLD = 3
 
     def __init__(self, target=Color.RED, health_threshold=50, prayer_threshold=20,
-                 prayers=None, dodge_hazards=False, flee=True):
+                 prayers=None, potions=None, eat_food=True, sip_prayer=False,
+                 dodge_hazards=False, cure_poison=False, flee=True):
         super().__init__()
         self.target = target
         self.health_threshold = health_threshold
         self.prayer_threshold = prayer_threshold
         self.dodge_hazards = dodge_hazards
+        self.eat_food = eat_food
+        self.sip_prayer = sip_prayer
+        self.cure_poison = cure_poison
         self.flee = flee
         self.prayers = prayers if (prayers is not None) else []
+        self.potions = potions if (potions is not None) else []
 
+        self.to_flee = False
+        self.food_retry = 0
         self.poison_retry = 0
         self.combat_retry = 0
 
@@ -52,15 +59,22 @@ class CombatAction(Action):
         if len(self.prayers) > 0:
             timing.action(self.prayer_on_action)
 
+        # todo: is waiting 4 seconds for combat start excessive?
         timing.execute_after(Timer.sec2tick(1), lambda: robot.press('Space'))  # inventory tab
-
         timing.wait(Timer.sec2tick(3))
+
         if self.dodge_hazards:
-            timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_hazards)
-        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat_end)
+            timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_combat_event)
+        if self.cure_poison:
+            _, poison_status = timing.observe(Timer.sec2tick(1), self.track_poison, self.respond_to_combat_event)
+        if self.sip_prayer:
+            _, prayer_status = timing.observe(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
+        if self.eat_food:
+            _, food_status = timing.observe(Timer.sec2tick(1), self.track_hitpoints, self.respond_to_combat_event)
+        combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat_over)
 
         exit_status = ActionStatus.IN_PROGRESS
-        if combat_status == CombatAction.Event.FLEE or combat_status == CombatAction.Event.DEAD:
+        if combat_status == CombatAction.Event.FLEE:
             exit_status = ActionStatus.ABORTED
             # todo: replace with teleport home action
             timing.execute(lambda: robot.press('2'))  # magic tab
@@ -71,14 +85,17 @@ class CombatAction(Action):
         if len(self.prayers) > 0:
             timing.action(self.prayer_off_action)
 
-        return timing.exit_status_after(Timer.sec2tick(5), exit_status)
+        return timing.exit_status_after(Timer.sec2tick(5.5), exit_status)
 
     def poll_target_visible(self):
         contour = vision.locate_contour(vision.grab_screen(), self.target)
         if contour is not None:
             return True
 
-    def poll_combat_end(self):
+    def poll_combat_over(self):
+        if self.to_flee:
+            return CombatAction.Event.FLEE
+
         ocr = vision.read_combat_info()
         # print('"', ocr, '"', len(ocr))
         if ocr.startswith("0/"):
@@ -93,42 +110,62 @@ class CombatAction(Action):
         else:
             self.combat_retry = 0  # '/' found
 
+    def track_hitpoints(self):
+        # todo: this is potentially broken now - we can flee when we're not out of food
         # eat food or teleport home on low health
         if vision.read_hitpoints() < self.health_threshold:
-            ate_food = robot.click_food()
-            if self.flee and not ate_food:
+            if self.flee and self.food_retry >= self.RETRY_THRESHOLD:
                 print("FLEEING - OUT OF FOOD")
                 return CombatAction.Event.FLEE
+            else:
+                self.food_retry += 1
+                return CombatAction.Event.EAT_FOOD
+        else:
+            self.food_retry = 0
 
+    def respond_to_combat_event(self, timing, prev_event, event):
+        if event == CombatAction.Event.EAT_FOOD:
+            ate_food = timing.execute(lambda: robot.click_food(), capture_result=True)
+            if not ate_food:
+                self.food_retry = self.RETRY_THRESHOLD
+        elif event == CombatAction.Event.SIP_PRAYER:
+            timing.execute(lambda: robot.click_potion(Potion.PRAYER))
+        elif event == CombatAction.Event.CURE_POISON:
+            timing.execute(lambda: robot.click(Minimap.HEALTH_ORB))
+        elif event == CombatAction.Event.DODGE_HAZARD:
+            timing.execute(lambda: robot.click_contour(Color.YELLOW))
+        elif event == CombatAction.Event.FLEE:
+            self.to_flee = True
+
+    def track_prayer(self):
         # sip prayer potions or teleport home on no prayer
         if vision.read_prayer_energy() < self.prayer_threshold:
-            robot.click_potion(Potion.PRAYER)
-            # todo: teleport home on no prayer - below doesn't work because we cant read_int below ~25
             if self.flee and vision.read_prayer_energy() == 0:
                 print("FLEEING - OUT OF PRAYER")
                 return CombatAction.Event.FLEE
+            else:
+                return CombatAction.Event.SIP_PRAYER
 
+    def track_poison(self):
         # cure poison or teleport home if unable to
         if vision.is_poisoned():
             if self.flee and self.poison_retry >= self.RETRY_THRESHOLD:
                 print("FLEEING - CAN'T CURE POISON")
                 return CombatAction.Event.FLEE
             else:
-                robot.click(Minimap.HEALTH_ORB)
                 self.poison_retry += 1
+                return CombatAction.Event.CURE_POISON
         else:
             self.poison_retry = 0
 
-
     def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)
-        return hazard is not None
-
-    def respond_to_hazards(self, timing, prev_hazard, curr_hazard):
-        if not prev_hazard and curr_hazard:
-            timing.execute(lambda: robot.click_contour(Color.YELLOW))
+        if hazard is not None:
+            return CombatAction.Event.DODGE_HAZARD
 
     def last_tick(self):
+        self.to_flee = False
+        self.food_retry = 0
         self.poison_retry = 0
         self.combat_retry = 0
 
@@ -136,3 +173,8 @@ class CombatAction(Action):
         DEAD = 0
         FLEE = 1
         FIGHT_OVER = 2
+
+        EAT_FOOD = 3
+        SIP_PRAYER = 4
+        CURE_POISON = 5
+        DODGE_HAZARD = 6

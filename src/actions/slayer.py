@@ -18,7 +18,6 @@ class SlayerTask(Enum):
     SKELETAL_WYVERN = 'Skeletal Wyvern'
 
 
-# todo: [bug] sometimes heal action is messed up and fails after tp back
 class SlayerAction(Action):
     def __init__(self, task):
         super().__init__()

@@ -115,7 +115,7 @@ class Timing:
         else:
             return None  # interval not called yet
 
-    def observe(self, tick_interval, fn, cb, starting_status=None):
+    def observe(self, tick_interval, fn, cb, default_status=None):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
 
@@ -138,7 +138,7 @@ class Timing:
         prev_record = self.timing_records.get(key)
         if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
             status = fn()
-            prev_status = prev_record.status if (prev_record is not None) else starting_status
+            prev_status = prev_record.status if (prev_record is not None) else default_status
             if status != prev_status:  # change observed?
                 self.timing_records[key] = TimingRecord(self.tick_counter, status, prev_status)
                 run_cb(self, prev_status, status, self.tick_counter)
@@ -148,7 +148,7 @@ class Timing:
             run_cb(self, prev_record.prev_status, prev_record.status, prev_record.tick)
             return prev_record.prev_status, prev_record.status
         else:  # no value observed?
-            return starting_status, starting_status
+            return default_status, default_status
 
     def poll(self, tick_interval, fn, default_status=None, play_count=-1):
         if not callable(fn):
