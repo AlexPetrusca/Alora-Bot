@@ -49,7 +49,8 @@ class CombatAction(Action):
                 return timing.complete()
             timing.execute(lambda: robot.click_contour(self.target))
 
-        timing.action(self.prayer_on_action)
+        if len(self.prayers) > 0:
+            timing.action(self.prayer_on_action)
 
         timing.execute_after(Timer.sec2tick(1), lambda: robot.press('Space'))  # inventory tab
 
@@ -67,7 +68,8 @@ class CombatAction(Action):
         elif combat_status == CombatAction.Event.FIGHT_OVER:
             exit_status = ActionStatus.COMPLETE
 
-        timing.action(self.prayer_off_action)
+        if len(self.prayers) > 0:
+            timing.action(self.prayer_off_action)
 
         return timing.exit_status_after(Timer.sec2tick(5), exit_status)
 

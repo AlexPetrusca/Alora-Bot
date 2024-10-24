@@ -136,9 +136,6 @@ def get_prayer_protect(haystack):
 
 
 def get_contour(haystack, color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOSEST):
-    if hasattr(color, 'value'):
-        color = color.value
-
     # todo: use of mask_ui implies that the haystack should be a full screen capture
     hsv = mask_ui(cv.cvtColor(haystack, cv.COLOR_BGR2HSV))
     lower_limit, upper_limit = color.get_limits()
@@ -222,32 +219,32 @@ def locate_ground_item(haystack, area_threshold=250):
 
         return largest_position
 
-    insane_value_item = locate_item_by_color(haystack, Color.INSANE_VALUE.value)
+    insane_value_item = locate_item_by_color(haystack, Color.INSANE_VALUE)
     if insane_value_item is not None:
         print("INSANE VALUE")
         return insane_value_item
 
-    high_value_item = locate_item_by_color(haystack, Color.HIGH_VALUE.value)
+    high_value_item = locate_item_by_color(haystack, Color.HIGH_VALUE)
     if high_value_item is not None:
         print("HIGH VALUE")
         return high_value_item
 
-    medium_value_item = locate_item_by_color(haystack, Color.MEDIUM_VALUE.value)
+    medium_value_item = locate_item_by_color(haystack, Color.MEDIUM_VALUE)
     if medium_value_item is not None:
         print("MEDIUM VALUE")
         return medium_value_item
 
-    low_value_item = locate_item_by_color(haystack, Color.LOW_VALUE.value)
+    low_value_item = locate_item_by_color(haystack, Color.LOW_VALUE)
     if low_value_item is not None:
         print("LOW VALUE")
         return low_value_item
 
-    highlighted_item = locate_item_by_color(haystack, Color.HIGHLIGHTED_VALUE.value)
+    highlighted_item = locate_item_by_color(haystack, Color.HIGHLIGHTED_VALUE)
     if highlighted_item is not None:
         print("HIGHLIGHTED VALUE")
         return highlighted_item
 
-    default_item = locate_item_by_color(haystack, Color.DEFAULT_VALUE.value)
+    default_item = locate_item_by_color(haystack, Color.DEFAULT_VALUE)
     if default_item is not None:
         print("DEFAULT VALUE")
         return default_item
