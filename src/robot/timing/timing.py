@@ -104,7 +104,7 @@ class Timing:
         interval_record = self.timing_records.get(key)
         is_scheduled = ignore_scheduling or self.tick_counter >= self.tick_offset
         is_playable = play_count == -1 or interval_record is None or interval_record.play_count > 0
-        if is_playable and is_scheduled and self.tick_counter % tick_interval == 0:
+        if is_playable and is_scheduled and (self.tick_counter - self.tick_offset) % tick_interval == 0:
             status = fn()
             play_count = interval_record.play_count if (interval_record is not None) else play_count
             new_play_count = play_count - 1 if (play_count != -1) else -1
@@ -136,7 +136,7 @@ class Timing:
         key = Timing.get_request_identifier()
 
         prev_record = self.timing_records.get(key)
-        if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+        if self.tick_counter >= self.tick_offset and (self.tick_counter - self.tick_offset) % tick_interval == 0:
             status = fn()
             prev_status = prev_record.status if (prev_record is not None) else default_status
             if status != prev_status:  # change observed?
@@ -169,7 +169,7 @@ class Timing:
             if not is_playable:
                 return Timing.PollStatus.ABORTED
 
-            if self.tick_counter >= self.tick_offset and self.tick_counter % tick_interval == 0:
+            if self.tick_counter >= self.tick_offset and (self.tick_counter - self.tick_offset) % tick_interval == 0:
                 status = fn()
                 play_count = poll_record.play_count if (poll_record is not None) else play_count
                 new_play_count = play_count - 1 if (play_count != -1) else -1

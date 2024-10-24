@@ -63,14 +63,18 @@ class CombatAction(Action):
         timing.execute_after(Timer.sec2tick(1), lambda: robot.press('Space'))  # inventory tab
         timing.wait(Timer.sec2tick(3))
 
+        # todo: how do I make sure these don't overlap - ex: need to eat food and sip potion
         if self.dodge_hazards:
             timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_combat_event)
         if self.cure_poison:
-            _, poison_status = timing.observe(Timer.sec2tick(1), self.track_poison, self.respond_to_combat_event)
+            timing.observe(Timer.sec2tick(1), self.track_poison, self.respond_to_combat_event)
         if self.sip_prayer:
-            _, prayer_status = timing.observe(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
+            timing.observe(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
         if self.eat_food:
-            _, food_status = timing.observe(Timer.sec2tick(1), self.track_hitpoints, self.respond_to_combat_event)
+            timing.observe(Timer.sec2tick(1), self.track_hitpoints, self.respond_to_combat_event)
+        for potion in self.potions:
+            timing.wait(1)
+            timing.observe(Timer.sec2tick(5), lambda: self.track_status_potion(potion), self.respond_to_combat_event)
         combat_status = timing.poll(Timer.sec2tick(1), self.poll_combat_over)
 
         exit_status = ActionStatus.IN_PROGRESS
@@ -110,6 +114,25 @@ class CombatAction(Action):
         else:
             self.combat_retry = 0  # '/' found
 
+    def respond_to_combat_event(self, timing, prev_event, event):
+        if event == CombatAction.Event.EAT_FOOD:
+            ate_food = timing.execute(lambda: robot.click_food(), capture_result=True)
+            if ate_food is False:
+                self.food_retry = self.RETRY_THRESHOLD
+            else:
+                self.food_retry = 0
+        elif event == CombatAction.Event.SIP_PRAYER:
+            timing.execute(lambda: robot.click_potion(Potion.PRAYER))
+        elif event == CombatAction.Event.CURE_POISON:
+            timing.execute(lambda: robot.click(Minimap.HEALTH_ORB))
+        elif event == CombatAction.Event.SIP_POTION:
+            print("SIP_POTION", event.ctx)
+            timing.execute(lambda: robot.click_potion(event.ctx))
+        elif event == CombatAction.Event.DODGE_HAZARD:
+            timing.execute(lambda: robot.click_contour(Color.YELLOW))
+        elif event == CombatAction.Event.FLEE:
+            self.to_flee = True
+
     def track_hitpoints(self):
         # todo: this is potentially broken now - we can flee when we're not out of food
         # eat food or teleport home on low health
@@ -122,20 +145,6 @@ class CombatAction(Action):
                 return CombatAction.Event.EAT_FOOD
         else:
             self.food_retry = 0
-
-    def respond_to_combat_event(self, timing, prev_event, event):
-        if event == CombatAction.Event.EAT_FOOD:
-            ate_food = timing.execute(lambda: robot.click_food(), capture_result=True)
-            if not ate_food:
-                self.food_retry = self.RETRY_THRESHOLD
-        elif event == CombatAction.Event.SIP_PRAYER:
-            timing.execute(lambda: robot.click_potion(Potion.PRAYER))
-        elif event == CombatAction.Event.CURE_POISON:
-            timing.execute(lambda: robot.click(Minimap.HEALTH_ORB))
-        elif event == CombatAction.Event.DODGE_HAZARD:
-            timing.execute(lambda: robot.click_contour(Color.YELLOW))
-        elif event == CombatAction.Event.FLEE:
-            self.to_flee = True
 
     def track_prayer(self):
         # sip prayer potions or teleport home on no prayer
@@ -158,6 +167,10 @@ class CombatAction(Action):
         else:
             self.poison_retry = 0
 
+    def track_status_potion(self, potion):
+        if not vision.is_status_active(potion.status):
+            return CombatAction.Event.SIP_POTION.with_ctx(potion)
+
     def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)
         if hazard is not None:
@@ -178,3 +191,13 @@ class CombatAction(Action):
         SIP_PRAYER = 4
         CURE_POISON = 5
         DODGE_HAZARD = 6
+        SIP_POTION = 7
+
+        def __new__(cls, value):
+            member = object.__new__(cls)
+            member.ctx = None
+            return member
+
+        def with_ctx(self, ctx):
+            self.ctx = ctx
+            return self

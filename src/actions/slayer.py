@@ -26,7 +26,11 @@ class SlayerAction(Action):
         config = SlayerAction.get_task_config(self.task)
         self.potions = config.potions
         self.combat_loop_action = OrchestratorAction([
-            CombatAction(health_threshold=config.health_threshold, dodge_hazards=config.dodge_hazards),
+            CombatAction(
+                health_threshold=config.health_threshold,
+                dodge_hazards=config.dodge_hazards,
+                potions=config.potions
+            ),
             PickUpItemsAction()
         ])
         self.prayer_on_action = PrayerAction(*config.prayers)
@@ -37,15 +41,7 @@ class SlayerAction(Action):
 
     def tick(self, timing):
         timing.action(self.prayer_on_action)
-        # todo: create potion action and replace this
-        timing.execute(lambda: robot.press("Space"))
-        for potion in self.potions:
-            timing.execute(lambda: print("Clicking Potion"))
-            timing.execute_after(Timer.sec2tick(1), lambda: robot.click_potion(potion))
-            timing.execute(lambda: print("Finished Clicking Potion"))
-
         timing.action(self.combat_loop_action)
-
         timing.action(self.prayer_off_action)
         return timing.complete()
 
@@ -55,10 +51,25 @@ class SlayerAction(Action):
     @staticmethod
     def get_task_config(task):
         task_configs = {
-            SlayerTask.CAVE_KRAKEN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]),
-            SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(80, [Prayer.PROTECT_FROM_MAGIC]),
-            SlayerTask.RUNE_DRAGON: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MAGIC], [Potion.ANTIFIRE]),
-            SlayerTask.SKELETAL_WYVERN: SlayerAction.Config(50, [Prayer.PROTECT_FROM_MISSILES], [Potion.ANTIFIRE]),
+            SlayerTask.CAVE_KRAKEN: SlayerAction.Config(
+                health_threshold=50,
+                prayers=[Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]
+            ),
+            SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(
+                health_threshold=75,
+                prayers=[Prayer.PROTECT_FROM_MAGIC],
+                potions=[Potion.SUPER_COMBAT]
+            ),
+            SlayerTask.RUNE_DRAGON: SlayerAction.Config(
+                health_threshold=50,
+                prayers=[Prayer.PROTECT_FROM_MAGIC],
+                potions=[Potion.SUPER_COMBAT, Potion.ANTIFIRE]
+            ),
+            SlayerTask.SKELETAL_WYVERN: SlayerAction.Config(
+                health_threshold=50,
+                prayers=[Prayer.PROTECT_FROM_MISSILES],
+                potions=[Potion.SUPER_COMBAT, Potion.ANTIFIRE]
+            ),
         }
         return task_configs[task]
 

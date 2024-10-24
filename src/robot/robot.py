@@ -46,13 +46,13 @@ def click_food():
 
 
 def click_potion(potion):
-    drank_potion = click_image(potion.doses[1], 0.95, region=Regions.INVENTORY)
+    drank_potion = click_image(potion.doses[1], 0.95, region=Regions.INVENTORY, silent=True)
     if not drank_potion:
-        drank_potion = click_image(potion.doses[2], 0.95, region=Regions.INVENTORY)
+        drank_potion = click_image(potion.doses[2], 0.95, region=Regions.INVENTORY, silent=True)
     if not drank_potion:
-        drank_potion = click_image(potion.doses[3], 0.95, region=Regions.INVENTORY)
+        drank_potion = click_image(potion.doses[3], 0.95, region=Regions.INVENTORY, silent=True)
     if not drank_potion:
-        drank_potion = click_image(potion.doses[4], 0.95, region=Regions.INVENTORY)
+        drank_potion = click_image(potion.doses[4], 0.95, region=Regions.INVENTORY, silent=True)
     return drank_potion
 
 
