@@ -91,7 +91,7 @@ class Status:
     ANTI_VENOM = ImageLoader.read('status/anti_venom.png')
     ANTIFIRE = ImageLoader.read('status/antifire.png')
 
-    GREATER_SKELETON = ImageLoader.read('status/greater_skeleton.png')
+    THRALL = ImageLoader.read('status/thrall.png')
 
 
 class PrayerProtect:

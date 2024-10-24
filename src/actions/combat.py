@@ -1,4 +1,5 @@
 import logging
+from copy import copy
 from enum import Enum
 
 from src.actions.prayer import PrayerAction
@@ -10,22 +11,15 @@ from src.robot.timing.timing import Timing
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.coordinates import StandardSpellbook, Minimap
-from src.vision.images import Potion
+from src.vision.images import Potion, Status
 
 
-# To-do:
-#  - Thrall
-#  - Status potion
-
-
-# todo: [bug] when health bar is halfway, the '/' is dropped by ocr which makes the bot erroneously think combat is over
-#   - this happens anywhere where we handle combat this way as well (barrows, cerberus, etc.)
 class CombatAction(Action):
     RETRY_THRESHOLD = 3
 
     def __init__(self, target=Color.RED, health_threshold=50, prayer_threshold=20,
-                 prayers=None, potions=None, eat_food=True, sip_prayer=False,
-                 dodge_hazards=False, cure_poison=False, flee=True):
+                 prayers=None, potions=None, thrall=None,
+                 eat_food=True, sip_prayer=False, cure_poison=False, dodge_hazards=False, flee=True):
         super().__init__()
         self.target = target
         self.health_threshold = health_threshold
@@ -37,6 +31,7 @@ class CombatAction(Action):
         self.flee = flee
         self.prayers = prayers if (prayers is not None) else []
         self.potions = potions if (potions is not None) else []
+        self.thrall = thrall
 
         self.to_flee = False
         self.food_retry = 0
@@ -66,12 +61,14 @@ class CombatAction(Action):
         # todo: how do I make sure these don't overlap - ex: need to eat food and sip potion
         if self.dodge_hazards:
             timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_combat_event)
-        if self.cure_poison:
-            timing.observe(Timer.sec2tick(1), self.track_poison, self.respond_to_combat_event)
-        if self.sip_prayer:
-            timing.observe(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
         if self.eat_food:
             timing.observe(Timer.sec2tick(1), self.track_hitpoints, self.respond_to_combat_event)
+        if self.sip_prayer:
+            timing.observe(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
+        if self.cure_poison:
+            timing.observe(Timer.sec2tick(1), self.track_poison, self.respond_to_combat_event)
+        if self.thrall:
+            timing.observe(Timer.sec2tick(1), self.track_thrall, self.respond_to_combat_event)
         for potion in self.potions:
             timing.wait(1)
             timing.observe(Timer.sec2tick(5), lambda: self.track_status_potion(potion), self.respond_to_combat_event)
@@ -122,12 +119,18 @@ class CombatAction(Action):
             else:
                 self.food_retry = 0
         elif event == CombatAction.Event.SIP_PRAYER:
+            timing.execute(lambda: print("SIP_PRAYER", event))
             timing.execute(lambda: robot.click_potion(Potion.PRAYER))
         elif event == CombatAction.Event.CURE_POISON:
             timing.execute(lambda: robot.click(Minimap.HEALTH_ORB))
         elif event == CombatAction.Event.SIP_POTION:
-            print("SIP_POTION", event.ctx)
+            timing.execute(lambda: print("SIP_POTION", event.ctx))
             timing.execute(lambda: robot.click_potion(event.ctx))
+        elif event == CombatAction.Event.SUMMON_THRALL:
+            # todo: replace with summon thrall action
+            timing.execute(lambda: robot.press('2'))  # magic tab
+            timing.execute(lambda: robot.click(self.thrall))
+            timing.execute(lambda: robot.press('Space'))  # inventory tab
         elif event == CombatAction.Event.DODGE_HAZARD:
             timing.execute(lambda: robot.click_contour(Color.YELLOW))
         elif event == CombatAction.Event.FLEE:
@@ -171,6 +174,10 @@ class CombatAction(Action):
         if not vision.is_status_active(potion.status):
             return CombatAction.Event.SIP_POTION.with_ctx(potion)
 
+    def track_thrall(self):
+        if not vision.is_status_active(Status.THRALL):
+            return CombatAction.Event.SUMMON_THRALL
+
     def track_hazards(self):
         hazard = vision.locate_contour(vision.grab_screen(), Color.MAGENTA, area_threshold=100)
         if hazard is not None:
@@ -192,6 +199,7 @@ class CombatAction(Action):
         CURE_POISON = 5
         DODGE_HAZARD = 6
         SIP_POTION = 7
+        SUMMON_THRALL = 8
 
         def __new__(cls, value):
             member = object.__new__(cls)
@@ -200,4 +208,4 @@ class CombatAction(Action):
 
         def with_ctx(self, ctx):
             self.ctx = ctx
-            return self
+            return copy(self)

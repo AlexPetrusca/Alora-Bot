@@ -20,12 +20,14 @@ class GearSwitchAction(Action):
 
         if self.condition_item is not None:
             found = timing.execute_after(Timer.sec2tick(0.1), self.is_condition_item_present, capture_result=True)
+            # found = timing.execute(self.is_condition_item_present, capture_result=True)
             if found is False:
                 return timing.abort()
 
         timing.execute(lambda: self.set_progress_message("Switching gear..."))
         for x, y in self.item_coords:
             timing.execute_after(Timer.sec2tick(0.1), lambda: robot.click(Inventory.item(x, y)))
+            # timing.execute(lambda: robot.click(Inventory.item(x, y)))
         return timing.complete()
 
     def is_condition_item_present(self):

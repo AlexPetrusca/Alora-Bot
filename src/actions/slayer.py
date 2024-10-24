@@ -7,7 +7,7 @@ from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.primitives.orchestrator import OrchestratorAction
 from src.robot import robot
 from src.robot.timing.timer import Timer
-from src.vision.coordinates import Prayer, ControlPanel
+from src.vision.coordinates import Prayer, ControlPanel, ArceuusSpellbook
 from src.vision.images import Potion
 
 
@@ -29,7 +29,8 @@ class SlayerAction(Action):
             CombatAction(
                 health_threshold=config.health_threshold,
                 dodge_hazards=config.dodge_hazards,
-                potions=config.potions
+                potions=config.potions,
+                thrall=config.thrall
             ),
             PickUpItemsAction()
         ])
@@ -74,8 +75,9 @@ class SlayerAction(Action):
         return task_configs[task]
 
     class Config:
-        def __init__(self, health_threshold=50, prayers=None, potions=None, dodge_hazards=False):
+        def __init__(self, health_threshold=50, prayers=None, potions=None, thrall=None, dodge_hazards=False):
             self.health_threshold = health_threshold
             self.prayers = prayers if (prayers is not None) else []
             self.potions = potions if (potions is not None) else []
+            self.thrall = thrall
             self.dodge_hazards = dodge_hazards
