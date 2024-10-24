@@ -38,7 +38,8 @@ class PrayerAction(Action):
             timing.execute(lambda: robot.press('1'))
             timing.execute(sync_prayers)
             if self.switch_inventory:
-                timing.execute_after(Timer.sec2tick(0.1), lambda: robot.press('Space'))
+                timing.execute(lambda: robot.press('Space'))
+                # timing.execute_after(Timer.sec2tick(0.1), lambda: robot.press('Space'))
         else:
             timing.execute(lambda: robot.click(ControlPanel.PRAYER_TAB))
             timing.execute(sync_prayers)
