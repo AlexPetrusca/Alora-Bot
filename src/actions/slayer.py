@@ -1,3 +1,4 @@
+from src.actions.combat.vampyre import VampyreAction
 from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
 from src.actions.combat.combat import CombatAction
@@ -44,6 +45,7 @@ class SlayerTask:
     VAMPYRE = Config(
         tp_target='Vampyre',
         prayers=[Prayer.PROTECT_FROM_MELEE],
+        # combat_action=VampyreAction(),
         combat_action=CombatAction(
             potions=[Potion.SUPER_COMBAT]
         ),
@@ -63,7 +65,7 @@ class SlayerAction(Action):
         self.prayer_off_action = PrayerAction()
 
     def first_tick(self):
-        # self.set_progress_message(f'Slaying {self.task.value}s...')
+        self.set_progress_message(f'Slaying {self.task.tp_target}s...')
         pass
 
     def tick(self, timing):

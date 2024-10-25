@@ -31,9 +31,8 @@ class CalibrateAction(Action):
         else:
             timing.execute(lambda: robot.right_click(Minimap.COMPASS))
             timing.execute_after(Timer.sec2tick(0.1), lambda: robot.click_image(self.direction_menu, region=Regions.MINIMAP))
-        timing.execute(lambda: robot.key_down('up'))
-        timing.execute_after(Timer.sec2tick(2), lambda: robot.key_up('up'))
-        return timing.complete()
+        timing.execute(lambda: robot.hold_key('w', 2))
+        return timing.complete_after(Timer.sec2tick(2))
 
     def last_tick(self):
         pass

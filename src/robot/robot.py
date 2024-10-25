@@ -94,3 +94,8 @@ def key_down(key):
 
 def key_up(key):
     pyautogui.keyUp(key)
+
+
+def hold_key(key, t):
+    with pyautogui.hold(key):
+        pyautogui.sleep(t)
