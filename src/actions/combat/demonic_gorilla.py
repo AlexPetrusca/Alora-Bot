@@ -1,7 +1,7 @@
 import logging
 import math
 
-from src.actions.combat import CombatAction
+from src.actions.combat.combat import CombatAction
 from src.actions.gear_switch import GearSwitchAction, GearSwitch
 from src.actions.prayer import PrayerAction
 from src.robot.timing.timer import Timer

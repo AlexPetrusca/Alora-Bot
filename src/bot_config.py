@@ -2,24 +2,19 @@ from src.actions.barrow import BarrowAction, BarrowBrother
 from src.actions.breadcrumb_trail import BreadcrumbTrailAction
 from src.actions.calibrate import CalibrateAction, Direction
 from src.actions.cerberus import CerberusAction
-from src.actions.demonic_gorillas import DemonicGorillaAction
-from src.actions.experiment import ExperimentAction
-from src.actions.gear_switch import GearSwitchAction, GearSwitch
+from src.actions.combat.demonic_gorilla import DemonicGorillaAction
 from src.actions.heal import HealAction
 from src.actions.home_teleport import HomeTeleportAction
-from src.actions.prayer import PrayerAction
 from src.actions.primitives.orchestrator import OrchestratorAction
 from src.actions.pick_up_items import PickUpItemsAction
-from src.actions.combat import CombatAction
-from src.actions.sarachnis import SarachnisAction
+from src.actions.combat.combat import CombatAction
+from src.actions.combat.sarachnis import SarachnisAction
 from src.actions.slayer import SlayerAction
 from src.actions.teleport_wizard import TeleportWizardAction
-from src.actions.tormented_demon import TormentedDemonAction
 from src.actions.wait import WaitAction
-from src.actions.zulrah import ZulrahAction
+from src.actions.combat.zulrah import ZulrahAction
 from src.vision.color import Color
 from src.vision.coordinates import Prayer
-from src.vision.images import Gear
 
 
 class BotConfig:
@@ -55,7 +50,7 @@ class BotConfig:
             CalibrateAction().play_once(),
 
             HomeTeleportAction(),
-            TeleportWizardAction(task),
+            TeleportWizardAction(task.tp_target),
 
             BreadcrumbTrailAction(trail_color),
             SlayerAction(task),

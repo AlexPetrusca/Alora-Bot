@@ -1,5 +1,4 @@
-from src.actions.combat import CombatAction
-from src.actions.types.action_status import ActionStatus
+from src.actions.combat.combat import CombatAction
 from src.robot import robot
 from src.robot.timing.timer import Timer
 from src.vision import vision

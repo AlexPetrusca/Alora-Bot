@@ -81,7 +81,7 @@ def click_contour(color, area_threshold=750, mode=ContourDetection.DISTANCE_CLOS
 
 
 def type_text(text):
-    pyautogui.press([c for c in text])
+    pyautogui.typewrite(text)
 
 
 def press(key):

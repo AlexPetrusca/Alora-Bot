@@ -99,7 +99,7 @@ class BreadcrumbTrailAction(Action):
             elif self.found_label != self.next_label:
                 self.found_label = self.next_label
                 self.found_loc = breadcrumb_loc
-                if not self.dangerous or len(modifiers) > 0:
+                if len(modifiers) > 0:
                     return self.Event.CLICK_BREADCRUMB
                 else:
                     return self.Event.SHIFT_CLICK_BREADCRUMB

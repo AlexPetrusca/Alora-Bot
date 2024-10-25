@@ -24,8 +24,6 @@ class PrayerAction(Action):
             # t1 = perf_counter()
             # print("TIMING:", t1 - t0)
 
-            print("PRAYERS:", self.prayers)
-
             # disable prayers that shouldn't be on
             for prayer in active_prayers:
                 if prayer not in self.prayers:

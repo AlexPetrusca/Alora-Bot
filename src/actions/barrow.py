@@ -1,4 +1,4 @@
-from src.actions.combat import CombatAction
+from src.actions.combat.combat import CombatAction
 from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
 from src.robot import robot

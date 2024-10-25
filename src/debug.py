@@ -4,11 +4,11 @@ from time import perf_counter
 import cv2 as cv
 import numpy as np
 
-from src.actions.demonic_gorillas import DemonicGorillaAction
+from src.actions.combat.demonic_gorilla import DemonicGorillaAction
 from src.actions.pick_up_items import PickUpItemsAction
-from src.actions.combat import CombatAction
-from src.actions.tormented_demon import TormentedDemonAction
-from src.actions.zulrah import ZulrahAction
+from src.actions.combat.combat import CombatAction
+from src.actions.combat.tormented_demon import TormentedDemonAction
+from src.actions.combat.zulrah import ZulrahAction
 from src.vision import vision
 from src.vision.color import Color
 from src.vision.regions import Regions

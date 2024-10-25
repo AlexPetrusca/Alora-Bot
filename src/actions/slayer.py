@@ -1,21 +1,53 @@
-from enum import Enum
-
 from src.actions.prayer import PrayerAction
 from src.actions.primitives.action import Action
-from src.actions.combat import CombatAction
+from src.actions.combat.combat import CombatAction
 from src.actions.pick_up_items import PickUpItemsAction
 from src.actions.primitives.orchestrator import OrchestratorAction
-from src.robot import robot
-from src.robot.timing.timer import Timer
-from src.vision.coordinates import Prayer, ControlPanel, ArceuusSpellbook
+from src.vision.coordinates import Prayer
 from src.vision.images import Potion
 
 
-class SlayerTask(Enum):
-    CAVE_KRAKEN = 'Cave Kraken'
-    RUNE_DRAGON = 'Rune Dragon'
-    BASILISK_KNIGHT = 'Basilisk Knight'
-    SKELETAL_WYVERN = 'Skeletal Wyvern'
+class SlayerTask:
+    class Config:
+        def __init__(self, tp_target, prayers, combat_action):
+            self.tp_target = tp_target
+            self.prayers = prayers
+            self.combat_action = combat_action
+
+    CAVE_KRAKEN = Config(
+        tp_target='Cave Kraken',
+        prayers=[Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT],
+        combat_action=CombatAction(),
+    )
+    RUNE_DRAGON = Config(
+        tp_target='Rune Dragon',
+        prayers=[Prayer.PROTECT_FROM_MAGIC],
+        combat_action=CombatAction(
+            potions=[Potion.SUPER_COMBAT, Potion.ANTIFIRE]
+        ),
+    )
+    BASILISK_KNIGHT = Config(
+        tp_target='Basilisk Knight',
+        prayers=[Prayer.PROTECT_FROM_MAGIC],
+        combat_action=CombatAction(
+            health_threshold=75,
+            potions=[Potion.SUPER_COMBAT]
+        ),
+    )
+    SKELETAL_WYVERN = Config(
+        tp_target='Skeletal Wyvern',
+        prayers=[Prayer.PROTECT_FROM_MAGIC],
+        combat_action=CombatAction(
+            potions=[Potion.SUPER_COMBAT, Potion.ANTIFIRE]
+        ),
+    )
+    VAMPYRE = Config(
+        tp_target='Vampyre',
+        prayers=[Prayer.PROTECT_FROM_MELEE],
+        combat_action=CombatAction(
+            potions=[Potion.SUPER_COMBAT]
+        ),
+    )
 
 
 class SlayerAction(Action):
@@ -23,22 +55,16 @@ class SlayerAction(Action):
         super().__init__()
         self.task = task
 
-        config = SlayerAction.get_task_config(self.task)
-        self.potions = config.potions
         self.combat_loop_action = OrchestratorAction([
-            CombatAction(
-                health_threshold=config.health_threshold,
-                dodge_hazards=config.dodge_hazards,
-                potions=config.potions,
-                thrall=config.thrall
-            ),
+            task.combat_action,
             PickUpItemsAction()
         ])
-        self.prayer_on_action = PrayerAction(*config.prayers)
+        self.prayer_on_action = PrayerAction(*task.prayers)
         self.prayer_off_action = PrayerAction()
 
     def first_tick(self):
-        self.set_progress_message(f'Slaying {self.task.value}s...')
+        # self.set_progress_message(f'Slaying {self.task.value}s...')
+        pass
 
     def tick(self, timing):
         timing.action(self.prayer_on_action)
@@ -48,36 +74,3 @@ class SlayerAction(Action):
 
     def last_tick(self):
         pass
-
-    @staticmethod
-    def get_task_config(task):
-        task_configs = {
-            SlayerTask.CAVE_KRAKEN: SlayerAction.Config(
-                health_threshold=50,
-                prayers=[Prayer.PROTECT_FROM_MAGIC, Prayer.MYSTIC_MIGHT]
-            ),
-            SlayerTask.BASILISK_KNIGHT: SlayerAction.Config(
-                health_threshold=75,
-                prayers=[Prayer.PROTECT_FROM_MAGIC],
-                potions=[Potion.SUPER_COMBAT]
-            ),
-            SlayerTask.RUNE_DRAGON: SlayerAction.Config(
-                health_threshold=50,
-                prayers=[Prayer.PROTECT_FROM_MAGIC],
-                potions=[Potion.SUPER_COMBAT, Potion.ANTIFIRE]
-            ),
-            SlayerTask.SKELETAL_WYVERN: SlayerAction.Config(
-                health_threshold=50,
-                prayers=[Prayer.PROTECT_FROM_MISSILES],
-                potions=[Potion.SUPER_COMBAT, Potion.ANTIFIRE]
-            ),
-        }
-        return task_configs[task]
-
-    class Config:
-        def __init__(self, health_threshold=50, prayers=None, potions=None, thrall=None, dodge_hazards=False):
-            self.health_threshold = health_threshold
-            self.prayers = prayers if (prayers is not None) else []
-            self.potions = potions if (potions is not None) else []
-            self.thrall = thrall
-            self.dodge_hazards = dodge_hazards

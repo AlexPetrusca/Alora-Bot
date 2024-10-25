@@ -1,7 +1,5 @@
-from src.actions.combat import CombatAction
+from src.actions.combat.combat import CombatAction
 from src.actions.prayer import PrayerAction
-from src.actions.primitives.action import Action
-from src.actions.types.action_status import ActionStatus
 from src.robot import robot
 from src.robot.timing.timer import Timer
 from src.vision import vision
@@ -15,7 +13,7 @@ from src.vision.vision import ContourDetection
 #   - Turn on "Entity Hider" > "Hide NPCs 2D"
 class ZulrahAction(CombatAction):
     def __init__(self):
-        super().__init__(target=None, health_threshold=70, sip_prayer=True, cure_poison=True,
+        super().__init__(target=None, health_threshold=75, sip_prayer=True, cure_poison=True,
                          potions=[Potion.RANGING], thrall=ArceuusSpellbook.RESURRECT_GREATER_SKELETON)
 
         self.prayer_action = PrayerAction(switch_to_inventory=True)
