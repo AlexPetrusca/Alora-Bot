@@ -105,7 +105,6 @@ class BreadcrumbTrailAction(Action):
                     return self.Event.SHIFT_CLICK_BREADCRUMB
 
     def respond(self, timing, from_status, to_status):
-        timing.execute(lambda: logging.info(f"TO_STATUS --> {to_status}"))
         if to_status == self.Event.CLICK_BREADCRUMB:
             timing.execute(lambda: robot.click(self.found_loc))
         elif to_status == self.Event.SHIFT_CLICK_BREADCRUMB:

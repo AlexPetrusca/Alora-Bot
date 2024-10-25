@@ -19,10 +19,12 @@ class PrayerAction(Action):
 
     def tick(self, timing):
         def sync_prayers():
-            t0 = perf_counter()
+            # t0 = perf_counter()
             active_prayers = vision.get_active_prayers()
-            t1 = perf_counter()
-            print("TIMING:", t1 - t0)
+            # t1 = perf_counter()
+            # print("TIMING:", t1 - t0)
+
+            print("PRAYERS:", self.prayers)
 
             # disable prayers that shouldn't be on
             for prayer in active_prayers:
@@ -48,9 +50,18 @@ class PrayerAction(Action):
 
         return timing.complete()
 
+    def enable_prayers(self, *prayers):
+        self.prayers = self.prayers.union(prayers)
+
+    def disable_prayers(self, *prayers):
+        self.prayers = self.prayers.difference(prayers)
+
+    def set_prayers(self, *prayers):
+        self.disable_all_prayers()
+        self.enable_prayers(*prayers)
+
+    def disable_all_prayers(self):
+        self.prayers.clear()
+
     def last_tick(self):
         pass
-
-    @classmethod
-    def DISABLE_ALL(cls):
-        return PrayerAction()

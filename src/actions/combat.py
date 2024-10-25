@@ -62,9 +62,9 @@ class CombatAction(Action):
         if self.dodge_hazards:
             timing.observe(Timer.sec2tick(0.5), self.track_hazards, self.respond_to_combat_event)
         if self.eat_food:
-            timing.observe(Timer.sec2tick(1), self.track_hitpoints, self.respond_to_combat_event)
+            timing.listen(Timer.sec2tick(0.5), self.track_hitpoints, self.respond_to_combat_event)
         if self.sip_prayer:
-            timing.observe(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
+            timing.listen(Timer.sec2tick(1), self.track_prayer, self.respond_to_combat_event)
         if self.cure_poison:
             timing.observe(Timer.sec2tick(1), self.track_poison, self.respond_to_combat_event)
         if self.thrall:
@@ -113,31 +113,36 @@ class CombatAction(Action):
 
     def respond_to_combat_event(self, timing, prev_event, event):
         if event == CombatAction.Event.EAT_FOOD:
+            timing.execute(lambda: print("[Combat Event] EAT_FOOD:", event))
             ate_food = timing.execute(lambda: robot.click_food(), capture_result=True)
             if ate_food is False:
                 self.food_retry = self.RETRY_THRESHOLD
             else:
                 self.food_retry = 0
         elif event == CombatAction.Event.SIP_PRAYER:
-            timing.execute(lambda: print("SIP_PRAYER", event))
+            timing.execute(lambda: print("[Combat Event] SIP_PRAYER:", event))
             timing.execute(lambda: robot.click_potion(Potion.PRAYER))
         elif event == CombatAction.Event.CURE_POISON:
+            timing.execute(lambda: print("[Combat Event] CURE_POISON:", event))
             timing.execute(lambda: robot.click(Minimap.HEALTH_ORB))
         elif event == CombatAction.Event.SIP_POTION:
-            timing.execute(lambda: print("SIP_POTION", event.ctx))
+            timing.execute(lambda: print("[Combat Event] SIP_POTION:", event.ctx))
             timing.execute(lambda: robot.click_potion(event.ctx))
         elif event == CombatAction.Event.SUMMON_THRALL:
+            timing.execute(lambda: print("[Combat Event] SUMMON_THRALL:", event.ctx))
             # todo: replace with summon thrall action
             timing.execute(lambda: robot.press('2'))  # magic tab
             timing.execute(lambda: robot.click(self.thrall))
             timing.execute(lambda: robot.press('Space'))  # inventory tab
         elif event == CombatAction.Event.DODGE_HAZARD:
+            timing.execute(lambda: print("[Combat Event] DODGE_HAZARD:", event.ctx))
             timing.execute(lambda: robot.click_contour(Color.YELLOW))
         elif event == CombatAction.Event.FLEE:
             self.to_flee = True
 
     def track_hitpoints(self):
         # todo: this is potentially broken now - we can flee when we're not out of food
+        #   - ALSO, WE CAN'T CHAIN EAT ANYMORE! HUGE PROBLEM!
         # eat food or teleport home on low health
         if vision.read_hitpoints() < self.health_threshold:
             if self.flee and self.food_retry >= self.RETRY_THRESHOLD:

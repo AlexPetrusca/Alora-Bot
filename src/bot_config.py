@@ -64,6 +64,25 @@ class BotConfig:
         ]
 
     @staticmethod
+    def zulrah():
+        return [
+            WaitAction(5).play_once(),
+            CalibrateAction().play_once(),
+
+            HomeTeleportAction(),
+            TeleportWizardAction("Zulrah"),
+
+            BreadcrumbTrailAction(Color.YELLOW, target=0),
+            OrchestratorAction([
+                ZulrahAction(),
+                PickUpItemsAction(),
+            ]),
+
+            CalibrateAction(Direction.NORTH),
+            HealAction(bank=True)
+        ]
+
+    @staticmethod
     def sarachnis():
         return [
             WaitAction(5).play_once(),

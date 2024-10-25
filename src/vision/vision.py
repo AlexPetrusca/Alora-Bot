@@ -60,7 +60,7 @@ def is_status_active(status):
 
 def is_poisoned():
     hitpoints_bar = grab_region(Regions.CP_HITPOINTS_BAR)
-    x, y = Regions.CP_HITPOINTS_BAR.w // 2, Regions.CP_HITPOINTS_BAR.h - 5
+    x, y = Regions.CP_HITPOINTS_BAR.w, 2 * Regions.CP_HITPOINTS_BAR.h - 5
     target_pixel = hitpoints_bar[y][x]
 
     healthy_score = Color.HEALTHY.distance(target_pixel)

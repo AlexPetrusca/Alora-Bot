@@ -37,22 +37,22 @@ def shift_click(x, y=None):
 
 
 def click_food():
-    ate_food = click_image(Food.MONKFISH, 0.9, region=Regions.CONTROL_PANEL, silent=True)
+    ate_food = click_image(Food.MONKFISH, 0.99, region=Regions.CONTROL_PANEL, silent=True)
     if not ate_food:
-        ate_food = click_image(Food.SHARK, 0.9, region=Regions.CONTROL_PANEL, silent=True)
+        ate_food = click_image(Food.SHARK, 0.99, region=Regions.CONTROL_PANEL, silent=True)
     if not ate_food:
-        ate_food = click_image(Food.MANTA_RAY, 0.9, region=Regions.CONTROL_PANEL, silent=True)
+        ate_food = click_image(Food.MANTA_RAY, 0.99, region=Regions.CONTROL_PANEL, silent=True)
     return ate_food
 
 
 def click_potion(potion):
-    drank_potion = click_image(potion.doses[1], 0.95, region=Regions.INVENTORY, silent=True)
+    drank_potion = click_image(potion.doses[1], 0.99, region=Regions.INVENTORY, silent=True)
     if not drank_potion:
-        drank_potion = click_image(potion.doses[2], 0.95, region=Regions.INVENTORY, silent=True)
+        drank_potion = click_image(potion.doses[2], 0.99, region=Regions.INVENTORY, silent=True)
     if not drank_potion:
-        drank_potion = click_image(potion.doses[3], 0.95, region=Regions.INVENTORY, silent=True)
+        drank_potion = click_image(potion.doses[3], 0.99, region=Regions.INVENTORY, silent=True)
     if not drank_potion:
-        drank_potion = click_image(potion.doses[4], 0.95, region=Regions.INVENTORY, silent=True)
+        drank_potion = click_image(potion.doses[4], 0.99, region=Regions.INVENTORY, silent=True)
     return drank_potion
 
 

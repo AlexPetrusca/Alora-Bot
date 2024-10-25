@@ -115,6 +115,46 @@ class Timing:
         else:
             return None  # interval not called yet
 
+    def listen(self, tick_interval, fn, cb):
+        if not callable(fn):
+            raise AssertionError(f"{fn} is not callable")
+
+        def run_cb(timing, status, triggered_tick):
+            tick_offset_restore = self.tick_offset
+            self.tick_offset = triggered_tick
+            param_count = len(inspect.signature(cb).parameters)
+            if param_count == 3:
+                cb(timing, None, status)
+            elif param_count == 2:
+                cb(timing, status)
+            elif param_count == 1:
+                cb(timing)
+            else:
+                cb()
+            self.tick_offset = tick_offset_restore
+
+        key = Timing.get_request_identifier()
+
+        # reset latch on first tick
+        if self.tick_counter == self.tick_offset:
+            listen_record = self.timing_records.get(key)
+            if listen_record is not None:
+                self.timing_records.pop(key)
+
+        # process listen on subsequent ticks
+        listen_record = self.timing_records.get(key)
+        if self.tick_counter >= self.tick_offset and (self.tick_counter - self.tick_offset) % tick_interval == 0:
+            status = fn()
+            self.timing_records[key] = TimingRecord(self.tick_counter, status)
+            run_cb(self, status, self.tick_counter)
+            return status  # current listen value
+
+        if listen_record is not None:
+            run_cb(self, listen_record.status, listen_record.tick)
+            return listen_record.status  # last listen value
+        else:
+            return None  # listen not called yet
+
     def observe(self, tick_interval, fn, cb, default_status=None):
         if not callable(fn):
             raise AssertionError(f"{fn} is not callable")
@@ -122,7 +162,6 @@ class Timing:
         def run_cb(timing, from_status, to_status, triggered_tick):
             tick_offset_restore = self.tick_offset
             self.tick_offset = triggered_tick
-
             param_count = len(inspect.signature(cb).parameters)
             if param_count == 3:
                 cb(timing, from_status, to_status)
@@ -130,7 +169,6 @@ class Timing:
                 cb(timing)
             else:
                 cb()
-
             self.tick_offset = tick_offset_restore
 
         key = Timing.get_request_identifier()
@@ -164,7 +202,7 @@ class Timing:
 
         # process poll on subsequent ticks
         poll_record = self.timing_records.get(key)
-        if poll_record is None or poll_record.status is default_status:
+        if poll_record is None or poll_record.status == default_status:
             is_playable = play_count == -1 or poll_record is None or poll_record.play_count > 0
             if not is_playable:
                 return Timing.PollStatus.ABORTED
@@ -174,7 +212,7 @@ class Timing:
                 play_count = poll_record.play_count if (poll_record is not None) else play_count
                 new_play_count = play_count - 1 if (play_count != -1) else -1
                 self.timing_records[key] = TimingRecord(self.tick_counter, status, play_count=new_play_count)
-                if status is not default_status:
+                if status != default_status:
                     self.timing_records[key] = TimingRecord(self.tick_counter, status)
                     self.tick_offset = self.tick_counter
                     return status  # event found

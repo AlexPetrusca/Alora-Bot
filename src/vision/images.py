@@ -64,24 +64,6 @@ class Food:
     MANTA_RAY = ImageLoader.read('item/food/manta_ray.png')
 
 
-class Potion:
-    class PotionDescriptor:
-        def __init__(self, potion, status):
-            self.doses = [
-                None,
-                ImageLoader.read(f'item/herblore/potion/{potion}/1.png'),
-                ImageLoader.read(f'item/herblore/potion/{potion}/2.png'),
-                ImageLoader.read(f'item/herblore/potion/{potion}/3.png'),
-                ImageLoader.read(f'item/herblore/potion/{potion}/4.png'),
-            ]
-            if status is not None:
-                self.status = ImageLoader.read(f'status/{status}.png')
-
-    ANTIFIRE = PotionDescriptor('antifire', 'antifire')
-    PRAYER = PotionDescriptor('prayer', None)
-    SUPER_COMBAT = PotionDescriptor('super_combat', 'attack')
-
-
 class Status:
     ATTACK = ImageLoader.read('status/attack.png')
     STRENGTH = ImageLoader.read('status/strength.png')
@@ -92,6 +74,24 @@ class Status:
     ANTIFIRE = ImageLoader.read('status/antifire.png')
 
     THRALL = ImageLoader.read('status/thrall.png')
+
+
+class Potion:
+    class PotionDescriptor:
+        def __init__(self, potion, status=None):
+            self.doses = [
+                None,
+                ImageLoader.read(f'item/herblore/potion/{potion}/1.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/2.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/3.png'),
+                ImageLoader.read(f'item/herblore/potion/{potion}/4.png'),
+            ]
+            self.status = status
+
+    PRAYER = PotionDescriptor('prayer')
+    ANTIFIRE = PotionDescriptor('antifire', Status.ANTIFIRE)
+    SUPER_COMBAT = PotionDescriptor('super_combat', Status.ATTACK)
+    RANGING = PotionDescriptor('ranging', Status.RANGED)
 
 
 class PrayerProtect:
